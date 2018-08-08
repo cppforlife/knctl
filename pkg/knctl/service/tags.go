@@ -144,12 +144,17 @@ func (t Tags) Untag(revision v1alpha1.Revision, tag string) error {
 	encodedTag := rfc6901Encoder.Replace(t.label(tag))
 	patchJSON := []byte(fmt.Sprintf(`[{"op":"remove", "path":"/metadata/labels/%s"}]`, encodedTag))
 
-	_, err := t.servingClient.ServingV1alpha1().Revisions(revision.Namespace).Patch(revision.Name, types.JSONPatchType, patchJSON)
-	if err != nil {
-		return fmt.Errorf("Untagging revision: %s", err)
+	var lastErr error
+
+	// TODO better way to avoid race: 'unable to find api field in struct...'
+	for i := 0; i < 5; i++ {
+		_, lastErr = t.servingClient.ServingV1alpha1().Revisions(revision.Namespace).Patch(revision.Name, types.JSONPatchType, patchJSON)
+		if lastErr == nil {
+			return nil
+		}
 	}
 
-	return nil
+	return fmt.Errorf("Untagging revision: %s", lastErr)
 }
 
 func (t Tags) label(tag string) string {

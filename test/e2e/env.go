@@ -26,6 +26,9 @@ type Env struct {
 	BuildGitRevision    string
 	BuildImage          string
 	BuildServiceAccount string
+
+	BuildGitRevisionV1 string
+	BuildGitRevisionV2 string
 }
 
 func BuildEnv(t *testing.T) Env {
@@ -34,6 +37,10 @@ func BuildEnv(t *testing.T) Env {
 		BuildGitRevision:    os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION"),
 		BuildImage:          os.Getenv("KNCTL_E2E_BUILD_IMAGE"),
 		BuildServiceAccount: os.Getenv("KNCTL_E2E_BUILD_SERVICE_ACCOUNT"),
+
+		// See deploy_with_build_test.go for usage
+		BuildGitRevisionV1: os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION_V1"),
+		BuildGitRevisionV2: os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION_V2"),
 	}
 	env.Validate(t)
 	return env
@@ -51,5 +58,11 @@ func (e Env) Validate(t *testing.T) {
 	}
 	if len(e.BuildServiceAccount) == 0 {
 		t.Fatalf("Expected BuildServiceAccount to be non-empty")
+	}
+	if len(e.BuildGitRevisionV1) == 0 {
+		t.Fatalf("Expected BuildGitRevisionV1 to be non-empty")
+	}
+	if len(e.BuildGitRevisionV2) == 0 {
+		t.Fatalf("Expected BuildGitRevisionV2 to be non-empty")
 	}
 }
