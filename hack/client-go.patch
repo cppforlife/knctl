@@ -1,0 +1,13 @@
+diff --git a/vendor/k8s.io/client-go/plugin/pkg/client/auth/azure/azure.go b/vendor/k8s.io/client-go/plugin/pkg/client/auth/azure/azure.go
+index 60304b0..e14dc8d 100644
+--- a/vendor/k8s.io/client-go/plugin/pkg/client/auth/azure/azure.go
++++ b/vendor/k8s.io/client-go/plugin/pkg/client/auth/azure/azure.go
+@@ -297,7 +297,7 @@ func (ts *azureTokenSource) refreshToken(token *azureToken) (*azureToken, error)
+ 	}
+ 
+ 	return &azureToken{
+-		token:       spt.Token,
++		token:       spt.Token(),
+ 		clientID:    token.clientID,
+ 		tenantID:    token.tenantID,
+ 		apiserverID: token.apiserverID,

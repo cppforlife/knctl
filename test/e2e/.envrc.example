@@ -1,0 +1,4 @@
+export KNCTL_E2E_BUILD_GIT_URL=https://github.com/cppforlife/simple-app
+export KNCTL_E2E_BUILD_GIT_REVISION=master
+export KNCTL_E2E_BUILD_IMAGE=docker.io/dkalinin/test-push:latest
+export KNCTL_E2E_BUILD_SERVICE_ACCOUNT=gcr-build-bot-aug-2
