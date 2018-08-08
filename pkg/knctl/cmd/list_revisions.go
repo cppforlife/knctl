@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
@@ -102,7 +103,7 @@ func (o *ListRevisionsOptions) Run() error {
 			NewAllocatedTrafficPercentValue(service, rev),
 			uitable.NewValueString(string(rev.Spec.ServingState)),
 			uitable.NewValueTime(rev.CreationTimestamp.Time),
-			uitable.NewValueInterface(rev.Annotations),
+			o.filterAnnotations(rev.Annotations),
 		})
 	}
 
@@ -120,4 +121,14 @@ func NewAllocatedTrafficPercentValue(svc *v1alpha1.Service, rev v1alpha1.Revisio
 		}
 	}
 	return uitable.NewValueSuffix(uitable.NewValueInt(percent), "%")
+}
+
+func (*ListRevisionsOptions) filterAnnotations(anns map[string]string) uitable.Value {
+	result := map[string]string{}
+	for k, v := range anns {
+		if !strings.HasPrefix(k, serving.GroupName) {
+			result[k] = v
+		}
+	}
+	return uitable.NewValueInterface(result)
 }
