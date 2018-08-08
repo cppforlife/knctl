@@ -87,12 +87,12 @@ func (o *ListRevisionsOptions) Run() error {
 			uitable.NewHeader("Tags"),
 			uitable.NewHeader("Allocated Traffic %"),
 			uitable.NewHeader("Serving State"),
-			uitable.NewHeader("Created At"),
 			uitable.NewHeader("Annotations"),
+			uitable.NewHeader("Created At"),
 		},
 
 		SortBy: []uitable.ColumnSort{
-			{Column: 4, Asc: false}, // Show latest first
+			{Column: 5, Asc: false}, // Show latest first
 		},
 	}
 
@@ -102,8 +102,8 @@ func (o *ListRevisionsOptions) Run() error {
 			uitable.NewValueStrings(ctlservice.NewTags(servingClient).List(rev)),
 			NewAllocatedTrafficPercentValue(service, rev),
 			uitable.NewValueString(string(rev.Spec.ServingState)),
+			NewAnnotationsValue(rev.Annotations),
 			uitable.NewValueTime(rev.CreationTimestamp.Time),
-			o.filterAnnotations(rev.Annotations),
 		})
 	}
 
@@ -123,7 +123,7 @@ func NewAllocatedTrafficPercentValue(svc *v1alpha1.Service, rev v1alpha1.Revisio
 	return uitable.NewValueSuffix(uitable.NewValueInt(percent), "%")
 }
 
-func (*ListRevisionsOptions) filterAnnotations(anns map[string]string) uitable.Value {
+func NewAnnotationsValue(anns map[string]string) uitable.Value {
 	result := map[string]string{}
 	for k, v := range anns {
 		if !strings.HasPrefix(k, serving.GroupName) {
