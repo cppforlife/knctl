@@ -54,6 +54,9 @@ func NewKnctlCmd(o *KnctlOptions) *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 
+		// Disable docs header
+		DisableAutoGenTag: true,
+
 		// TODO bash completion
 	}
 
