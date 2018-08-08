@@ -16,4 +16,4 @@
 
 set -e -x -u
 
-KNCTL_NAMESPACE= go run ./hack/generate-docs.go
+KNCTL_KUBECONFIG= KNCTL_NAMESPACE= go run ./hack/generate-docs.go

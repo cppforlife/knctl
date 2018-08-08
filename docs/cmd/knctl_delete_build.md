@@ -23,7 +23,7 @@ knctl delete build [flags]
 ```
   -b, --build string       Specified build
   -h, --help               help for build
-  -n, --namespace string   Specified namespace
+  -n, --namespace string   Specified namespace (can be provided via environment variable KNCTL_NAMESPACE)
 ```
 
 ### Options inherited from parent commands
@@ -31,7 +31,7 @@ knctl delete build [flags]
 ```
       --column strings      Filter to show only given columns
       --json                Output as JSON
-      --kubeconfig string   Path to the kubeconfig file (default "/Users/pivotal/.kube/config")
+      --kubeconfig string   Path to the kubeconfig file (can be provided via environment variable KNCTL_KUBECONFIG) (default "/Users/pivotal/.kube/config")
       --no-color            Disable colorized output
       --non-interactive     Don't ask for user input
       --tty                 Force TTY-like output

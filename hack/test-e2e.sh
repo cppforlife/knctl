@@ -16,4 +16,4 @@
 
 set -e -x -u
 
-KNCTL_NAMESPACE= GOCACHE=off go test ./test/e2e/ -test.v
+KNCTL_KUBECONFIG= KNCTL_NAMESPACE= GOCACHE=off go test ./test/e2e/ -test.v

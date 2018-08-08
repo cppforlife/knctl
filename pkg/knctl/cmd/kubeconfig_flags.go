@@ -28,8 +28,11 @@ type KubeconfigFlags struct {
 }
 
 func (f *KubeconfigFlags) Set(cmd *cobra.Command) {
-	defaultPath := filepath.Join(f.homeDir(), ".kube", "config")
-	cmd.PersistentFlags().StringVar(&f.Path, "kubeconfig", defaultPath, "Path to the kubeconfig file")
+	defaultPath := os.Getenv("KNCTL_KUBECONFIG")
+	if len(defaultPath) == 0 {
+		defaultPath = filepath.Join(f.homeDir(), ".kube", "config")
+	}
+	cmd.PersistentFlags().StringVar(&f.Path, "kubeconfig", defaultPath, "Path to the kubeconfig file (can be provided via environment variable KNCTL_KUBECONFIG)")
 }
 
 func (*KubeconfigFlags) homeDir() string {
