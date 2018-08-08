@@ -40,8 +40,9 @@ func NewAnnotateServiceOptions(ui ui.UI, depsFactory DepsFactory) *AnnotateServi
 
 func NewAnnotateServiceCmd(o *AnnotateServiceOptions) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "service",
-		Short: "Annotate service",
+		Use:     "service",
+		Aliases: serviceAliases,
+		Short:   "Annotate service",
 		Example: `
   # Annotate service 'srv1' in namespace 'ns1' with key and value
   knctl annotate service -s srv1 -a key=value -n ns1`,

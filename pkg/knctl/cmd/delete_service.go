@@ -37,8 +37,9 @@ func NewDeleteServiceOptions(ui ui.UI, depsFactory DepsFactory) *DeleteServiceOp
 
 func NewDeleteServiceCmd(o *DeleteServiceOptions) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "service",
-		Short: "Delete service",
+		Use:     "service",
+		Aliases: serviceAliases,
+		Short:   "Delete service",
 		Example: `
   # Delete service 'svc1' in namespace 'ns1'
   knctl delete service -s svc1 -n ns1`,

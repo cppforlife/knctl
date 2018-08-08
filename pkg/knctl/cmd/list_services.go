@@ -39,7 +39,7 @@ func NewListServicesOptions(ui ui.UI, depsFactory DepsFactory) *ListServicesOpti
 func NewListServicesCmd(o *ListServicesOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "services",
-		Aliases: []string{"s", "svc", "service"},
+		Aliases: servicesAliases,
 		Short:   "List services",
 		Long:    "List all services in a namespace",
 		Example: `

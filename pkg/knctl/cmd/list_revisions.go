@@ -44,7 +44,7 @@ func NewListRevisionsOptions(ui ui.UI, depsFactory DepsFactory) *ListRevisionsOp
 func NewListRevisionsCmd(o *ListRevisionsOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "revisions",
-		Aliases: []string{"r", "rs", "rev", "revs", "revision"},
+		Aliases: revisionsAliases,
 		Short:   "List revisions",
 		Long:    "List all revisions for a service",
 		Example: `

@@ -41,8 +41,9 @@ func NewAnnotateRevisionOptions(ui ui.UI, depsFactory DepsFactory) *AnnotateRevi
 
 func NewAnnotateRevisionCmd(o *AnnotateRevisionOptions) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "revision",
-		Short: "Annotate revision",
+		Use:     "revision",
+		Aliases: revisionAliases,
+		Short:   "Annotate revision",
 		Example: `
   # Annotate revision 'rev1' in namespace 'ns1' with key and value
   knctl annotate revision -r rev1 -a key=value -n ns1`,

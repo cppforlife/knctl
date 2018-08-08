@@ -38,8 +38,9 @@ func NewDeleteRevisionOptions(ui ui.UI, depsFactory DepsFactory) *DeleteRevision
 
 func NewDeleteRevisionCmd(o *DeleteRevisionOptions) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "revision",
-		Short: "Delete revision",
+		Use:     "revision",
+		Aliases: revisionAliases,
+		Short:   "Delete revision",
 		Example: `
   # Delete revision 'rev1' in namespace 'ns1'
   knctl delete revision -r rev1 -n ns1`,
