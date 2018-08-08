@@ -88,6 +88,7 @@ func NewKnctlCmd(o *KnctlOptions) *cobra.Command {
 	cmd.AddCommand(deleteCmd)
 
 	annotateCmd := NewAnnotateCmd()
+	annotateCmd.AddCommand(NewAnnotateServiceCmd(NewAnnotateServiceOptions(o.ui, o.depsFactory)))
 	annotateCmd.AddCommand(NewAnnotateRevisionCmd(NewAnnotateRevisionOptions(o.ui, o.depsFactory)))
 	cmd.AddCommand(annotateCmd)
 

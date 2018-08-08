@@ -18,4 +18,4 @@ set -e -x -u
 
 ./hack/build.sh
 
-KNCTL_KUBECONFIG= KNCTL_NAMESPACE= GOCACHE=off go test ./test/e2e/ -test.v
+KNCTL_KUBECONFIG= KNCTL_NAMESPACE= GOCACHE=off go test ./test/e2e/ -test.v $@

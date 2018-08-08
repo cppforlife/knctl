@@ -71,6 +71,7 @@ func (o *ListServicesOptions) Run() error {
 			uitable.NewHeader("Name"),
 			uitable.NewHeader("Domain"),
 			uitable.NewHeader("Internal Domain"),
+			uitable.NewHeader("Annotations"),
 			uitable.NewHeader("Created At"),
 		},
 
@@ -84,6 +85,7 @@ func (o *ListServicesOptions) Run() error {
 			uitable.NewValueString(svc.Name),
 			uitable.NewValueString(svc.Status.Domain),
 			uitable.NewValueString(svc.Status.DomainInternal),
+			NewAnnotationsValue(svc.Annotations),
 			uitable.NewValueTime(svc.CreationTimestamp.Time),
 		})
 	}

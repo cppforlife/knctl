@@ -31,4 +31,5 @@ knctl annotate [flags]
 
 * [knctl](knctl.md)	 - knctl controls Knative resources
 * [knctl annotate revision](knctl_annotate_revision.md)	 - Annotate revision
+* [knctl annotate service](knctl_annotate_service.md)	 - Annotate service
 
