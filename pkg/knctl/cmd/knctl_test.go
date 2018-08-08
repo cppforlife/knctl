@@ -91,6 +91,10 @@ func TestNewKnctlCmd_ValidateAllCommandExamples(t *testing.T) {
 				t.Fatalf("Expected example command '%s' to start with 'knctl'", line)
 			}
 
+			// recreate for every command since cobra persists some state
+			noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
+			rootCmd := NewKnctlCmd(NewDefaultKnctlOptions(noopUI))
+
 			testCmd := NewTestCmd(t, rootCmd)
 			testCmd.Execute(args[1:])
 			testCmd.ExpectReachesExecution()
