@@ -37,7 +37,7 @@ func NewPodWatcher(
 	return PodWatcher{podsClient, listOpts}
 }
 
-func (w PodWatcher) Watch(podsToWatch chan corev1.Pod, cancelCh chan struct{}) error {
+func (w PodWatcher) Watch(podsToWatchCh chan corev1.Pod, cancelCh chan struct{}) error {
 	watcher, err := w.podsClient.Watch(w.listOpts)
 	if err != nil {
 		return fmt.Errorf("Creating Pod watcher: %s", err)
@@ -51,7 +51,14 @@ func (w PodWatcher) Watch(podsToWatch chan corev1.Pod, cancelCh chan struct{}) e
 	}
 
 	for _, pod := range podsList.Items {
-		podsToWatch <- pod
+		podsToWatchCh <- pod
+	}
+
+	// Return before potentially getting any events
+	select {
+	case <-cancelCh:
+		return nil
+	default:
 	}
 
 	for {
@@ -68,7 +75,7 @@ func (w PodWatcher) Watch(podsToWatch chan corev1.Pod, cancelCh chan struct{}) e
 
 			switch e.Type {
 			case watch.Added:
-				podsToWatch <- *pod
+				podsToWatchCh <- *pod
 			}
 
 		case <-cancelCh:

@@ -37,7 +37,7 @@ func NewRevisionWatcher(
 	return RevisionWatcher{revisionsClient, listOpts}
 }
 
-func (w RevisionWatcher) Watch(revisionsToWatch chan v1alpha1.Revision, cancelCh chan struct{}) error {
+func (w RevisionWatcher) Watch(revisionsToWatchCh chan v1alpha1.Revision, cancelCh chan struct{}) error {
 	watcher, err := w.revisionsClient.Watch(w.listOpts)
 	if err != nil {
 		return fmt.Errorf("Creating Revision watcher: %s", err)
@@ -51,7 +51,14 @@ func (w RevisionWatcher) Watch(revisionsToWatch chan v1alpha1.Revision, cancelCh
 	}
 
 	for _, revision := range revisionsList.Items {
-		revisionsToWatch <- revision
+		revisionsToWatchCh <- revision
+	}
+
+	// Return before potentially getting any events
+	select {
+	case <-cancelCh:
+		return nil
+	default:
 	}
 
 	for {
@@ -68,7 +75,7 @@ func (w RevisionWatcher) Watch(revisionsToWatch chan v1alpha1.Revision, cancelCh
 
 			switch e.Type {
 			case watch.Added:
-				revisionsToWatch <- *revision
+				revisionsToWatchCh <- *revision
 			}
 
 		case <-cancelCh:

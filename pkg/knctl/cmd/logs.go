@@ -22,14 +22,9 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/cppforlife/knctl/pkg/knctl/logs"
-	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
 	"github.com/knative/serving/pkg/apis/serving"
-	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
-	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 type LogsOptions struct {
@@ -73,138 +68,77 @@ func (o *LogsOptions) Run() error {
 		return fmt.Errorf("Expected --lines to be greater than zero since --follow is not specified")
 	}
 
-	servingClient, err := o.depsFactory.ServingClient()
+	tailOpts := logs.PodLogOpts{Follow: o.Follow}
+
+	if o.Lines != 0 {
+		tailOpts.Lines = &o.Lines
+	}
+
+	podsToWatchCh, cancelPodTailCh, err := o.setUpPodWatching()
 	if err != nil {
 		return err
 	}
-
-	revisionWatcher := ctlservice.NewRevisionWatcher(
-		servingClient.ServingV1alpha1().Revisions(o.ServiceFlags.NamespaceFlags.Name),
-		metav1.ListOptions{
-			LabelSelector: labels.Set(map[string]string{
-				serving.ConfigurationLabelKey: o.ServiceFlags.Name,
-			}).String(),
-		},
-	)
 
 	coreClient, err := o.depsFactory.CoreClient()
 	if err != nil {
 		return err
 	}
 
-	podsClient := coreClient.CoreV1().Pods(o.ServiceFlags.NamespaceFlags.Name)
+	var wg sync.WaitGroup
 
-	podWatcherFunc := func(revision v1alpha1.Revision) ctlservice.PodWatcher {
-		return ctlservice.NewPodWatcher(
-			podsClient,
-			metav1.ListOptions{
-				LabelSelector: labels.Set(map[string]string{
-					serving.RevisionUID: string(revision.UID),
-				}).String(),
-			},
-		)
+	for pod := range podsToWatchCh {
+		pod := pod
+		wg.Add(1)
+
+		go func() {
+			podsClient := coreClient.CoreV1().Pods(pod.Namespace)
+			tag := fmt.Sprintf("%s > %s", pod.Labels[serving.RevisionLabelKey], pod.Name)
+
+			err := logs.NewPodContainerLog(pod, "user-container", podsClient, tag, tailOpts).Tail(o.ui, cancelPodTailCh)
+			if err != nil {
+				o.ui.BeginLinef("Pod logs tailing error: %s\n", err)
+			}
+
+			wg.Done()
+		}()
 	}
 
-	return o.tail(revisionWatcher, podWatcherFunc, podsClient)
+	wg.Wait()
+
+	return nil
 }
 
-func (o *LogsOptions) tail(
-	revisionWatcher ctlservice.RevisionWatcher,
-	podWatcherFunc func(rev v1alpha1.Revision) ctlservice.PodWatcher,
-	podsClient typedcorev1.PodInterface) error {
-
-	cancelResWatchCh := make(chan struct{})
-	cancelPodTailCh := make(chan struct{})
-	doneCh := make(chan struct{})
-	revisionsToWatchCh := make(chan v1alpha1.Revision)
+func (o *LogsOptions) setUpPodWatching() (chan corev1.Pod, chan struct{}, error) {
 	podsToWatchCh := make(chan corev1.Pod)
-
-	// Watch revisions in this service
-	go func() {
-		err := revisionWatcher.Watch(revisionsToWatchCh, cancelResWatchCh)
-		if err != nil {
-			o.ui.BeginLinef("Revision watching error: %s\n", err)
-		}
-		close(revisionsToWatchCh)
-	}()
-
-	// Watch pods in each revision
-	go func() {
-		var wg sync.WaitGroup
-
-		watchedRevs := map[string]struct{}{}
-
-		for revision := range revisionsToWatchCh {
-			revision := revision
-
-			revUID := string(revision.UID)
-			if _, found := watchedRevs[revUID]; found {
-				continue
-			}
-
-			watchedRevs[revUID] = struct{}{}
-			wg.Add(1)
-
-			go func() {
-				err := podWatcherFunc(revision).Watch(podsToWatchCh, cancelResWatchCh)
-				if err != nil {
-					o.ui.BeginLinef("Pod watching error: %s\n", err)
-				}
-				wg.Done()
-			}()
-		}
-
-		wg.Wait()
-		close(podsToWatchCh)
-	}()
-
-	// Tail logs for each pod
-	go func() {
-		var wg sync.WaitGroup
-
-		watchedPods := map[string]struct{}{}
-		tailOpts := logs.PodLogOpts{Follow: o.Follow}
-
-		if o.Lines != 0 {
-			tailOpts.Lines = &o.Lines
-		}
-
-		for pod := range podsToWatchCh {
-			pod := pod
-
-			podUID := string(pod.UID)
-			if _, found := watchedPods[podUID]; found {
-				continue
-			}
-
-			watchedPods[podUID] = struct{}{}
-			wg.Add(1)
-
-			go func() {
-				tag := fmt.Sprintf("%s > %s", pod.Labels[serving.RevisionLabelKey], pod.Name)
-				err := logs.NewPodContainerLog(pod, "user-container", podsClient, tag, tailOpts).Tail(o.ui, cancelPodTailCh)
-				if err != nil {
-					o.ui.BeginLinef("Pod logs tailing error: %s\n", err)
-				}
-				wg.Done()
-			}()
-		}
-
-		wg.Wait()
-
-		doneCh <- struct{}{}
-	}()
+	cancelPodTailCh := make(chan struct{})
+	cancelCh := make(chan struct{})
 
 	if o.Follow {
 		o.cancelSignals.Watch(func() {
-			close(cancelResWatchCh)
+			close(cancelCh)
 			close(cancelPodTailCh)
 		})
 	} else {
-		close(cancelResWatchCh)
+		close(cancelCh)
 	}
 
-	<-doneCh
+	servingClient, err := o.depsFactory.ServingClient()
+	if err != nil {
+		return podsToWatchCh, cancelPodTailCh, err
+	}
 
-	return nil
+	coreClient, err := o.depsFactory.CoreClient()
+	if err != nil {
+		return podsToWatchCh, cancelPodTailCh, err
+	}
+
+	watcher := NewRevisionPodWatcher(
+		o.ServiceFlags.NamespaceFlags.Name, o.ServiceFlags.Name, servingClient, coreClient, o.ui)
+
+	go func() {
+		watcher.Watch(podsToWatchCh, cancelCh)
+		close(podsToWatchCh)
+	}()
+
+	return podsToWatchCh, cancelPodTailCh, nil
 }

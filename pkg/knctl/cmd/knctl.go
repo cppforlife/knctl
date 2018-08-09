@@ -75,6 +75,7 @@ func NewKnctlCmd(o *KnctlOptions) *cobra.Command {
 	listCmd := NewListCmd()
 	listCmd.AddCommand(NewListServicesCmd(NewListServicesOptions(o.ui, o.depsFactory)))
 	listCmd.AddCommand(NewListRevisionsCmd(NewListRevisionsOptions(o.ui, o.depsFactory)))
+	listCmd.AddCommand(NewListPodsCmd(NewListPodsOptions(o.ui, o.depsFactory)))
 	listCmd.AddCommand(NewListBuildsCmd(NewListBuildsOptions(o.ui, o.depsFactory)))
 	listCmd.AddCommand(NewListRoutesCmd(NewListRoutesOptions(o.ui, o.depsFactory)))
 	listCmd.AddCommand(NewListIngressesCmd(NewListIngressesOptions(o.ui, o.depsFactory)))
