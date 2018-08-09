@@ -25,7 +25,8 @@ import (
 
 func TestBasicDeploy(t *testing.T) {
 	logger := Logger{}
-	knctl := Knctl{t, logger}
+	env := BuildEnv(t)
+	knctl := Knctl{t, env.Namespace, logger}
 	curl := Curl{t, knctl}
 
 	const (
@@ -34,11 +35,11 @@ func TestBasicDeploy(t *testing.T) {
 	)
 
 	logger.Section("Delete previous service with the same name if exists", func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 	})
 
 	defer func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 	}()
 
 	logger.Section("Deploy service", func() {
@@ -52,7 +53,7 @@ func TestBasicDeploy(t *testing.T) {
 	})
 
 	logger.Section("Checking if service was added", func() {
-		out := knctl.Run([]string{"list", "services", "-n", "default", "--json"})
+		out := knctl.Run([]string{"list", "services", "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		var foundService bool
@@ -78,7 +79,7 @@ func TestBasicDeploy(t *testing.T) {
 			"Hello world received a request.",
 		}
 
-		out := knctl.Run([]string{"logs", "-n", "default", "-s", serviceName})
+		out := knctl.Run([]string{"logs", "-s", serviceName})
 
 		for _, line := range expectedLogLines {
 			if !strings.Contains(out, line) {
@@ -88,9 +89,9 @@ func TestBasicDeploy(t *testing.T) {
 	})
 
 	logger.Section("Deleting service", func() {
-		knctl.Run([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.Run([]string{"delete", "service", "-s", serviceName})
 
-		out := knctl.Run([]string{"list", "services", "-n", "default", "--json"})
+		out := knctl.Run([]string{"list", "services", "--json"})
 		if strings.Contains(out, serviceName) {
 			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
 		}

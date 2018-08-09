@@ -22,6 +22,8 @@ import (
 )
 
 type Env struct {
+	Namespace string
+
 	BuildGitURL         string
 	BuildGitRevision    string
 	BuildImage          string
@@ -33,6 +35,8 @@ type Env struct {
 
 func BuildEnv(t *testing.T) Env {
 	env := Env{
+		Namespace: os.Getenv("KNCTL_E2E_NAMESPACE"),
+
 		BuildGitURL:         os.Getenv("KNCTL_E2E_BUILD_GIT_URL"),
 		BuildGitRevision:    os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION"),
 		BuildImage:          os.Getenv("KNCTL_E2E_BUILD_IMAGE"),
@@ -47,6 +51,9 @@ func BuildEnv(t *testing.T) Env {
 }
 
 func (e Env) Validate(t *testing.T) {
+	if len(e.Namespace) == 0 {
+		t.Fatalf("Expected Namespace to be non-empty")
+	}
 	if len(e.BuildGitURL) == 0 {
 		t.Fatalf("Expected BuildGitURL to be non-empty")
 	}

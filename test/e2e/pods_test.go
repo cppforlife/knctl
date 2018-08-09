@@ -25,7 +25,8 @@ import (
 
 func TestPods(t *testing.T) {
 	logger := Logger{}
-	knctl := Knctl{t, logger}
+	env := BuildEnv(t)
+	knctl := Knctl{t, env.Namespace, logger}
 	curl := Curl{t, knctl}
 
 	const (
@@ -35,17 +36,16 @@ func TestPods(t *testing.T) {
 	)
 
 	logger.Section("Delete previous service with the same name if exists", func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 	})
 
 	defer func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 	}()
 
 	logger.Section("Deploy service", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContent1,
@@ -57,7 +57,6 @@ func TestPods(t *testing.T) {
 	logger.Section("Deploy additional revision", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContent2,
@@ -67,7 +66,7 @@ func TestPods(t *testing.T) {
 	})
 
 	logger.Section("Check listing of pods", func() {
-		out := knctl.Run([]string{"list", "pods", "-n", "default", "-s", serviceName, "--json"})
+		out := knctl.Run([]string{"list", "pods", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		if len(resp.Tables[0].Rows) != 2 {
@@ -92,9 +91,9 @@ func TestPods(t *testing.T) {
 	})
 
 	logger.Section("Deleting service", func() {
-		knctl.Run([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.Run([]string{"delete", "service", "-s", serviceName})
 
-		out := knctl.Run([]string{"list", "services", "-n", "default", "--json"})
+		out := knctl.Run([]string{"list", "services", "--json"})
 		if strings.Contains(out, serviceName) {
 			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
 		}

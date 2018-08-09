@@ -26,7 +26,8 @@ import (
 
 func TestRevisions(t *testing.T) {
 	logger := Logger{}
-	knctl := Knctl{t, logger}
+	env := BuildEnv(t)
+	knctl := Knctl{t, env.Namespace, logger}
 	curl := Curl{t, knctl}
 
 	const (
@@ -43,17 +44,16 @@ func TestRevisions(t *testing.T) {
 	})
 
 	logger.Section("Delete previous service with the same name if exists", func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 	})
 
 	defer func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 	}()
 
 	logger.Section("Deploy revision 1", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContentRev1,
@@ -61,7 +61,7 @@ func TestRevisions(t *testing.T) {
 	})
 
 	logger.Section("Checking if revision was added", func() {
-		out := knctl.Run([]string{"list", "revisions", "-n", "default", "-s", serviceName, "--json"})
+		out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		if len(resp.Tables[0].Rows) != 1 {
@@ -76,7 +76,6 @@ func TestRevisions(t *testing.T) {
 	logger.Section("Deploy revision 2", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContentRev2,
@@ -84,7 +83,7 @@ func TestRevisions(t *testing.T) {
 	})
 
 	logger.Section("Checking if revision was added", func() {
-		out := knctl.Run([]string{"list", "revisions", "-n", "default", "-s", serviceName, "--json"})
+		out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		if len(resp.Tables[0].Rows) != 2 {
@@ -99,7 +98,6 @@ func TestRevisions(t *testing.T) {
 	logger.Section("Deploy revision 3", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContentRev3,
@@ -107,7 +105,7 @@ func TestRevisions(t *testing.T) {
 	})
 
 	logger.Section("Checking if revision was added", func() {
-		out := knctl.Run([]string{"list", "revisions", "-n", "default", "-s", serviceName, "--json"})
+		out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		if len(resp.Tables[0].Rows) != 3 {
@@ -120,11 +118,11 @@ func TestRevisions(t *testing.T) {
 	})
 
 	logger.Section("Deleting revision", func() {
-		knctl.Run([]string{"delete", "revision", "-n", "default", "-r", serviceName + "-00002"}) // TODO better way to find out?
+		knctl.Run([]string{"delete", "revision", "-r", serviceName + "-00002"}) // TODO better way to find out?
 	})
 
 	logger.Section("Checking if revison was deleted", func() {
-		out := knctl.Run([]string{"list", "revisions", "-n", "default", "-s", serviceName, "--json"})
+		out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		if len(resp.Tables[0].Rows) != 2 {
@@ -133,9 +131,9 @@ func TestRevisions(t *testing.T) {
 	})
 
 	logger.Section("Deleting service", func() {
-		knctl.Run([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.Run([]string{"delete", "service", "-s", serviceName})
 
-		out := knctl.Run([]string{"list", "services", "-n", "default", "--json"})
+		out := knctl.Run([]string{"list", "services", "--json"})
 		if strings.Contains(out, serviceName) {
 			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
 		}

@@ -27,18 +27,19 @@ import (
 
 func TestAnnotateService(t *testing.T) {
 	logger := Logger{}
-	knctl := Knctl{t, logger}
+	env := BuildEnv(t)
+	knctl := Knctl{t, env.Namespace, logger}
 
 	const (
 		serviceName = "test-annotate-service-service-name"
 	)
 
 	logger.Section("Delete previous service with the same name if exists", func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 	})
 
 	defer func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 	}()
 
 	logger.Section("Deploy service", func() {
@@ -58,7 +59,7 @@ func TestAnnotateService(t *testing.T) {
 	)
 
 	logger.Section("Checking that there are no annotations", func() {
-		out := knctl.Run([]string{"list", "services", "-n", "default", "--json"})
+		out := knctl.Run([]string{"list", "services", "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		var foundService bool
@@ -87,21 +88,21 @@ func TestAnnotateService(t *testing.T) {
 	})
 
 	logger.Section("Annotating services", func() {
-		out := knctl.Run([]string{"list", "services", "-n", "default", "--json"})
+		out := knctl.Run([]string{"list", "services", "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		for _, row := range resp.Tables[0].Rows {
 			if row["name"] == serviceName {
 				ann1 := fmt.Sprintf("%s=%s", annotationKey, annotationValue)
 				ann2 := fmt.Sprintf("%s=%s", annotationCustomNameKey, row["name"])
-				knctl.Run([]string{"annotate", "service", "-n", "default", "-s", row["name"], "-a", ann1, "-a", ann2})
+				knctl.Run([]string{"annotate", "service", "-s", row["name"], "-a", ann1, "-a", ann2})
 				break
 			}
 		}
 	})
 
 	logger.Section("Checking that there are annotations", func() {
-		out := knctl.Run([]string{"list", "services", "-n", "default", "--json"})
+		out := knctl.Run([]string{"list", "services", "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		var foundService bool
@@ -133,9 +134,9 @@ func TestAnnotateService(t *testing.T) {
 	})
 
 	logger.Section("Deleting service", func() {
-		knctl.Run([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.Run([]string{"delete", "service", "-s", serviceName})
 
-		out := knctl.Run([]string{"list", "services", "-n", "default", "--json"})
+		out := knctl.Run([]string{"list", "services", "--json"})
 		if strings.Contains(out, serviceName) {
 			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
 		}

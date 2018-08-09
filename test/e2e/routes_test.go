@@ -25,7 +25,8 @@ import (
 
 func TestRoutes(t *testing.T) {
 	logger := Logger{}
-	knctl := Knctl{t, logger}
+	env := BuildEnv(t)
+	knctl := Knctl{t, env.Namespace, logger}
 
 	const (
 		routeName    = "test-routes-name"
@@ -34,27 +35,26 @@ func TestRoutes(t *testing.T) {
 	)
 
 	logger.Section("Delete previous route with the same name if exists", func() {
-		knctl.RunWithErr([]string{"delete", "route", "-n", "default", "--route", routeName})
+		knctl.RunWithOpts([]string{"delete", "route", "-n", "default", "--route", routeName}, RunOpts{AllowError: true})
 	})
 
 	defer func() {
-		knctl.RunWithErr([]string{"delete", "route", "-n", "default", "--route", routeName})
+		knctl.RunWithOpts([]string{"delete", "route", "-n", "default", "--route", routeName}, RunOpts{AllowError: true})
 	}()
 
 	logger.Section("Delete previous service with the same name if exists", func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName1})
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName2})
+		knctl.RunWithOpts([]string{"delete", "service", "-n", "default", "-s", serviceName1}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"delete", "service", "-n", "default", "-s", serviceName2}, RunOpts{AllowError: true})
 	})
 
 	defer func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName1})
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName2})
+		knctl.RunWithOpts([]string{"delete", "service", "-n", "default", "-s", serviceName1}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"delete", "service", "-n", "default", "-s", serviceName2}, RunOpts{AllowError: true})
 	}()
 
 	logger.Section("Deploy services that can be routed to", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName1,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + serviceName1,
@@ -62,7 +62,6 @@ func TestRoutes(t *testing.T) {
 
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName2,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + serviceName2,
@@ -72,7 +71,6 @@ func TestRoutes(t *testing.T) {
 	logger.Section("Create route", func() {
 		knctl.Run([]string{
 			"route",
-			"-n", "default",
 			"--route", routeName,
 			"-p", serviceName1 + ":latest=50%",
 			"-p", serviceName2 + ":latest=50%",
@@ -112,7 +110,6 @@ func TestRoutes(t *testing.T) {
 	logger.Section("Reconfigure route", func() {
 		knctl.Run([]string{
 			"route",
-			"-n", "default",
 			"--route", routeName,
 			"-p", serviceName1 + ":latest=20%",
 			"-p", serviceName2 + ":latest=80%",

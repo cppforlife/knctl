@@ -26,7 +26,8 @@ import (
 
 func TestLogsFollow(t *testing.T) {
 	logger := Logger{}
-	knctl := Knctl{t, logger}
+	env := BuildEnv(t)
+	knctl := Knctl{t, env.Namespace, logger}
 	curl := Curl{t, knctl}
 
 	const (
@@ -43,17 +44,16 @@ func TestLogsFollow(t *testing.T) {
 	})
 
 	logger.Section("Delete previous service with the same name if exists", func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 	})
 
 	defer func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 	}()
 
 	logger.Section("Deploy revision 1", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContentRev1,
@@ -70,14 +70,13 @@ func TestLogsFollow(t *testing.T) {
 
 	// Start tailing logs in the backgroud
 	go func() {
-		collectedLogs, _ = knctl.RunWithCancel([]string{"logs", "-n", "default", "-s", serviceName, "-f"}, cancelCh)
+		collectedLogs, _ = knctl.RunWithOpts([]string{"logs", "-s", serviceName, "-f"}, RunOpts{CancelCh: cancelCh})
 		doneCh <- struct{}{}
 	}()
 
 	logger.Section("Deploy revision 2 and check its logs", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContentRev2,
@@ -89,7 +88,6 @@ func TestLogsFollow(t *testing.T) {
 	logger.Section("Deploy revision 3 and check its logs", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContentRev3,
@@ -109,7 +107,7 @@ func TestLogsFollow(t *testing.T) {
 			"Hello world received a request.",
 		}
 
-		out := knctl.Run([]string{"list", "revisions", "-n", "default", "-s", serviceName, "--json"})
+		out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		if len(resp.Tables[0].Rows) != 3 {
@@ -119,17 +117,19 @@ func TestLogsFollow(t *testing.T) {
 		var matchedLines int
 
 		for _, row := range resp.Tables[0].Rows {
+			expectedRevision := row["name"]
+
 			for _, expectedLogLine := range expectedLogLines {
 				var found bool
 				for _, line := range collectedLogsLines {
-					if strings.HasPrefix(line, row["name"]+" >") && strings.HasSuffix(line, expectedLogLine) {
+					if strings.HasPrefix(line, expectedRevision+" >") && strings.HasSuffix(line, expectedLogLine) {
 						found = true
 						matchedLines++
 						break
 					}
 				}
 				if !found {
-					t.Fatalf("Expected to find log line '%s' in service logs: '%s'", expectedLogLine, collectedLogs)
+					t.Fatalf("Expected to find log line '%s' for revision '%s' in service logs: '%s'", expectedLogLine, expectedRevision, collectedLogs)
 				}
 			}
 		}
@@ -140,9 +140,9 @@ func TestLogsFollow(t *testing.T) {
 	})
 
 	logger.Section("Deleting service", func() {
-		knctl.Run([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.Run([]string{"delete", "service", "-s", serviceName})
 
-		out := knctl.Run([]string{"list", "services", "-n", "default", "--json"})
+		out := knctl.Run([]string{"list", "services", "--json"})
 		if strings.Contains(out, serviceName) {
 			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
 		}

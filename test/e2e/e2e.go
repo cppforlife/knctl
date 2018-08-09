@@ -27,53 +27,50 @@ import (
 )
 
 type Knctl struct {
-	t *testing.T
-	l Logger
+	t         *testing.T
+	namespace string
+	l         Logger
+}
+
+type RunOpts struct {
+	NoNamespace bool
+	AllowError  bool
+	CancelCh    chan struct{}
 }
 
 func (k Knctl) Run(args []string) string {
-	out, err := k.RunWithErr(args)
-	if err != nil {
-		k.t.Fatalf("Failed to successfully execute '%s': %v", k.cmdDesc(args), err)
-	}
-
+	out, _ := k.RunWithOpts(args, RunOpts{})
 	return out
 }
 
-func (k Knctl) RunWithErr(args []string) (string, error) {
+func (k Knctl) RunWithOpts(args []string, opts RunOpts) (string, error) {
 	k.l.Debugf("Running '%s'...\n", k.cmdDesc(args))
 
-	var stderr bytes.Buffer
-
-	cmd := exec.Command("knctl", args...)
-	cmd.Stderr = &stderr
-
-	out, err := cmd.Output()
-	if err != nil {
-		err = fmt.Errorf("Execution error: stderr: '%s' error: '%s'", stderr.String(), err)
+	if !opts.NoNamespace {
+		args = append(args, []string{"-n", k.namespace}...)
 	}
 
-	return string(out), err
-}
-
-func (k Knctl) RunWithCancel(args []string, cancelCh chan struct{}) (string, error) {
-	k.l.Debugf("Running '%s'...\n", k.cmdDesc(args))
-
 	var stderr bytes.Buffer
 
 	cmd := exec.Command("knctl", args...)
 	cmd.Stderr = &stderr
 
-	go func() {
-		select {
-		case <-cancelCh:
-			cmd.Process.Signal(os.Interrupt)
-		}
-	}()
+	if opts.CancelCh != nil {
+		go func() {
+			select {
+			case <-opts.CancelCh:
+				cmd.Process.Signal(os.Interrupt)
+			}
+		}()
+	}
 
 	out, err := cmd.Output()
 	if err != nil {
 		err = fmt.Errorf("Execution error: stderr: '%s' error: '%s'", stderr.String(), err)
+
+		if !opts.AllowError {
+			k.t.Fatalf("Failed to successfully execute '%s': %v", k.cmdDesc(args), err)
+		}
 	}
 
 	return string(out), err
@@ -104,7 +101,7 @@ func (c Curl) WaitForContent(serviceName, expectedContent string) {
 	var out string
 
 	for i := 0; i < 100; i++ {
-		out, _ = c.knctl.RunWithErr([]string{"curl", "-n", "default", "-s", serviceName})
+		out, _ = c.knctl.RunWithOpts([]string{"curl", "-n", "default", "-s", serviceName}, RunOpts{AllowError: true})
 		if strings.Contains(out, expectedContent) {
 			curledSuccessfully = true
 			break

@@ -22,9 +22,9 @@ import (
 )
 
 func TestDeployWithBuild(t *testing.T) {
-	env := BuildEnv(t)
 	logger := Logger{}
-	knctl := Knctl{t, logger}
+	env := BuildEnv(t)
+	knctl := Knctl{t, env.Namespace, logger}
 	curl := Curl{t, knctl}
 
 	const (
@@ -34,17 +34,16 @@ func TestDeployWithBuild(t *testing.T) {
 	)
 
 	logger.Section("Delete previous service with the same name if exists", func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 	})
 
 	defer func() {
-		knctl.RunWithErr([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 	}()
 
 	logger.Section("Deploy service v1", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevisionV1,
@@ -61,7 +60,6 @@ func TestDeployWithBuild(t *testing.T) {
 	logger.Section("Deploy service v2 with a Git change (new env variable)", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevisionV2,
@@ -76,9 +74,9 @@ func TestDeployWithBuild(t *testing.T) {
 	})
 
 	logger.Section("Deleting service", func() {
-		knctl.Run([]string{"delete", "service", "-n", "default", "-s", serviceName})
+		knctl.Run([]string{"delete", "service", "-s", serviceName})
 
-		out := knctl.Run([]string{"list", "services", "-n", "default", "--json"})
+		out := knctl.Run([]string{"list", "services", "--json"})
 		if strings.Contains(out, serviceName) {
 			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
 		}

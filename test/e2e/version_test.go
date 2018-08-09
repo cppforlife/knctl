@@ -22,9 +22,10 @@ import (
 )
 
 func TestVersion(t *testing.T) {
-	knctl := Knctl{t, Logger{}}
+	env := BuildEnv(t)
+	knctl := Knctl{t, env.Namespace, Logger{}}
 
-	out := knctl.Run([]string{"version"})
+	out, _ := knctl.RunWithOpts([]string{"version"}, RunOpts{NoNamespace: true})
 
 	if !strings.Contains(out, "Client Version") {
 		t.Fatalf("Expected to find client version")
