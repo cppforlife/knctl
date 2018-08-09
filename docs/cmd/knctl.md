@@ -26,6 +26,7 @@ knctl [flags]
 
 * [knctl annotate](knctl_annotate.md)	 - Annotate resources (revision)
 * [knctl build](knctl_build.md)	 - Build source code into image
+* [knctl create](knctl_create.md)	 - Create resources (namespace)
 * [knctl curl](knctl_curl.md)	 - Curl service
 * [knctl delete](knctl_delete.md)	 - Delete resource (service, revision)
 * [knctl deploy](knctl_deploy.md)	 - Deploy service

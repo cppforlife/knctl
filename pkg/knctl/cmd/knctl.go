@@ -72,6 +72,10 @@ func NewKnctlCmd(o *KnctlOptions) *cobra.Command {
 	cmd.AddCommand(NewBuildCmd(NewBuildOptions(o.ui, o.depsFactory, CancelSignals{})))
 	cmd.AddCommand(NewRouteCmd(NewRouteOptions(o.ui, o.depsFactory)))
 
+	createCmd := NewCreateCmd()
+	createCmd.AddCommand(NewCreateNamespaceCmd(NewCreateNamespaceOptions(o.ui, o.depsFactory)))
+	cmd.AddCommand(createCmd)
+
 	listCmd := NewListCmd()
 	listCmd.AddCommand(NewListServicesCmd(NewListServicesOptions(o.ui, o.depsFactory)))
 	listCmd.AddCommand(NewListRevisionsCmd(NewListRevisionsOptions(o.ui, o.depsFactory)))
