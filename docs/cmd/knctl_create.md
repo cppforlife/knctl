@@ -30,5 +30,8 @@ knctl create [flags]
 ### SEE ALSO
 
 * [knctl](knctl.md)	 - knctl controls Knative resources
+* [knctl create basic-auth-secret](knctl_create_basic-auth-secret.md)	 - Create basic auth secret
 * [knctl create namespace](knctl_create_namespace.md)	 - Create namespace
+* [knctl create service-account](knctl_create_service-account.md)	 - Create service account
+* [knctl create ssh-auth-secret](knctl_create_ssh-auth-secret.md)	 - Create basic auth secret
 

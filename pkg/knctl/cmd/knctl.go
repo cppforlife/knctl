@@ -74,6 +74,9 @@ func NewKnctlCmd(o *KnctlOptions) *cobra.Command {
 
 	createCmd := NewCreateCmd()
 	createCmd.AddCommand(NewCreateNamespaceCmd(NewCreateNamespaceOptions(o.ui, o.depsFactory)))
+	createCmd.AddCommand(NewCreateServiceAccountCmd(NewCreateServiceAccountOptions(o.ui, o.depsFactory)))
+	createCmd.AddCommand(NewCreateBasicAuthSecretCmd(NewCreateBasicAuthSecretOptions(o.ui, o.depsFactory)))
+	createCmd.AddCommand(NewCreateSSHAuthSecretCmd(NewCreateSSHAuthSecretOptions(o.ui, o.depsFactory)))
 	cmd.AddCommand(createCmd)
 
 	listCmd := NewListCmd()

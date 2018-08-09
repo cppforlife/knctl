@@ -1,0 +1,71 @@
+/*
+Copyright 2018 The Knative Authors
+
+Licensed under the Apache License, Open 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package cmd
+
+import (
+	"fmt"
+	"github.com/spf13/cobra"
+)
+
+type BasicAuthSecretCreateFlags struct {
+	Type     string
+	URL      string
+	Username string
+	Password string
+
+	DockerHub bool
+	GCR       bool
+}
+
+func (s *BasicAuthSecretCreateFlags) Set(cmd *cobra.Command) {
+	cmd.Flags().StringVar(&s.Type, "type", "", "Set type (example: docker, ssh)")
+	cmd.Flags().StringVar(&s.URL, "url", "", "Set url (example: https://index.docker.io/v1/, https://github.com)")
+
+	cmd.Flags().StringVarP(&s.Username, "username", "u", "", "Set username")
+	cmd.MarkFlagRequired("username")
+
+	cmd.Flags().StringVarP(&s.Password, "password", "p", "", "Set password")
+	cmd.MarkFlagRequired("password")
+
+	cmd.Flags().BoolVar(&s.DockerHub, "docker-hub", false, "Use Docker Hub registry (automatically fills 'type' and 'url')")
+	cmd.Flags().BoolVar(&s.GCR, "gcr", false, "Use gcr.io registry (automatically fills 'type' and 'url')")
+}
+
+func (s *BasicAuthSecretCreateFlags) BackfillTypeAndURL() error {
+	if s.GCR || s.DockerHub {
+		if len(s.Type) != 0 || len(s.URL) != 0 {
+			return fmt.Errorf("Expected to not specify --type or --url when preconfigured registry flags are used")
+		}
+	}
+
+	switch {
+	case s.DockerHub:
+		s.Type = "docker"
+		s.URL = "https://index.docker.io/v1/"
+
+	case s.GCR:
+		s.Type = "docker"
+		s.URL = "https://gcr.io"
+
+	default:
+		if len(s.Type) == 0 || len(s.URL) == 0 {
+			return fmt.Errorf("Expected --type and --url to be non-empty when preconfigured registry flags are not used")
+		}
+	}
+
+	return nil
+}
