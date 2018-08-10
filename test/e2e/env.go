@@ -24,27 +24,28 @@ import (
 type Env struct {
 	Namespace string
 
-	BuildGitURL         string
-	BuildGitRevision    string
-	BuildImage          string
-	BuildServiceAccount string
-
+	BuildGitURL        string
+	BuildGitRevision   string
 	BuildGitRevisionV1 string
 	BuildGitRevisionV2 string
+
+	BuildImage          string
+	BuildDockerUsername string
+	BuildDockerPassword string
 }
 
 func BuildEnv(t *testing.T) Env {
 	env := Env{
 		Namespace: os.Getenv("KNCTL_E2E_NAMESPACE"),
 
-		BuildGitURL:         os.Getenv("KNCTL_E2E_BUILD_GIT_URL"),
-		BuildGitRevision:    os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION"),
-		BuildImage:          os.Getenv("KNCTL_E2E_BUILD_IMAGE"),
-		BuildServiceAccount: os.Getenv("KNCTL_E2E_BUILD_SERVICE_ACCOUNT"),
-
-		// See deploy_with_build_test.go for usage
-		BuildGitRevisionV1: os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION_V1"),
+		BuildGitURL:        os.Getenv("KNCTL_E2E_BUILD_GIT_URL"),
+		BuildGitRevision:   os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION"),
+		BuildGitRevisionV1: os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION_V1"), // See deploy_with_build_test.go for usage
 		BuildGitRevisionV2: os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION_V2"),
+
+		BuildImage:          os.Getenv("KNCTL_E2E_BUILD_IMAGE"),
+		BuildDockerUsername: os.Getenv("KNCTL_E2E_BUILD_DOCKER_USERNAME"),
+		BuildDockerPassword: os.Getenv("KNCTL_E2E_BUILD_DOCKER_PASSWORD"),
 	}
 	env.Validate(t)
 	return env
@@ -54,22 +55,27 @@ func (e Env) Validate(t *testing.T) {
 	if len(e.Namespace) == 0 {
 		t.Fatalf("Expected Namespace to be non-empty")
 	}
+
 	if len(e.BuildGitURL) == 0 {
 		t.Fatalf("Expected BuildGitURL to be non-empty")
 	}
 	if len(e.BuildGitRevision) == 0 {
 		t.Fatalf("Expected BuildGitRevision to be non-empty")
 	}
-	if len(e.BuildImage) == 0 {
-		t.Fatalf("Expected BuildImage to be non-empty")
-	}
-	if len(e.BuildServiceAccount) == 0 {
-		t.Fatalf("Expected BuildServiceAccount to be non-empty")
-	}
 	if len(e.BuildGitRevisionV1) == 0 {
 		t.Fatalf("Expected BuildGitRevisionV1 to be non-empty")
 	}
 	if len(e.BuildGitRevisionV2) == 0 {
 		t.Fatalf("Expected BuildGitRevisionV2 to be non-empty")
+	}
+
+	if len(e.BuildImage) == 0 {
+		t.Fatalf("Expected BuildImage to be non-empty")
+	}
+	if len(e.BuildDockerUsername) == 0 {
+		t.Fatalf("Expected BuildDockerUsername to be non-empty")
+	}
+	if len(e.BuildDockerPassword) == 0 {
+		t.Fatalf("Expected BuildDockerPassword to be non-empty")
 	}
 }

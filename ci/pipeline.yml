@@ -54,11 +54,11 @@ jobs:
           version: xenial
       params:
         KUBECONFIG_CONTENTS: ((kubeconfig))
-        DOCKER_USERNAME: ((docker_username))
-        DOCKER_PASSWORD: ((docker_password))
         KNCTL_E2E_BUILD_GIT_URL: https://github.com/cppforlife/simple-app
         KNCTL_E2E_BUILD_GIT_REVISION: master
-        KNCTL_E2E_BUILD_IMAGE: docker.io/dkalinin/test-push:latest
+        KNCTL_E2E_BUILD_IMAGE: docker.io/dkalinin/simple-app:latest
+        KNCTL_E2E_BUILD_DOCKER_USERNAME: ((docker_username))
+        KNCTL_E2E_BUILD_DOCKER_PASSWORD: ((docker_password))
         KNCTL_E2E_BUILD_GIT_REVISION_V1: v1
         KNCTL_E2E_BUILD_GIT_REVISION_V2: v2
       run:
@@ -101,13 +101,7 @@ jobs:
           }
           trap finish EXIT
 
-          set +x
-          knctl create basic-auth-secret -s registry1 --docker-hub -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-          knctl create service-account -a acct1 -s registry1
-          set -x
           export KNCTL_E2E_NAMESPACE=$KNCTL_NAMESPACE
-          export KNCTL_E2E_BUILD_SERVICE_ACCOUNT=acct1
-
           ./hack/test-e2e.sh 
       inputs:
       - name: knctl

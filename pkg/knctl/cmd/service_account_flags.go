@@ -21,8 +21,8 @@ import (
 )
 
 type ServiceAccountFlags struct {
-	Name           string
 	NamespaceFlags NamespaceFlags
+	Name           string
 }
 
 func (s *ServiceAccountFlags) Set(cmd *cobra.Command) {

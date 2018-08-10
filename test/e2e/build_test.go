@@ -27,10 +27,13 @@ func TestBuildSuccess(t *testing.T) {
 	logger := Logger{}
 	env := BuildEnv(t)
 	knctl := Knctl{t, env.Namespace, logger}
+	kubectl := Kubectl{t, env.Namespace, logger}
 
 	const (
-		buildName            = "test-build-success-service-name"
-		expectedKanikoOutput = "Taking snapshot of full filesystem"
+		buildName               = "test-build-success-service-name"
+		buildDockerSecretName   = buildName + "-docker-secret"
+		buildServiceAccountName = buildName + "-service-account"
+		expectedBuildOutput     = "Taking snapshot of full filesystem" // coming from kaniko
 	)
 
 	logger.Section("Delete previous build with the same name if exists", func() {
@@ -39,7 +42,22 @@ func TestBuildSuccess(t *testing.T) {
 
 	defer func() {
 		knctl.RunWithOpts([]string{"delete", "build", "-b", buildName}, RunOpts{AllowError: true})
+		kubectl.RunWithOpts([]string{"delete", "secret", buildDockerSecretName}, RunOpts{AllowError: true})
+		kubectl.RunWithOpts([]string{"delete", "serviceaccount", buildServiceAccountName}, RunOpts{AllowError: true})
 	}()
+
+	logger.Section("Add service account with Docker push secret", func() {
+		knctl.RunWithOpts([]string{
+			"create",
+			"basic-auth-secret",
+			"-s", buildDockerSecretName,
+			"--docker-hub",
+			"-u", env.BuildDockerUsername,
+			"-p", env.BuildDockerPassword,
+		}, RunOpts{Redact: true})
+
+		knctl.Run([]string{"create", "service-account", "-a", buildServiceAccountName, "-s", buildDockerSecretName})
+	})
 
 	logger.Section("Run build and see log output", func() {
 		out := knctl.Run([]string{
@@ -48,11 +66,11 @@ func TestBuildSuccess(t *testing.T) {
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevision,
 			"-i", env.BuildImage,
-			"--service-account-name", env.BuildServiceAccount,
+			"--service-account-name", buildServiceAccountName,
 		})
 
 		// TODO stronger assertion of generated image?
-		if !strings.Contains(out, expectedKanikoOutput) {
+		if !strings.Contains(out, expectedBuildOutput) {
 			t.Fatalf("Expected to see kaniko output, but was: %s", out)
 		}
 
@@ -96,14 +114,36 @@ func TestBuildFailed(t *testing.T) {
 	logger := Logger{}
 	env := BuildEnv(t)
 	knctl := Knctl{t, env.Namespace, logger}
+	kubectl := Kubectl{t, env.Namespace, logger}
 
 	const (
-		buildName          = "test-build-failed-service-name"
-		expectedErrorOuput = "Unexpected error running git"
+		buildName               = "test-build-failed-service-name"
+		buildDockerSecretName   = buildName + "-docker-secret"
+		buildServiceAccountName = buildName + "-service-account"
+		expectedErrorOuput      = "Unexpected error running git"
 	)
 
 	logger.Section("Delete previous build with the same name if exists", func() {
 		knctl.RunWithOpts([]string{"delete", "build", "-b", buildName}, RunOpts{AllowError: true})
+	})
+
+	defer func() {
+		knctl.RunWithOpts([]string{"delete", "build", "-b", buildName}, RunOpts{AllowError: true})
+		kubectl.RunWithOpts([]string{"delete", "secret", buildDockerSecretName}, RunOpts{AllowError: true})
+		kubectl.RunWithOpts([]string{"delete", "serviceaccount", buildServiceAccountName}, RunOpts{AllowError: true})
+	}()
+
+	logger.Section("Add service account with Docker push secret", func() {
+		knctl.RunWithOpts([]string{
+			"create",
+			"basic-auth-secret",
+			"-s", buildDockerSecretName,
+			"--docker-hub",
+			"-u", env.BuildDockerUsername,
+			"-p", env.BuildDockerPassword,
+		}, RunOpts{Redact: true})
+
+		knctl.Run([]string{"create", "service-account", "-a", buildServiceAccountName, "-s", buildDockerSecretName})
 	})
 
 	logger.Section("Run build and see it fail", func() {
@@ -113,7 +153,7 @@ func TestBuildFailed(t *testing.T) {
 			"--git-url", "invalid-git-url",
 			"--git-revision", "invalid-git-revision",
 			"-i", env.BuildImage,
-			"--service-account-name", env.BuildServiceAccount,
+			"--service-account-name", buildServiceAccountName,
 		}, RunOpts{AllowError: true})
 
 		if err == nil {

@@ -21,8 +21,8 @@ import (
 )
 
 type SecretFlags struct {
-	Name           string
 	NamespaceFlags NamespaceFlags
+	Name           string
 }
 
 func (s *SecretFlags) Set(cmd *cobra.Command) {

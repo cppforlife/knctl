@@ -25,12 +25,15 @@ func TestDeployWithBuild(t *testing.T) {
 	logger := Logger{}
 	env := BuildEnv(t)
 	knctl := Knctl{t, env.Namespace, logger}
+	kubectl := Kubectl{t, env.Namespace, logger}
 	curl := Curl{t, knctl}
 
 	const (
-		serviceName      = "test-deploy-with-build-service-name"
-		expectedContent1 = "TestDeployWithBuild_ContentV1"
-		expectedContent2 = "TestDeployWithBuild_ContentV2"
+		serviceName             = "test-deploy-with-build-service-name"
+		buildDockerSecretName   = serviceName + "-docker-secret"
+		buildServiceAccountName = serviceName + "-service-account"
+		expectedContent1        = "TestDeployWithBuild_ContentV1"
+		expectedContent2        = "TestDeployWithBuild_ContentV2"
 	)
 
 	logger.Section("Delete previous service with the same name if exists", func() {
@@ -39,7 +42,22 @@ func TestDeployWithBuild(t *testing.T) {
 
 	defer func() {
 		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
+		kubectl.RunWithOpts([]string{"delete", "secret", buildDockerSecretName}, RunOpts{AllowError: true})
+		kubectl.RunWithOpts([]string{"delete", "serviceaccount", buildServiceAccountName}, RunOpts{AllowError: true})
 	}()
+
+	logger.Section("Add service account with Docker push secret", func() {
+		knctl.RunWithOpts([]string{
+			"create",
+			"basic-auth-secret",
+			"-s", buildDockerSecretName,
+			"--docker-hub",
+			"-u", env.BuildDockerUsername,
+			"-p", env.BuildDockerPassword,
+		}, RunOpts{Redact: true})
+
+		knctl.Run([]string{"create", "service-account", "-a", buildServiceAccountName, "-s", buildDockerSecretName})
+	})
 
 	logger.Section("Deploy service v1", func() {
 		knctl.Run([]string{
@@ -48,7 +66,7 @@ func TestDeployWithBuild(t *testing.T) {
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevisionV1,
 			"-i", env.BuildImage,
-			"--service-account-name", env.BuildServiceAccount,
+			"--service-account-name", buildServiceAccountName,
 			"-e", "SIMPLE_MSG=" + expectedContent1,
 		})
 	})
@@ -64,7 +82,7 @@ func TestDeployWithBuild(t *testing.T) {
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevisionV2,
 			"-i", env.BuildImage,
-			"--service-account-name", env.BuildServiceAccount,
+			"--service-account-name", buildServiceAccountName,
 			"-e", "SIMPLE_MSG_V2=" + expectedContent2,
 		})
 	})
