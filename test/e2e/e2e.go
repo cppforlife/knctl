@@ -19,6 +19,7 @@ package e2e
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -33,9 +34,10 @@ type Knctl struct {
 }
 
 type RunOpts struct {
-	NoNamespace bool
-	AllowError  bool
-	CancelCh    chan struct{}
+	NoNamespace  bool
+	AllowError   bool
+	StdoutWriter io.Writer
+	CancelCh     chan struct{}
 }
 
 func (k Knctl) Run(args []string) string {
@@ -51,6 +53,7 @@ func (k Knctl) RunWithOpts(args []string, opts RunOpts) (string, error) {
 	}
 
 	var stderr bytes.Buffer
+	var stdout bytes.Buffer
 
 	cmd := exec.Command("knctl", args...)
 	cmd.Stderr = &stderr
@@ -64,7 +67,13 @@ func (k Knctl) RunWithOpts(args []string, opts RunOpts) (string, error) {
 		}()
 	}
 
-	out, err := cmd.Output()
+	if opts.StdoutWriter != nil {
+		cmd.Stdout = opts.StdoutWriter
+	} else {
+		cmd.Stdout = &stdout
+	}
+
+	err := cmd.Run()
 	if err != nil {
 		err = fmt.Errorf("Execution error: stderr: '%s' error: '%s'", stderr.String(), err)
 
@@ -73,7 +82,7 @@ func (k Knctl) RunWithOpts(args []string, opts RunOpts) (string, error) {
 		}
 	}
 
-	return string(out), err
+	return stdout.String(), err
 }
 
 func (k Knctl) cmdDesc(args []string) string {
