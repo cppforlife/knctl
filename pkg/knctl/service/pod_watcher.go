@@ -38,13 +38,6 @@ func NewPodWatcher(
 }
 
 func (w PodWatcher) Watch(podsToWatchCh chan corev1.Pod, cancelCh chan struct{}) error {
-	watcher, err := w.podsClient.Watch(w.listOpts)
-	if err != nil {
-		return fmt.Errorf("Creating Pod watcher: %s", err)
-	}
-
-	defer watcher.Stop()
-
 	podsList, err := w.podsClient.List(w.listOpts)
 	if err != nil {
 		return err
@@ -62,10 +55,30 @@ func (w PodWatcher) Watch(podsToWatchCh chan corev1.Pod, cancelCh chan struct{})
 	}
 
 	for {
+		retry, err := w.watch(podsToWatchCh, cancelCh)
+		if err != nil {
+			return err
+		}
+		if !retry {
+			return nil
+		}
+	}
+}
+
+func (w PodWatcher) watch(podsToWatchCh chan corev1.Pod, cancelCh chan struct{}) (bool, error) {
+	watcher, err := w.podsClient.Watch(w.listOpts)
+	if err != nil {
+		return false, fmt.Errorf("Creating Pod watcher: %s", err)
+	}
+
+	defer watcher.Stop()
+
+	for {
 		select {
-		case e := <-watcher.ResultChan():
-			if e.Object == nil {
-				return nil // TODO return?
+		case e, ok := <-watcher.ResultChan():
+			if !ok || e.Object == nil {
+				// Watcher may expire, hence try to retry
+				return true, nil
 			}
 
 			pod, ok := e.Object.(*corev1.Pod)
@@ -79,7 +92,7 @@ func (w PodWatcher) Watch(podsToWatchCh chan corev1.Pod, cancelCh chan struct{})
 			}
 
 		case <-cancelCh:
-			return nil
+			return false, nil
 		}
 	}
 }

@@ -38,13 +38,6 @@ func NewRevisionWatcher(
 }
 
 func (w RevisionWatcher) Watch(revisionsToWatchCh chan v1alpha1.Revision, cancelCh chan struct{}) error {
-	watcher, err := w.revisionsClient.Watch(w.listOpts)
-	if err != nil {
-		return fmt.Errorf("Creating Revision watcher: %s", err)
-	}
-
-	defer watcher.Stop()
-
 	revisionsList, err := w.revisionsClient.List(w.listOpts)
 	if err != nil {
 		return err
@@ -62,10 +55,30 @@ func (w RevisionWatcher) Watch(revisionsToWatchCh chan v1alpha1.Revision, cancel
 	}
 
 	for {
+		retry, err := w.watch(revisionsToWatchCh, cancelCh)
+		if err != nil {
+			return err
+		}
+		if !retry {
+			return nil
+		}
+	}
+}
+
+func (w RevisionWatcher) watch(revisionsToWatchCh chan v1alpha1.Revision, cancelCh chan struct{}) (bool, error) {
+	watcher, err := w.revisionsClient.Watch(w.listOpts)
+	if err != nil {
+		return false, fmt.Errorf("Creating Revision watcher: %s", err)
+	}
+
+	defer watcher.Stop()
+
+	for {
 		select {
-		case e := <-watcher.ResultChan():
-			if e.Object == nil {
-				return nil // TODO return?
+		case e, ok := <-watcher.ResultChan():
+			if !ok || e.Object == nil {
+				// Watcher may expire, hence try to retry
+				return true, nil
 			}
 
 			revision, ok := e.Object.(*v1alpha1.Revision)
@@ -79,7 +92,7 @@ func (w RevisionWatcher) Watch(revisionsToWatchCh chan v1alpha1.Revision, cancel
 			}
 
 		case <-cancelCh:
-			return nil
+			return false, nil
 		}
 	}
 }

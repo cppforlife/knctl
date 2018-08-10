@@ -38,13 +38,6 @@ func NewBuildWatcher(
 }
 
 func (w BuildWatcher) Watch(buildsToWatch chan v1alpha1.Build, cancelCh chan struct{}) error {
-	watcher, err := w.buildsClient.Watch(w.listOpts)
-	if err != nil {
-		return fmt.Errorf("Creating Build watcher: %s", err)
-	}
-
-	defer watcher.Stop()
-
 	buildsList, err := w.buildsClient.List(w.listOpts)
 	if err != nil {
 		return err
@@ -54,11 +47,38 @@ func (w BuildWatcher) Watch(buildsToWatch chan v1alpha1.Build, cancelCh chan str
 		buildsToWatch <- build
 	}
 
+	// Return before potentially getting any events
+	select {
+	case <-cancelCh:
+		return nil
+	default:
+	}
+
+	for {
+		retry, err := w.watch(buildsToWatch, cancelCh)
+		if err != nil {
+			return err
+		}
+		if !retry {
+			return nil
+		}
+	}
+}
+
+func (w BuildWatcher) watch(buildsToWatch chan v1alpha1.Build, cancelCh chan struct{}) (bool, error) {
+	watcher, err := w.buildsClient.Watch(w.listOpts)
+	if err != nil {
+		return false, fmt.Errorf("Creating Build watcher: %s", err)
+	}
+
+	defer watcher.Stop()
+
 	for {
 		select {
-		case e := <-watcher.ResultChan():
-			if e.Object == nil {
-				return nil // TODO return?
+		case e, ok := <-watcher.ResultChan():
+			if !ok || e.Object == nil {
+				// Watcher may expire, hence try to retry
+				return true, nil
 			}
 
 			build, ok := e.Object.(*v1alpha1.Build)
@@ -72,7 +92,7 @@ func (w BuildWatcher) Watch(buildsToWatch chan v1alpha1.Build, cancelCh chan str
 			}
 
 		case <-cancelCh:
-			return nil
+			return false, nil
 		}
 	}
 }
