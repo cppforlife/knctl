@@ -123,10 +123,14 @@ func NewAllocatedTrafficPercentValue(svc *v1alpha1.Service, rev v1alpha1.Revisio
 	return uitable.NewValueSuffix(uitable.NewValueInt(percent), "%")
 }
 
+const (
+	kubectlLastAppliedAnnotation = "kubectl.kubernetes.io/last-applied-configuration"
+)
+
 func NewAnnotationsValue(anns map[string]string) uitable.Value {
 	result := map[string]string{}
 	for k, v := range anns {
-		if !strings.HasPrefix(k, serving.GroupName) {
+		if !strings.HasPrefix(k, serving.GroupName) && k != kubectlLastAppliedAnnotation {
 			result[k] = v
 		}
 	}
