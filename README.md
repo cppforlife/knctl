@@ -16,6 +16,8 @@ $ ./knctl version
 
 ## Docs
 
-- [Basic Workflow](./docs/basic-workflow.md)
+- [Basic workflow](./docs/basic-workflow.md)
 - [Deploy from public Git repo](./docs/deploy-public-git-repo.md)
+- [Traffic splitting](./docs/traffic-splitting.md)
+- [Misc](./docs/misc.md)
 - [Complete command reference](./docs/cmd/knctl.md).
