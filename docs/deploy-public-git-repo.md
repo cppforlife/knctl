@@ -10,7 +10,7 @@ $ knctl create namespace -n deploy-from-git
 $ export KNCTL_NAMESPACE=deploy-from-git
 ```
 
-Create Docker Hub secret where images will be pushed (assumes that pushing needs authentication, but pulling does not)
+Create Docker Hub secret where images will be pushed (**assumes that pushing needs authentication, but pulling does not**)
 
 ```bash
 $ knctl create basic-auth-secret -s docker-reg1 --docker-hub -u <your-username> -p <your-password>
