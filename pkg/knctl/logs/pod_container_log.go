@@ -25,7 +25,6 @@ import (
 	"github.com/cppforlife/go-cli-ui/ui"
 	corev1 "k8s.io/api/core/v1"
 	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
-	"k8s.io/client-go/rest"
 )
 
 type PodContainerLog struct {
@@ -55,14 +54,7 @@ func NewPodContainerLog(
 }
 
 func (l PodContainerLog) Tail(ui ui.UI, cancelCh chan struct{}) error {
-	logs := l.podsClient.GetLogs(l.pod.Name, &corev1.PodLogOptions{
-		Follow:    l.opts.Follow,
-		TailLines: l.opts.Lines,
-		Container: l.container,
-		// TODO other options
-	})
-
-	stream, err := l.obtainStream(logs, cancelCh)
+	stream, err := l.obtainStream(cancelCh)
 	if err != nil {
 		return err
 	}
@@ -78,17 +70,31 @@ func (l PodContainerLog) Tail(ui ui.UI, cancelCh chan struct{}) error {
 		stream.Close()
 	}()
 
-	scanner := bufio.NewScanner(stream)
-	for scanner.Scan() {
-		ui.PrintBlock([]byte(fmt.Sprintf("%s | %s\n", l.tag, scanner.Text())))
-	}
+	reader := bufio.NewReader(stream)
 
-	return scanner.Err()
+	for {
+		line, err := reader.ReadBytes('\n')
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		}
+
+		ui.PrintBlock([]byte(fmt.Sprintf("%s | %s\n", l.tag, line)))
+	}
 }
 
-func (l PodContainerLog) obtainStream(logs *rest.Request, cancelCh chan struct{}) (io.ReadCloser, error) {
+func (l PodContainerLog) obtainStream(cancelCh chan struct{}) (io.ReadCloser, error) {
 	for {
 		// TODO infinite retry
+
+		logs := l.podsClient.GetLogs(l.pod.Name, &corev1.PodLogOptions{
+			Follow:    l.opts.Follow,
+			TailLines: l.opts.Lines,
+			Container: l.container,
+			// TODO other options
+		})
 
 		stream, err := logs.Stream()
 		if err == nil {
