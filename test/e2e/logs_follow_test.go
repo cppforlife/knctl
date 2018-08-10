@@ -38,6 +38,7 @@ func TestLogsFollow(t *testing.T) {
 		expectedContentRev1 = "TestRevisions_ContentRev1"
 		expectedContentRev2 = "TestRevisions_ContentRev2"
 		expectedContentRev3 = "TestRevisions_ContentRev3"
+		expectedContentRev4 = "TestRevisions_ContentRev4"
 	)
 
 	logger.Section("Sleeping...", func() {
@@ -97,11 +98,22 @@ func TestLogsFollow(t *testing.T) {
 		curl.WaitForContent(serviceName, expectedContentRev3)
 	})
 
-	logger.Section("Check logs of service to make sure it includes logs from 3 revisions", func() {
+	logger.Section("Deploy revision 4 and check its logs", func() {
+		knctl.Run([]string{
+			"deploy",
+			"-s", serviceName,
+			"-i", "gcr.io/knative-samples/helloworld-go",
+			"-e", "TARGET=" + expectedContentRev4,
+		})
+
+		curl.WaitForContent(serviceName, expectedContentRev4)
+	})
+
+	logger.Section("Check logs of service to make sure it includes logs from 4 revisions", func() {
 		out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
-		if len(resp.Tables[0].Rows) != 3 {
+		if len(resp.Tables[0].Rows) != 4 {
 			t.Fatalf("Expected to see one revision in the list of revisions, but did not: '%s'", out)
 		}
 
@@ -143,7 +155,8 @@ func TestLogsFollow(t *testing.T) {
 		var lastErr error
 
 		// Try multiple times for all logs to make it
-		for i := 0; i < 120; i++ {
+		for i := 0; i < 20; i++ {
+			logger.Debugf("Trying to check logs try=%d\n", i)
 			lastErr = checkLogs(collectedLogs.Current(), resp.Tables[0].Rows)
 			if lastErr == nil {
 				break
