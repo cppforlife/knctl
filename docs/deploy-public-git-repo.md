@@ -1,6 +1,6 @@
 ## Deploy from public Git repo
 
-See [Basic Workflow for introduction](./basic-workflow.md).
+See [Basic Workflow](./basic-workflow.md) for introduction.
 
 Create new namespace
 
@@ -27,9 +27,9 @@ Deploy service that builds image from a Git repo, and then deploys it
 ```bash
 $ knctl deploy \
 		--service simple-app \
-  	--git-url https://github.com/cppforlife/simple-app
+  	--git-url https://github.com/cppforlife/simple-app \
   	--git-revision master \
   	--service-account-name serv-acct1 \
   	--image index.docker.io/<your-username>/<your-repo> \
-  	--env SIMPLE_ENV=123
+  	--env SIMPLE_MSG=123
 ```
