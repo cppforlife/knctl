@@ -70,7 +70,7 @@ func (o *LogsOptions) Run() error {
 
 	tailOpts := logs.PodLogOpts{Follow: o.Follow}
 
-	if o.Lines != 0 {
+	if !o.Follow {
 		tailOpts.Lines = &o.Lines
 	}
 

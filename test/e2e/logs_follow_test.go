@@ -17,7 +17,10 @@ limitations under the License.
 package e2e
 
 import (
+	"fmt"
+	"io"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -58,19 +61,17 @@ func TestLogsFollow(t *testing.T) {
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContentRev1,
 		})
-	})
 
-	logger.Section("Checking if service is reachable and presents content", func() {
 		curl.WaitForContent(serviceName, expectedContentRev1)
 	})
 
 	cancelCh := make(chan struct{})
 	doneCh := make(chan struct{})
-	var collectedLogs string
+	collectedLogs := &LogsWriter{}
 
 	// Start tailing logs in the backgroud
 	go func() {
-		collectedLogs, _ = knctl.RunWithOpts([]string{"logs", "-s", serviceName, "-f"}, RunOpts{CancelCh: cancelCh})
+		knctl.RunWithOpts([]string{"logs", "-s", serviceName, "-f"}, RunOpts{StdoutWriter: collectedLogs, CancelCh: cancelCh})
 		doneCh <- struct{}{}
 	}()
 
@@ -96,17 +97,7 @@ func TestLogsFollow(t *testing.T) {
 		curl.WaitForContent(serviceName, expectedContentRev3)
 	})
 
-	cancelCh <- struct{}{}
-	<-doneCh
-
 	logger.Section("Check logs of service to make sure it includes logs from 3 revisions", func() {
-		collectedLogsLines := strings.Split(collectedLogs, "\n")
-
-		expectedLogLines := []string{
-			"Hello world sample started.",
-			"Hello world received a request.",
-		}
-
 		out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
@@ -114,30 +105,59 @@ func TestLogsFollow(t *testing.T) {
 			t.Fatalf("Expected to see one revision in the list of revisions, but did not: '%s'", out)
 		}
 
-		var matchedLines int
+		checkLogs := func(currentLogs string, revisionRows []map[string]string) error {
+			currentLogsLines := strings.Split(currentLogs, "\n")
 
-		for _, row := range resp.Tables[0].Rows {
-			expectedRevision := row["name"]
+			expectedLogLines := []string{
+				"Hello world sample started.",
+				"Hello world received a request.",
+			}
 
-			for _, expectedLogLine := range expectedLogLines {
-				var found bool
-				for _, line := range collectedLogsLines {
-					if strings.HasPrefix(line, expectedRevision+" >") && strings.HasSuffix(line, expectedLogLine) {
-						found = true
-						matchedLines++
-						break
+			var matchedLines int
+
+			for _, row := range revisionRows {
+				expectedRevision := row["name"]
+
+				for _, expectedLogLine := range expectedLogLines {
+					var found bool
+					for _, line := range currentLogsLines {
+						if strings.HasPrefix(line, expectedRevision+" >") && strings.HasSuffix(line, expectedLogLine) {
+							found = true
+							matchedLines++
+							break
+						}
+					}
+					if !found {
+						return fmt.Errorf("Expected to find log line '%s' for revision '%s' in service logs: '%s'", expectedLogLine, expectedRevision, currentLogs)
 					}
 				}
-				if !found {
-					t.Fatalf("Expected to find log line '%s' for revision '%s' in service logs: '%s'", expectedLogLine, expectedRevision, collectedLogs)
-				}
 			}
+
+			if matchedLines == 0 {
+				return fmt.Errorf("Expected to have matched several lines")
+			}
+
+			return nil
 		}
 
-		if matchedLines == 0 {
-			t.Fatalf("Expected to have matched several lines")
+		var lastErr error
+
+		// Try multiple times for all logs to make it
+		for i := 0; i < 120; i++ {
+			lastErr = checkLogs(collectedLogs.Current(), resp.Tables[0].Rows)
+			if lastErr == nil {
+				break
+			}
+			time.Sleep(1 * time.Second)
+		}
+
+		if lastErr != nil {
+			t.Fatalf(lastErr.Error())
 		}
 	})
+
+	cancelCh <- struct{}{}
+	<-doneCh
 
 	logger.Section("Deleting service", func() {
 		knctl.Run([]string{"delete", "service", "-s", serviceName})
@@ -147,4 +167,26 @@ func TestLogsFollow(t *testing.T) {
 			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
 		}
 	})
+}
+
+type LogsWriter struct {
+	lock   sync.RWMutex
+	output []byte
+}
+
+var _ io.Writer = &LogsWriter{}
+
+func (w *LogsWriter) Write(p []byte) (n int, err error) {
+	w.lock.Lock()
+	defer w.lock.Unlock()
+
+	w.output = append(w.output, p...)
+	return len(p), nil
+}
+
+func (w *LogsWriter) Current() string {
+	w.lock.RLock()
+	defer w.lock.RUnlock()
+
+	return string(w.output)
 }
