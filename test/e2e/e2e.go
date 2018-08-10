@@ -110,6 +110,6 @@ func (c Curl) WaitForContent(serviceName, expectedContent string) {
 	}
 
 	if !curledSuccessfully {
-		c.t.Fatalf("Expected to see sample service output, but was: '%s'", out)
+		c.t.Fatalf("Expected to find output '%s' in '%s' but did not", expectedContent, out)
 	}
 }
