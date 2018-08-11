@@ -1,10 +1,12 @@
 ## knctl open
 
-Open web browser pointing at a service domain. Requires open command installed on the system.
+Open web browser pointing at a service domain
 
 ### Synopsis
 
-Open web browser pointing at a service domain. Requires open command installed on the system.
+Open web browser pointing at a service domain.
+
+Requires 'open' command installed on the system.
 
 ```
 knctl open [flags]

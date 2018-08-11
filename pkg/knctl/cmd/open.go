@@ -39,7 +39,10 @@ func NewOpenOptions(ui ui.UI, depsFactory DepsFactory) *OpenOptions {
 func NewOpenCmd(o *OpenOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "open",
-		Short: "Open web browser pointing at a service domain. Requires open command installed on the system.",
+		Short: "Open web browser pointing at a service domain",
+		Long: `Open web browser pointing at a service domain.
+
+Requires 'open' command installed on the system.`,
 		Example: `
 # Open web browser pointing at service 'svc1' in namespace 'ns1'
 knctl open -s svc1 -n ns1`,
