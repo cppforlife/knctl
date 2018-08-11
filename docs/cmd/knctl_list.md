@@ -31,6 +31,7 @@ knctl list [flags]
 
 * [knctl](knctl.md)	 - knctl controls Knative resources
 * [knctl list builds](knctl_list_builds.md)	 - List builds
+* [knctl list domains](knctl_list_domains.md)	 - List domains
 * [knctl list ingresses](knctl_list_ingresses.md)	 - List ingresses
 * [knctl list pods](knctl_list_pods.md)	 - List pods
 * [knctl list revisions](knctl_list_revisions.md)	 - List revisions
