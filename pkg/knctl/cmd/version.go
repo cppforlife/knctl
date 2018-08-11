@@ -17,8 +17,14 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/spf13/cobra"
+)
+
+const (
+	Version = "0.0.2-pre.1"
 )
 
 type VersionOptions struct {
@@ -39,7 +45,7 @@ func NewVersionCmd(o *VersionOptions) *cobra.Command {
 }
 
 func (o *VersionOptions) Run() error {
-	o.ui.PrintBlock([]byte("Client Version: 0.0.1\n"))
+	o.ui.PrintBlock([]byte(fmt.Sprintf("Client Version: %s\n", Version)))
 
 	return nil
 }
