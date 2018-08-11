@@ -18,6 +18,7 @@ package e2e
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -52,30 +53,36 @@ func BuildEnv(t *testing.T) Env {
 }
 
 func (e Env) Validate(t *testing.T) {
+	errStrs := []string{}
+
 	if len(e.Namespace) == 0 {
-		t.Fatalf("Expected Namespace to be non-empty")
+		errStrs = append(errStrs, "Expected Namespace to be non-empty")
 	}
 
 	if len(e.BuildGitURL) == 0 {
-		t.Fatalf("Expected BuildGitURL to be non-empty")
+		errStrs = append(errStrs, "Expected BuildGitURL to be non-empty")
 	}
 	if len(e.BuildGitRevision) == 0 {
-		t.Fatalf("Expected BuildGitRevision to be non-empty")
+		errStrs = append(errStrs, "Expected BuildGitRevision to be non-empty")
 	}
 	if len(e.BuildGitRevisionV1) == 0 {
-		t.Fatalf("Expected BuildGitRevisionV1 to be non-empty")
+		errStrs = append(errStrs, "Expected BuildGitRevisionV1 to be non-empty")
 	}
 	if len(e.BuildGitRevisionV2) == 0 {
-		t.Fatalf("Expected BuildGitRevisionV2 to be non-empty")
+		errStrs = append(errStrs, "Expected BuildGitRevisionV2 to be non-empty")
 	}
 
 	if len(e.BuildImage) == 0 {
-		t.Fatalf("Expected BuildImage to be non-empty")
+		errStrs = append(errStrs, "Expected BuildImage to be non-empty")
 	}
 	if len(e.BuildDockerUsername) == 0 {
-		t.Fatalf("Expected BuildDockerUsername to be non-empty")
+		errStrs = append(errStrs, "Expected BuildDockerUsername to be non-empty")
 	}
 	if len(e.BuildDockerPassword) == 0 {
-		t.Fatalf("Expected BuildDockerPassword to be non-empty")
+		errStrs = append(errStrs, "Expected BuildDockerPassword to be non-empty")
+	}
+
+	if len(errStrs) > 0 {
+		t.Fatalf("%s", strings.Join(errStrs, "\n"))
 	}
 }
