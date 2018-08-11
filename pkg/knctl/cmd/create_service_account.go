@@ -42,6 +42,9 @@ func NewCreateServiceAccountCmd(o *CreateServiceAccountOptions) *cobra.Command {
 		Use:     "service-account",
 		Aliases: []string{"sa"},
 		Short:   "Create service account",
+		Long: `Create service account.
+
+Use 'kubectl delete serviceaccount <name> -n <namespace>' to delete service account.`,
 		Example: `
   # Create service account 'sa1' with two secrets in namespace 'ns1'
   knctl create service-account -a sa1 --secret secret1 --secret secret2 -n ns1`,

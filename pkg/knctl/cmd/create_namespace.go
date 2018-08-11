@@ -41,6 +41,9 @@ func NewCreateNamespaceCmd(o *CreateNamespaceOptions) *cobra.Command {
 		Use:     "namespace",
 		Aliases: []string{"ns"},
 		Short:   "Create namespace",
+		Long: `Create namespace.
+
+Use 'kubectl delete ns <name>' to delete namespace.`,
 		Example: `
   # Create namespace 'ns1'
   knctl create namespace -n ns1`,

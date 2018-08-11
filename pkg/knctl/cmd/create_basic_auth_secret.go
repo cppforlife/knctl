@@ -41,6 +41,9 @@ func NewCreateBasicAuthSecretCmd(o *CreateBasicAuthSecretOptions) *cobra.Command
 	cmd := &cobra.Command{
 		Use:   "basic-auth-secret",
 		Short: "Create basic auth secret",
+		Long: `Create basic auth secret.
+
+Use 'kubectl delete secret <name> -n <namespace>' to delete secret.`,
 		Example: `
   # Create SSH basic auth secret 'secret1' in namespace 'ns1'
   knctl create basic-auth-secret -s secret1 --type ssh --url github.com --username username --password password -n ns1

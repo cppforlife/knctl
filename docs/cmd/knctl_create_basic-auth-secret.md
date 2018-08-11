@@ -4,7 +4,9 @@ Create basic auth secret
 
 ### Synopsis
 
-Create basic auth secret
+Create basic auth secret.
+
+Use 'kubectl delete secret <name> -n <namespace>' to delete secret.
 
 ```
 knctl create basic-auth-secret [flags]

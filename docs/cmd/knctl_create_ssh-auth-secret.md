@@ -1,10 +1,12 @@
 ## knctl create ssh-auth-secret
 
-Create basic auth secret
+Create SSH auth secret
 
 ### Synopsis
 
-Create basic auth secret
+Create SSH auth secret.
+
+Use 'kubectl delete secret <name> -n <namespace>' to delete secret.
 
 ```
 knctl create ssh-auth-secret [flags]

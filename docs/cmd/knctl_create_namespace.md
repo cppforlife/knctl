@@ -4,7 +4,9 @@ Create namespace
 
 ### Synopsis
 
-Create namespace
+Create namespace.
+
+Use 'kubectl delete ns <name>' to delete namespace.
 
 ```
 knctl create namespace [flags]

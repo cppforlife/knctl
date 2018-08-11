@@ -4,7 +4,9 @@ Create service account
 
 ### Synopsis
 
-Create service account
+Create service account.
+
+Use 'kubectl delete serviceaccount <name> -n <namespace>' to delete service account.
 
 ```
 knctl create service-account [flags]
