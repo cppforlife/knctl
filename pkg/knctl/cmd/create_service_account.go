@@ -72,6 +72,10 @@ func (o *CreateServiceAccountOptions) Run() error {
 		serviceAccount.Secrets = append(serviceAccount.Secrets, corev1.ObjectReference{Name: secretName})
 	}
 
+	for _, secretName := range o.ServiceAccountCreateFlags.ImagePullSecrets {
+		serviceAccount.ImagePullSecrets = append(serviceAccount.ImagePullSecrets, corev1.LocalObjectReference{Name: secretName})
+	}
+
 	_, err = coreClient.CoreV1().ServiceAccounts(o.ServiceAccountFlags.NamespaceFlags.Name).Create(serviceAccount)
 	if err != nil {
 		return fmt.Errorf("Creating service account: %s", err)

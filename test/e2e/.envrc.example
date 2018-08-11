@@ -5,6 +5,7 @@ export KNCTL_E2E_BUILD_GIT_REVISION=master
 export KNCTL_E2E_BUILD_GIT_REVISION_V1=v1
 export KNCTL_E2E_BUILD_GIT_REVISION_V2=v2
 
-export KNCTL_E2E_BUILD_IMAGE=docker.io/dkalinin/simple-app:latest
+export KNCTL_E2E_BUILD_PUBLIC_IMAGE=docker.io/dkalinin/simple-app:latest
+export KNCTL_E2E_BUILD_PRIVATE_IMAGE=docker.io/dkalinin/test-push:latest
 export KNCTL_E2E_BUILD_DOCKER_USERNAME=
 export KNCTL_E2E_BUILD_DOCKER_PASSWORD=

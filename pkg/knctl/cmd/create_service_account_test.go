@@ -31,14 +31,18 @@ func TestNewCreateServiceAccountCmd_Ok(t *testing.T) {
 		"-a", "test-serv-account",
 		"-s", "test-secret1",
 		"-s", "test-secret2",
+		"-p", "test-secret3",
+		"-p", "test-secret4",
 	})
 	cmd.ExpectReachesExecution()
 
 	DeepEqual(t, realCmd.ServiceAccountFlags,
 		ServiceAccountFlags{NamespaceFlags{"test-namespace"}, "test-serv-account"})
 
-	DeepEqual(t, realCmd.ServiceAccountCreateFlags,
-		ServiceAccountCreateFlags{Secrets: []string{"test-secret1", "test-secret2"}})
+	DeepEqual(t, realCmd.ServiceAccountCreateFlags, ServiceAccountCreateFlags{
+		Secrets:          []string{"test-secret1", "test-secret2"},
+		ImagePullSecrets: []string{"test-secret3", "test-secret4"},
+	})
 }
 
 func TestNewCreateServiceAccountCmd_OkLongFlagNames(t *testing.T) {
@@ -49,14 +53,33 @@ func TestNewCreateServiceAccountCmd_OkLongFlagNames(t *testing.T) {
 		"--service-account", "test-serv-account",
 		"--secret", "test-secret1",
 		"--secret", "test-secret2",
+		"--image-pull-secret", "test-secret3",
+		"--image-pull-secret", "test-secret4",
 	})
 	cmd.ExpectReachesExecution()
 
 	DeepEqual(t, realCmd.ServiceAccountFlags,
 		ServiceAccountFlags{NamespaceFlags{"test-namespace"}, "test-serv-account"})
 
-	DeepEqual(t, realCmd.ServiceAccountCreateFlags,
-		ServiceAccountCreateFlags{Secrets: []string{"test-secret1", "test-secret2"}})
+	DeepEqual(t, realCmd.ServiceAccountCreateFlags, ServiceAccountCreateFlags{
+		Secrets:          []string{"test-secret1", "test-secret2"},
+		ImagePullSecrets: []string{"test-secret3", "test-secret4"},
+	})
+}
+
+func TestNewCreateServiceAccountCmd_OkMinimum(t *testing.T) {
+	realCmd := NewCreateServiceAccountOptions(nil, NewDepsFactoryImpl())
+	cmd := NewTestCmd(t, NewCreateServiceAccountCmd(realCmd))
+	cmd.Execute([]string{
+		"--namespace", "test-namespace",
+		"--service-account", "test-serv-account",
+	})
+	cmd.ExpectReachesExecution()
+
+	DeepEqual(t, realCmd.ServiceAccountFlags,
+		ServiceAccountFlags{NamespaceFlags{"test-namespace"}, "test-serv-account"})
+
+	DeepEqual(t, realCmd.ServiceAccountCreateFlags, ServiceAccountCreateFlags{})
 }
 
 func TestNewCreateServiceAccountCmd_RequiredFlags(t *testing.T) {

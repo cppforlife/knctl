@@ -79,15 +79,17 @@ func (k Knctl) RunWithOpts(args []string, opts RunOpts) (string, error) {
 	}
 
 	err := cmd.Run()
+	stdoutStr := stdout.String()
+
 	if err != nil {
-		err = fmt.Errorf("Execution error: stderr: '%s' error: '%s'", stderr.String(), err)
+		err = fmt.Errorf("Execution error: stdout: '%s' stderr: '%s' error: '%s'", stdoutStr, stderr.String(), err)
 
 		if !opts.AllowError {
 			k.t.Fatalf("Failed to successfully execute '%s': %v", k.cmdDesc(args, opts), err)
 		}
 	}
 
-	return stdout.String(), err
+	return stdoutStr, err
 }
 
 func (k Knctl) cmdDesc(args []string, opts RunOpts) string {

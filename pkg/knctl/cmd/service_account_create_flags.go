@@ -21,9 +21,11 @@ import (
 )
 
 type ServiceAccountCreateFlags struct {
-	Secrets []string
+	Secrets          []string
+	ImagePullSecrets []string
 }
 
 func (s *ServiceAccountCreateFlags) Set(cmd *cobra.Command) {
 	cmd.Flags().StringSliceVarP(&s.Secrets, "secret", "s", nil, "Set secret (format: secret-name) (can be specified multiple times)")
+	cmd.Flags().StringSliceVarP(&s.ImagePullSecrets, "image-pull-secret", "p", nil, "Set image pull secret (format: secret-name) (can be specified multiple times)")
 }

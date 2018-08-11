@@ -30,7 +30,8 @@ type Env struct {
 	BuildGitRevisionV1 string
 	BuildGitRevisionV2 string
 
-	BuildImage          string
+	BuildPublicImage    string // push with auth, pull w/o auth
+	BuildPrivateImage   string // push and pull requires auth
 	BuildDockerUsername string
 	BuildDockerPassword string
 }
@@ -44,7 +45,8 @@ func BuildEnv(t *testing.T) Env {
 		BuildGitRevisionV1: os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION_V1"), // See deploy_with_build_test.go for usage
 		BuildGitRevisionV2: os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION_V2"),
 
-		BuildImage:          os.Getenv("KNCTL_E2E_BUILD_IMAGE"),
+		BuildPublicImage:    os.Getenv("KNCTL_E2E_BUILD_PUBLIC_IMAGE"),
+		BuildPrivateImage:   os.Getenv("KNCTL_E2E_BUILD_PRIVATE_IMAGE"),
 		BuildDockerUsername: os.Getenv("KNCTL_E2E_BUILD_DOCKER_USERNAME"),
 		BuildDockerPassword: os.Getenv("KNCTL_E2E_BUILD_DOCKER_PASSWORD"),
 	}
@@ -72,8 +74,11 @@ func (e Env) Validate(t *testing.T) {
 		errStrs = append(errStrs, "Expected BuildGitRevisionV2 to be non-empty")
 	}
 
-	if len(e.BuildImage) == 0 {
-		errStrs = append(errStrs, "Expected BuildImage to be non-empty")
+	if len(e.BuildPublicImage) == 0 {
+		errStrs = append(errStrs, "Expected BuildPublicImage to be non-empty")
+	}
+	if len(e.BuildPrivateImage) == 0 {
+		errStrs = append(errStrs, "Expected BuildPrivateImage to be non-empty")
 	}
 	if len(e.BuildDockerUsername) == 0 {
 		errStrs = append(errStrs, "Expected BuildDockerUsername to be non-empty")

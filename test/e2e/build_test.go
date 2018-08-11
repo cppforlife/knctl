@@ -64,7 +64,7 @@ func TestBuildSuccess(t *testing.T) {
 			"-b", buildName,
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevision,
-			"-i", env.BuildImage,
+			"-i", env.BuildPublicImage,
 			"--service-account", buildServiceAccountName,
 		})
 
@@ -73,7 +73,7 @@ func TestBuildSuccess(t *testing.T) {
 			t.Fatalf("Expected to see kaniko output, but was: %s", out)
 		}
 
-		if !strings.Contains(out, env.BuildImage) {
+		if !strings.Contains(out, env.BuildPublicImage) {
 			t.Fatalf("Expected to see image pushed, but was: %s", out)
 		}
 	})
@@ -150,7 +150,7 @@ func TestBuildFailed(t *testing.T) {
 			"-b", buildName,
 			"--git-url", "invalid-git-url",
 			"--git-revision", "invalid-git-revision",
-			"-i", env.BuildImage,
+			"-i", env.BuildPublicImage,
 			"--service-account", buildServiceAccountName,
 		}, RunOpts{AllowError: true})
 

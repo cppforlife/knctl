@@ -21,7 +21,7 @@ import (
 	"testing"
 )
 
-func TestDeployWithBuild(t *testing.T) {
+func TestDeployWithBuildPublicImage(t *testing.T) {
 	logger := Logger{}
 	env := BuildEnv(t)
 	knctl := Knctl{t, env.Namespace, logger}
@@ -29,16 +29,16 @@ func TestDeployWithBuild(t *testing.T) {
 	curl := Curl{t, knctl}
 
 	const (
-		serviceName             = "test-deploy-with-build-service-name"
-		buildDockerSecretName   = serviceName + "-docker-secret"
-		buildServiceAccountName = serviceName + "-service-account"
-		expectedContent1        = "TestDeployWithBuild_ContentV1"
-		expectedContent2        = "TestDeployWithBuild_ContentV2"
+		serviceName              = "test-d-w-b-pub-i-service-name"
+		pushPullDockerSecretName = serviceName + "-docker-secret"
+		buildServiceAccountName  = serviceName + "-service-account"
+		expectedContent1         = "TestDeployWithBuild_ContentV1"
+		expectedContent2         = "TestDeployWithBuild_ContentV2"
 	)
 
 	cleanUp := func() {
 		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
-		kubectl.RunWithOpts([]string{"delete", "secret", buildDockerSecretName}, RunOpts{AllowError: true})
+		kubectl.RunWithOpts([]string{"delete", "secret", pushPullDockerSecretName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "serviceaccount", buildServiceAccountName}, RunOpts{AllowError: true})
 	}
 
@@ -49,13 +49,13 @@ func TestDeployWithBuild(t *testing.T) {
 		knctl.RunWithOpts([]string{
 			"create",
 			"basic-auth-secret",
-			"-s", buildDockerSecretName,
+			"-s", pushPullDockerSecretName,
 			"--docker-hub",
 			"-u", env.BuildDockerUsername,
 			"-p", env.BuildDockerPassword,
 		}, RunOpts{Redact: true})
 
-		knctl.Run([]string{"create", "service-account", "-a", buildServiceAccountName, "-s", buildDockerSecretName})
+		knctl.Run([]string{"create", "service-account", "-a", buildServiceAccountName, "-s", pushPullDockerSecretName})
 	})
 
 	logger.Section("Deploy service v1", func() {
@@ -64,7 +64,7 @@ func TestDeployWithBuild(t *testing.T) {
 			"-s", serviceName,
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevisionV1,
-			"-i", env.BuildImage,
+			"-i", env.BuildPublicImage,
 			"--service-account", buildServiceAccountName,
 			"-e", "SIMPLE_MSG=" + expectedContent1,
 		})
@@ -80,7 +80,102 @@ func TestDeployWithBuild(t *testing.T) {
 			"-s", serviceName,
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevisionV2,
-			"-i", env.BuildImage,
+			"-i", env.BuildPublicImage,
+			"--service-account", buildServiceAccountName,
+			"-e", "SIMPLE_MSG_V2=" + expectedContent2,
+		})
+	})
+
+	logger.Section("Checking if service is reachable and presents content", func() {
+		curl.WaitForContent(serviceName, expectedContent2)
+	})
+
+	logger.Section("Deleting service", func() {
+		knctl.Run([]string{"delete", "service", "-s", serviceName})
+
+		out := knctl.Run([]string{"list", "services", "--json"})
+		if strings.Contains(out, serviceName) {
+			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
+		}
+	})
+}
+
+func TestDeployWithBuildPrivateImage(t *testing.T) {
+	logger := Logger{}
+	env := BuildEnv(t)
+	knctl := Knctl{t, env.Namespace, logger}
+	kubectl := Kubectl{t, env.Namespace, logger}
+	curl := Curl{t, knctl}
+
+	const (
+		serviceName              = "test-d-w-b-priv-i-service-name"
+		pushPullDockerSecretName = serviceName + "-docker-secret"
+		pullDockerSecretName     = serviceName + "-p-docker-secret"
+		buildServiceAccountName  = serviceName + "-service-account"
+		expectedContent1         = "TestDeployWithBuild_ContentV1"
+		expectedContent2         = "TestDeployWithBuild_ContentV2"
+	)
+
+	cleanUp := func() {
+		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
+		kubectl.RunWithOpts([]string{"delete", "secret", pushPullDockerSecretName}, RunOpts{AllowError: true})
+		kubectl.RunWithOpts([]string{"delete", "secret", pullDockerSecretName}, RunOpts{AllowError: true})
+		kubectl.RunWithOpts([]string{"delete", "serviceaccount", buildServiceAccountName}, RunOpts{AllowError: true})
+	}
+
+	logger.Section("Delete previous service with the same name if exists", cleanUp)
+	defer cleanUp()
+
+	logger.Section("Add service account with Docker push secret", func() {
+		knctl.RunWithOpts([]string{
+			"create",
+			"basic-auth-secret",
+			"-s", pushPullDockerSecretName,
+			"--docker-hub",
+			"-u", env.BuildDockerUsername,
+			"-p", env.BuildDockerPassword,
+		}, RunOpts{Redact: true})
+
+		kubectl.RunWithOpts([]string{
+			"create", "secret", "docker-registry", pullDockerSecretName,
+			"--docker-server", "https://index.docker.io",
+			"--docker-username", env.BuildDockerUsername,
+			"--docker-password", env.BuildDockerPassword,
+			"--docker-email", "foo",
+		}, RunOpts{Redact: true})
+
+		knctl.Run([]string{
+			"create",
+			"service-account",
+			"-a", buildServiceAccountName,
+			"-s", pushPullDockerSecretName,
+			"-p", pullDockerSecretName,
+		})
+	})
+
+	logger.Section("Deploy service v1", func() {
+		knctl.Run([]string{
+			"deploy",
+			"-s", serviceName,
+			"--git-url", env.BuildGitURL,
+			"--git-revision", env.BuildGitRevisionV1,
+			"-i", env.BuildPrivateImage,
+			"--service-account", buildServiceAccountName,
+			"-e", "SIMPLE_MSG=" + expectedContent1,
+		})
+	})
+
+	logger.Section("Checking if service is reachable and presents content", func() {
+		curl.WaitForContent(serviceName, expectedContent1)
+	})
+
+	logger.Section("Deploy service v2 with a Git change (new env variable)", func() {
+		knctl.Run([]string{
+			"deploy",
+			"-s", serviceName,
+			"--git-url", env.BuildGitURL,
+			"--git-revision", env.BuildGitRevisionV2,
+			"-i", env.BuildPrivateImage,
 			"--service-account", buildServiceAccountName,
 			"-e", "SIMPLE_MSG_V2=" + expectedContent2,
 		})

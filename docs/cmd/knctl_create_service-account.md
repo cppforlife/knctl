@@ -23,10 +23,11 @@ knctl create service-account [flags]
 ### Options
 
 ```
-  -h, --help                     help for service-account
-  -n, --namespace string         Specified namespace ($KNCTL_NAMESPACE)
-  -s, --secret strings           Set secret (format: secret-name) (can be specified multiple times)
-  -a, --service-account string   Specified service-account
+  -h, --help                        help for service-account
+  -p, --image-pull-secret strings   Set image pull secret (format: secret-name) (can be specified multiple times)
+  -n, --namespace string            Specified namespace ($KNCTL_NAMESPACE)
+  -s, --secret strings              Set secret (format: secret-name) (can be specified multiple times)
+  -a, --service-account string      Specified service-account
 ```
 
 ### Options inherited from parent commands
