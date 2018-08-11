@@ -34,13 +34,12 @@ func TestRoutes(t *testing.T) {
 		serviceName2 = "test-routes-service2-name"
 	)
 
-	logger.Section("Delete previous route with the same name if exists", func() {
+	cleanUp := func() {
 		knctl.RunWithOpts([]string{"delete", "route", "-n", "default", "--route", routeName}, RunOpts{AllowError: true})
-	})
+	}
 
-	defer func() {
-		knctl.RunWithOpts([]string{"delete", "route", "-n", "default", "--route", routeName}, RunOpts{AllowError: true})
-	}()
+	logger.Section("Delete previous route with the same name if exists", cleanUp)
+	defer cleanUp()
 
 	logger.Section("Delete previous service with the same name if exists", func() {
 		knctl.RunWithOpts([]string{"delete", "service", "-n", "default", "-s", serviceName1}, RunOpts{AllowError: true})

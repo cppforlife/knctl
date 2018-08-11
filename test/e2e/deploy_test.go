@@ -34,13 +34,12 @@ func TestBasicDeploy(t *testing.T) {
 		expectedContent = "TestBasicDeploy_Content"
 	)
 
-	logger.Section("Delete previous service with the same name if exists", func() {
+	cleanUp := func() {
 		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
-	})
+	}
 
-	defer func() {
-		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
-	}()
+	logger.Section("Delete previous service with the same name if exists", cleanUp)
+	defer cleanUp()
 
 	logger.Section("Deploy service", func() {
 		knctl.Run([]string{

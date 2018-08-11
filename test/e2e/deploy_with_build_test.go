@@ -36,15 +36,14 @@ func TestDeployWithBuild(t *testing.T) {
 		expectedContent2        = "TestDeployWithBuild_ContentV2"
 	)
 
-	logger.Section("Delete previous service with the same name if exists", func() {
-		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
-	})
-
-	defer func() {
+	cleanUp := func() {
 		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "secret", buildDockerSecretName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "serviceaccount", buildServiceAccountName}, RunOpts{AllowError: true})
-	}()
+	}
+
+	logger.Section("Delete previous service with the same name if exists", cleanUp)
+	defer cleanUp()
 
 	logger.Section("Add service account with Docker push secret", func() {
 		knctl.RunWithOpts([]string{

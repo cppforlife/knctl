@@ -37,13 +37,12 @@ func TestDefaultRevisionTags(t *testing.T) {
 		expectedContentRev3 = "TestRevisions_ContentRev3"
 	)
 
-	logger.Section("Delete previous service with the same name if exists", func() {
+	cleanUp := func() {
 		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
-	})
+	}
 
-	defer func() {
-		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
-	}()
+	logger.Section("Delete previous service with the same name if exists", cleanUp)
+	defer cleanUp()
 
 	logger.Section("Deploy first revision", func() {
 		knctl.Run([]string{

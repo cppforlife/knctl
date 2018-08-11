@@ -36,15 +36,14 @@ func TestBuildSuccess(t *testing.T) {
 		expectedBuildOutput     = "Taking snapshot of full filesystem" // coming from kaniko
 	)
 
-	logger.Section("Delete previous build with the same name if exists", func() {
-		knctl.RunWithOpts([]string{"delete", "build", "-b", buildName}, RunOpts{AllowError: true})
-	})
-
-	defer func() {
+	cleanUp := func() {
 		knctl.RunWithOpts([]string{"delete", "build", "-b", buildName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "secret", buildDockerSecretName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "serviceaccount", buildServiceAccountName}, RunOpts{AllowError: true})
-	}()
+	}
+
+	logger.Section("Delete previous build with the same name if exists", cleanUp)
+	defer cleanUp()
 
 	logger.Section("Add service account with Docker push secret", func() {
 		knctl.RunWithOpts([]string{
@@ -123,15 +122,14 @@ func TestBuildFailed(t *testing.T) {
 		expectedErrorOuput      = "Unexpected error running git"
 	)
 
-	logger.Section("Delete previous build with the same name if exists", func() {
-		knctl.RunWithOpts([]string{"delete", "build", "-b", buildName}, RunOpts{AllowError: true})
-	})
-
-	defer func() {
+	cleanUp := func() {
 		knctl.RunWithOpts([]string{"delete", "build", "-b", buildName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "secret", buildDockerSecretName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "serviceaccount", buildServiceAccountName}, RunOpts{AllowError: true})
-	}()
+	}
+
+	logger.Section("Delete previous build with the same name if exists", cleanUp)
+	defer cleanUp()
 
 	logger.Section("Add service account with Docker push secret", func() {
 		knctl.RunWithOpts([]string{
