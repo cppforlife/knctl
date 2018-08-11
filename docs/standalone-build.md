@@ -27,8 +27,8 @@ Deploy service that builds image from a Git repo, and then deploys it
 ```bash
 $ knctl build \
     --build build1 \
-  	--git-url https://github.com/cppforlife/simple-app \
-  	--git-revision master \
-  	--service-account-name serv-acct1 \
-  	--image index.docker.io/<your-username>/<your-repo>
+    --git-url https://github.com/cppforlife/simple-app \
+    --git-revision master \
+    --service-account-name serv-acct1 \
+    --image index.docker.io/<your-username>/<your-repo>
 ```

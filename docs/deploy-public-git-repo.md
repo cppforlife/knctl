@@ -26,10 +26,10 @@ Deploy service that builds image from a Git repo, and then deploys it
 
 ```bash
 $ knctl deploy \
-		--service simple-app \
-  	--git-url https://github.com/cppforlife/simple-app \
-  	--git-revision master \
-  	--service-account-name serv-acct1 \
-  	--image index.docker.io/<your-username>/<your-repo> \
-  	--env SIMPLE_MSG=123
+    --service simple-app \
+    --git-url https://github.com/cppforlife/simple-app \
+    --git-revision master \
+    --service-account-name serv-acct1 \
+    --image index.docker.io/<your-username>/<your-repo> \
+    --env SIMPLE_MSG=123
 ```
