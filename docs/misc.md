@@ -19,8 +19,8 @@ $ knctl -n default list ingresses
 
 Ingresses
 
-Name                    Addresses  Ports  Created At
-knative-ingressgateway  0.0.0.0    80     2018-08-01T17:10:38-07:00
+Name                    Addresses  Ports  Age
+knative-ingressgateway  0.0.0.0    80     1d
                                    443
                                    32400
 

@@ -19,8 +19,8 @@ $ knctl -n default list services
 
 Services in namespace 'default'
 
-Name   Domain                     Internal Domain                  Created At
-hello  hello.default.example.com  hello.default.svc.cluster.local  2018-08-01T17:35:51-07:00
+Name   Domain                     Internal Domain                  Age
+hello  hello.default.example.com  hello.default.svc.cluster.local  1d
 
 1 services
 ```
@@ -62,9 +62,9 @@ $ knctl -n default list revisions
 
 Revisions for service 'hello'
 
-Name         Allocated Traffic %  Serving State  Created At
-hello-00002  100%                 Active         2018-08-01T17:35:51-07:00
-hello-00001  0%                   Reserve        2018-08-01T17:32:51-07:00
+Name         Allocated Traffic %  Serving State  Age
+hello-00002  100%                 Active         2m
+hello-00001  0%                   Reserve        3m
 
 2 revisions
 ```
