@@ -64,7 +64,7 @@ func (o *ListIngressesOptions) Run() error {
 			uitable.NewHeader("Name"),
 			uitable.NewHeader("Addresses"),
 			uitable.NewHeader("Ports"),
-			uitable.NewHeader("Created At"),
+			uitable.NewHeader("Age"),
 		},
 
 		SortBy: []uitable.ColumnSort{
@@ -93,7 +93,7 @@ func (o *ListIngressesOptions) Run() error {
 			uitable.NewValueString(svc.Name),
 			uitable.NewValueStrings(addrs),
 			uitable.NewValueStrings(ports),
-			uitable.NewValueTime(svc.CreationTimestamp.Time),
+			NewValueAge(svc.CreationTimestamp.Time),
 		})
 	}
 

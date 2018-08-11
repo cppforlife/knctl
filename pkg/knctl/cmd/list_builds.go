@@ -73,7 +73,7 @@ func (o *ListBuildsOptions) Run() error {
 			uitable.NewHeader("Name"),
 			uitable.NewHeader("Builder"),
 			uitable.NewHeader("Succeeded"),
-			uitable.NewHeader("Created At"),
+			uitable.NewHeader("Age"),
 		},
 
 		SortBy: []uitable.ColumnSort{
@@ -86,7 +86,7 @@ func (o *ListBuildsOptions) Run() error {
 			uitable.NewValueString(build.Name),
 			uitable.NewValueString(string(build.Status.Builder)),
 			o.succeededValue(build),
-			uitable.NewValueTime(build.CreationTimestamp.Time),
+			NewValueAge(build.CreationTimestamp.Time),
 		})
 	}
 

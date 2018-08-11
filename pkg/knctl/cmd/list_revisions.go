@@ -88,7 +88,7 @@ func (o *ListRevisionsOptions) Run() error {
 			uitable.NewHeader("Allocated Traffic %"),
 			uitable.NewHeader("Serving State"),
 			uitable.NewHeader("Annotations"),
-			uitable.NewHeader("Created At"),
+			uitable.NewHeader("Age"),
 		},
 
 		SortBy: []uitable.ColumnSort{
@@ -103,7 +103,7 @@ func (o *ListRevisionsOptions) Run() error {
 			NewAllocatedTrafficPercentValue(service, rev),
 			uitable.NewValueString(string(rev.Spec.ServingState)),
 			NewAnnotationsValue(rev.Annotations),
-			uitable.NewValueTime(rev.CreationTimestamp.Time),
+			NewValueAge(rev.CreationTimestamp.Time),
 		})
 	}
 

@@ -76,7 +76,7 @@ func (o *ListRoutesOptions) Run() error {
 			uitable.NewHeader("Ready"),
 			uitable.NewHeader("Domain"),
 			uitable.NewHeader("Internal Domain"),
-			uitable.NewHeader("Created At"),
+			uitable.NewHeader("Age"),
 		},
 
 		SortBy: []uitable.ColumnSort{
@@ -92,7 +92,7 @@ func (o *ListRoutesOptions) Run() error {
 			o.readyValue(route),
 			uitable.NewValueString(route.Status.Domain),
 			uitable.NewValueString(route.Status.DomainInternal),
-			uitable.NewValueTime(route.CreationTimestamp.Time),
+			NewValueAge(route.CreationTimestamp.Time),
 		})
 	}
 

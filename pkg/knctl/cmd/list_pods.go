@@ -64,7 +64,7 @@ func (o *ListPodsOptions) Run() error {
 			uitable.NewHeader("Name"),
 			uitable.NewHeader("Phase"),
 			uitable.NewHeader("Restarts"),
-			uitable.NewHeader("Created At"),
+			uitable.NewHeader("Age"),
 		},
 
 		SortBy: []uitable.ColumnSort{
@@ -82,7 +82,7 @@ func (o *ListPodsOptions) Run() error {
 				Error: !o.isOKStatus(pod),
 			},
 			uitable.NewValueInt(o.podRestarts(pod)),
-			uitable.NewValueTime(pod.CreationTimestamp.Time),
+			NewValueAge(pod.CreationTimestamp.Time),
 		})
 	}
 
