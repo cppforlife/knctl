@@ -21,13 +21,13 @@ knctl build [flags]
 ### Options
 
 ```
-  -b, --build string                  Specified build
-      --git-revision string           Set Git revision (Examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
-      --git-url string                Set Git URL
-  -h, --help                          help for build
-  -i, --image string                  Set image URL
-  -n, --namespace string              Specified namespace ($KNCTL_NAMESPACE)
-      --service-account-name string   Set service account name for building
+  -b, --build string             Specified build
+      --git-revision string      Set Git revision (Examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
+      --git-url string           Set Git URL
+  -h, --help                     help for build
+  -i, --image string             Set image URL
+  -n, --namespace string         Specified namespace ($KNCTL_NAMESPACE)
+      --service-account string   Set service account name for building
 ```
 
 ### Options inherited from parent commands

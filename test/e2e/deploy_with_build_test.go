@@ -65,7 +65,7 @@ func TestDeployWithBuild(t *testing.T) {
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevisionV1,
 			"-i", env.BuildImage,
-			"--service-account-name", buildServiceAccountName,
+			"--service-account", buildServiceAccountName,
 			"-e", "SIMPLE_MSG=" + expectedContent1,
 		})
 	})
@@ -81,7 +81,7 @@ func TestDeployWithBuild(t *testing.T) {
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevisionV2,
 			"-i", env.BuildImage,
-			"--service-account-name", buildServiceAccountName,
+			"--service-account", buildServiceAccountName,
 			"-e", "SIMPLE_MSG_V2=" + expectedContent2,
 		})
 	})

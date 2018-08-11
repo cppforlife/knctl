@@ -65,7 +65,7 @@ func TestBuildSuccess(t *testing.T) {
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevision,
 			"-i", env.BuildImage,
-			"--service-account-name", buildServiceAccountName,
+			"--service-account", buildServiceAccountName,
 		})
 
 		// TODO stronger assertion of generated image?
@@ -151,7 +151,7 @@ func TestBuildFailed(t *testing.T) {
 			"--git-url", "invalid-git-url",
 			"--git-revision", "invalid-git-revision",
 			"-i", env.BuildImage,
-			"--service-account-name", buildServiceAccountName,
+			"--service-account", buildServiceAccountName,
 		}, RunOpts{AllowError: true})
 
 		if err == nil {

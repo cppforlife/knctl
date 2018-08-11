@@ -32,7 +32,7 @@ func TestNewBuildCmd_Ok(t *testing.T) {
 		"-b", "test-build",
 		"--git-url", "test-git-url",
 		"--git-revision", "test-git-revision",
-		"--service-account-name", "test-service-account",
+		"--service-account", "test-service-account",
 		"-i", "test-image",
 	})
 	cmd.ExpectReachesExecution()
@@ -58,7 +58,7 @@ func TestNewBuildCmd_OkLongFlagNames(t *testing.T) {
 		"--build", "test-build",
 		"--git-url", "test-git-url",
 		"--git-revision", "test-git-revision",
-		"--service-account-name", "test-service-account",
+		"--service-account", "test-service-account",
 		"--image", "test-image",
 	})
 	cmd.ExpectReachesExecution()

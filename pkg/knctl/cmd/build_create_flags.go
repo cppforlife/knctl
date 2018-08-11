@@ -41,7 +41,7 @@ func (s *BuildCreateFlags) Set(cmd *cobra.Command, opts BuildCreateFlagsOpts) {
 		cmd.MarkFlagRequired("git-revision")
 	}
 
-	cmd.Flags().StringVar(&s.ServiceAccountName, "service-account-name", "", "Set service account name for building") // TODO separate
+	cmd.Flags().StringVar(&s.ServiceAccountName, "service-account", "", "Set service account name for building") // TODO separate
 
 	if !opts.NoImage {
 		cmd.Flags().StringVarP(&s.Image, "image", "i", "", "Set image URL")

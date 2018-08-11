@@ -24,14 +24,14 @@ knctl deploy [flags]
 ### Options
 
 ```
-  -e, --env strings                   Set environment variable (format: key=value) (can be specified multiple times)
-      --git-revision string           Set Git revision (Examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
-      --git-url string                Set Git URL
-  -h, --help                          help for deploy
-  -i, --image string                  Set image URL
-  -n, --namespace string              Specified namespace ($KNCTL_NAMESPACE)
-  -s, --service string                Specified service
-      --service-account-name string   Set service account name for building
+  -e, --env strings              Set environment variable (format: key=value) (can be specified multiple times)
+      --git-revision string      Set Git revision (Examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
+      --git-url string           Set Git URL
+  -h, --help                     help for deploy
+  -i, --image string             Set image URL
+  -n, --namespace string         Specified namespace ($KNCTL_NAMESPACE)
+  -s, --service string           Specified service
+      --service-account string   Set service account name for building
 ```
 
 ### Options inherited from parent commands
