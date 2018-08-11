@@ -81,7 +81,7 @@ func (l PodContainerLog) Tail(ui ui.UI, cancelCh chan struct{}) error {
 			return err
 		}
 
-		ui.PrintBlock([]byte(fmt.Sprintf("%s | %s\n", l.tag, line)))
+		ui.PrintBlock([]byte(fmt.Sprintf("%s | %s", l.tag, line)))
 	}
 }
 
