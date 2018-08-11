@@ -40,5 +40,5 @@ knctl create namespace [flags]
 
 ### SEE ALSO
 
-* [knctl create](knctl_create.md)	 - Create resources (namespace)
+* [knctl create](knctl_create.md)	 - Create resources (namespace, service-account, basic-auth-secret, ssh-auth-secret)
 

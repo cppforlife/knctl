@@ -1,10 +1,10 @@
 ## knctl list
 
-List resources (service, revision, ingress)
+List resources (services, revisions, builds, pods, ingresses)
 
 ### Synopsis
 
-List resources (service, revision, ingress)
+List resources (services, revisions, builds, pods, ingresses)
 
 ```
 knctl list [flags]

@@ -1,10 +1,10 @@
 ## knctl delete
 
-Delete resource (service, revision)
+Delete resource (service, revision, route, build)
 
 ### Synopsis
 
-Delete resource (service, revision)
+Delete resource (service, revision, route, build)
 
 ```
 knctl delete [flags]

@@ -1,10 +1,10 @@
 ## knctl create
 
-Create resources (namespace)
+Create resources (namespace, service-account, basic-auth-secret, ssh-auth-secret)
 
 ### Synopsis
 
-Create resources (namespace)
+Create resources (namespace, service-account, basic-auth-secret, ssh-auth-secret)
 
 ```
 knctl create [flags]

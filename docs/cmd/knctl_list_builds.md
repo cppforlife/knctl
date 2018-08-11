@@ -38,5 +38,5 @@ knctl list builds [flags]
 
 ### SEE ALSO
 
-* [knctl list](knctl_list.md)	 - List resources (service, revision, ingress)
+* [knctl list](knctl_list.md)	 - List resources (services, revisions, builds, pods, ingresses)
 

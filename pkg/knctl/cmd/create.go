@@ -23,7 +23,7 @@ import (
 func NewCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "Create resources (namespace)",
+		Short: "Create resources (namespace, service-account, basic-auth-secret, ssh-auth-secret)",
 		RunE:  ShowHelp,
 	}
 	return cmd

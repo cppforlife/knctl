@@ -39,5 +39,5 @@ knctl delete build [flags]
 
 ### SEE ALSO
 
-* [knctl delete](knctl_delete.md)	 - Delete resource (service, revision)
+* [knctl delete](knctl_delete.md)	 - Delete resource (service, revision, route, build)
 

@@ -26,12 +26,12 @@ knctl [flags]
 
 * [knctl annotate](knctl_annotate.md)	 - Annotate resources (revision)
 * [knctl build](knctl_build.md)	 - Build source code into image
-* [knctl create](knctl_create.md)	 - Create resources (namespace)
+* [knctl create](knctl_create.md)	 - Create resources (namespace, service-account, basic-auth-secret, ssh-auth-secret)
 * [knctl curl](knctl_curl.md)	 - Curl service
-* [knctl delete](knctl_delete.md)	 - Delete resource (service, revision)
+* [knctl delete](knctl_delete.md)	 - Delete resource (service, revision, route, build)
 * [knctl deploy](knctl_deploy.md)	 - Deploy service
 * [knctl install](knctl_install.md)	 - Install Knative and Istio
-* [knctl list](knctl_list.md)	 - List resources (service, revision, ingress)
+* [knctl list](knctl_list.md)	 - List resources (services, revisions, builds, pods, ingresses)
 * [knctl logs](knctl_logs.md)	 - Print logs
 * [knctl open](knctl_open.md)	 - Open web browser pointing at a service domain. Requires open command installed on the system.
 * [knctl route](knctl_route.md)	 - Configure route
