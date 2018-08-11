@@ -19,7 +19,7 @@ $ knctl create basic-auth-secret -s docker-reg1 --docker-hub -u <your-username> 
 If Docker repository is private, there is no need to create this secret (and use below); otherwise, create Docker Hub secret for pulling images
 
 ```bash
-$ kubectl create secret docker-registry docker-reg2 \
+$ kubectl -n deploy-from-git create secret docker-registry docker-reg2 \
     --docker-server https://index.docker.io \
     --docker-username <your-username> \
     --docker-password <your-password> \
