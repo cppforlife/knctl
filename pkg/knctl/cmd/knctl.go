@@ -17,6 +17,9 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+	"io"
+
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/spf13/cobra"
 )
@@ -59,6 +62,8 @@ func NewKnctlCmd(o *KnctlOptions) *cobra.Command {
 
 		// TODO bash completion
 	}
+
+	cmd.SetOutput(uiWriter{o.ui}) // setting output for cmd.Help()
 
 	o.UIFlags.Set(cmd)
 	o.KubeconfigFlags.Set(cmd)
@@ -120,8 +125,8 @@ func NewKnctlCmd(o *KnctlOptions) *cobra.Command {
 }
 
 func ShowHelp(cmd *cobra.Command, args []string) error {
-	cmd.Help() // TODO use ui for output
-	return nil
+	cmd.Help()
+	return fmt.Errorf("Invalid command - see available commands/subcommands above")
 }
 
 func VisitCommands(cmd *cobra.Command, f func(*cobra.Command)) {
@@ -129,4 +134,15 @@ func VisitCommands(cmd *cobra.Command, f func(*cobra.Command)) {
 	for _, child := range cmd.Commands() {
 		VisitCommands(child, f)
 	}
+}
+
+type uiWriter struct {
+	ui ui.UI
+}
+
+var _ io.Writer = uiWriter{}
+
+func (w uiWriter) Write(p []byte) (n int, err error) {
+	w.ui.PrintBlock(p)
+	return len(p), nil
 }
