@@ -17,15 +17,15 @@ limitations under the License.
 package cmd_test
 
 import (
-  "testing"
+	"testing"
 
-  . "github.com/cppforlife/knctl/pkg/knctl/cmd"
+	. "github.com/cppforlife/knctl/pkg/knctl/cmd"
 )
 
 func TestNewListDomainsCmd_OkMinimum(t *testing.T) {
-  realCmd := NewListDomainsOptions(nil, NewDepsFactoryImpl())
-  cmd := NewTestCmd(t, NewListDomainsCmd(realCmd))
-  cmd.ExpectBasicConfig()
-  cmd.Execute([]string{})
-  cmd.ExpectReachesExecution()
+	realCmd := NewListDomainsOptions(nil, NewDepsFactoryImpl())
+	cmd := NewTestCmd(t, NewListDomainsCmd(realCmd))
+	cmd.ExpectBasicConfig()
+	cmd.Execute([]string{})
+	cmd.ExpectReachesExecution()
 }

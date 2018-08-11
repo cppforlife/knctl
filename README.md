@@ -18,8 +18,9 @@ $ ./knctl version
 
 - [Basic workflow](./docs/basic-workflow.md)
 - [Deploy from public Git repo](./docs/deploy-public-git-repo.md)
-- [Stanalone build](./docs/standalone-build.md)
+- [Manage domains](./docs/manage-domains.md)
 - [Traffic splitting](./docs/traffic-splitting.md)
+- [Stanalone build](./docs/standalone-build.md)
 - [Misc](./docs/misc.md)
 - [Complete command reference](./docs/cmd/knctl.md)
 

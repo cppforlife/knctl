@@ -20,7 +20,6 @@ import (
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 	"github.com/spf13/cobra"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type ListDomainsOptions struct {
@@ -49,7 +48,7 @@ func (o *ListDomainsOptions) Run() error {
 		return err
 	}
 
-	config, err := coreClient.CoreV1().ConfigMaps("knative-serving").Get("config-domain", metav1.GetOptions{})
+	domains, err := NewDomains(coreClient).List()
 	if err != nil {
 		return err
 	}
@@ -69,14 +68,11 @@ func (o *ListDomainsOptions) Run() error {
 		},
 	}
 
-	for k, v := range config.Data {
-		// Empty value indicates default domain
-		if v == "" {
-			table.Rows = append(table.Rows, []uitable.Value{
-				uitable.NewValueString(k),
-				uitable.NewValueBool(true),
-			})
-		}
+	for _, domain := range domains {
+		table.Rows = append(table.Rows, []uitable.Value{
+			uitable.NewValueString(domain.Name),
+			uitable.NewValueBool(domain.Default),
+		})
 	}
 
 	o.ui.PrintTable(table)

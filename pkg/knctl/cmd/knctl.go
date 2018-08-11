@@ -77,6 +77,7 @@ func NewKnctlCmd(o *KnctlOptions) *cobra.Command {
 	createCmd.AddCommand(NewCreateServiceAccountCmd(NewCreateServiceAccountOptions(o.ui, o.depsFactory)))
 	createCmd.AddCommand(NewCreateBasicAuthSecretCmd(NewCreateBasicAuthSecretOptions(o.ui, o.depsFactory)))
 	createCmd.AddCommand(NewCreateSSHAuthSecretCmd(NewCreateSSHAuthSecretOptions(o.ui, o.depsFactory)))
+	createCmd.AddCommand(NewCreateDomainCmd(NewCreateDomainOptions(o.ui, o.depsFactory)))
 	cmd.AddCommand(createCmd)
 
 	listCmd := NewListCmd()
