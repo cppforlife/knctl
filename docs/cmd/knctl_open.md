@@ -24,7 +24,7 @@ knctl open -s svc1 -n ns1
 
 ```
   -h, --help               help for open
-  -n, --namespace string   Specified namespace (can be provided via environment variable KNCTL_NAMESPACE)
+  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)
   -s, --service string     Specified service
 ```
 
@@ -33,7 +33,7 @@ knctl open -s svc1 -n ns1
 ```
       --column strings      Filter to show only given columns
       --json                Output as JSON
-      --kubeconfig string   Path to the kubeconfig file (can be provided via environment variable KNCTL_KUBECONFIG) (default "/Users/pivotal/.kube/config")
+      --kubeconfig string   Path to the kubeconfig file ($KNCTL_KUBECONFIG) (default "/Users/pivotal/.kube/config")
       --no-color            Disable colorized output
       --non-interactive     Don't ask for user input
       --tty                 Force TTY-like output

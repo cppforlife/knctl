@@ -27,7 +27,7 @@ knctl logs [flags]
   -f, --follow             As new revisions are added, new pod logs will be printed
   -h, --help               help for logs
   -l, --lines int          Number of lines (default 10)
-  -n, --namespace string   Specified namespace (can be provided via environment variable KNCTL_NAMESPACE)
+  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)
   -s, --service string     Specified service
 ```
 
@@ -36,7 +36,7 @@ knctl logs [flags]
 ```
       --column strings      Filter to show only given columns
       --json                Output as JSON
-      --kubeconfig string   Path to the kubeconfig file (can be provided via environment variable KNCTL_KUBECONFIG) (default "/Users/pivotal/.kube/config")
+      --kubeconfig string   Path to the kubeconfig file ($KNCTL_KUBECONFIG) (default "/Users/pivotal/.kube/config")
       --no-color            Disable colorized output
       --non-interactive     Don't ask for user input
       --tty                 Force TTY-like output

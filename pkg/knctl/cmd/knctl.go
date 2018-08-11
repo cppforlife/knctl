@@ -44,7 +44,10 @@ func NewKnctlCmd(o *KnctlOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "knctl",
 		Short: "knctl controls Knative resources",
-		Long:  "Find more information at: https://github.com/knative/docs",
+		Long: `knctl controls Knative resources.
+
+CLI docs: https://github.com/cppforlife/knctl#docs.
+Knative docs: https://github.com/knative/docs.`,
 
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			o.depsFactory.ConfigureConfigPath(o.KubeconfigFlags.Path)

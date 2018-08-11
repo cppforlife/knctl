@@ -28,7 +28,7 @@ type NamespaceFlags struct {
 
 func (s *NamespaceFlags) Set(cmd *cobra.Command) {
 	defaultName := os.Getenv("KNCTL_NAMESPACE")
-	cmd.Flags().StringVarP(&s.Name, "namespace", "n", defaultName, "Specified namespace (can be provided via environment variable KNCTL_NAMESPACE)")
+	cmd.Flags().StringVarP(&s.Name, "namespace", "n", defaultName, "Specified namespace ($KNCTL_NAMESPACE)")
 	if len(defaultName) == 0 {
 		cmd.MarkFlagRequired("namespace")
 	}
