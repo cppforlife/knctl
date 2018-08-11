@@ -32,6 +32,9 @@ import (
 const (
 	tagRevisionLabelKeyPrefix = "tag.cli.knative.dev/"
 	tagRevisionLabelValue     = "true"
+
+	TagsLatest   = "latest"
+	TagsPrevious = "previous"
 )
 
 var (

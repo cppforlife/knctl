@@ -91,6 +91,13 @@ func (o *DeployOptions) Run() error {
 		return err
 	}
 
+	tags := ctlservice.NewTags(servingClient)
+
+	err = o.updateRevisionTags(serviceObj, tags, lastRevision)
+	if err != nil {
+		return err
+	}
+
 	if service.Spec.RunLatest.Configuration.Build != nil {
 		buildObj, err := serviceObj.CreatedBuildSinceRevision(lastRevision)
 		if err != nil {
@@ -107,32 +114,42 @@ func (o *DeployOptions) Run() error {
 		return buildObj.Error(cancelCh)
 	}
 
-	tags := ctlservice.NewTags(servingClient)
-
-	return o.updateRevisionTags(serviceObj, tags, lastRevision)
+	return nil
 }
 
 func (o *DeployOptions) updateRevisionTags(
 	serviceObj ctlservice.Service, tags ctlservice.Tags, lastRevision *v1alpha1.Revision) error {
+
+	if lastRevision != nil {
+		o.ui.PrintLinef("Waiting for new revision (after revision '%s') to be created...", lastRevision.Name)
+	} else {
+		o.ui.PrintLinef("Waiting for new revision to be created...")
+	}
 
 	newLastRevision, err := serviceObj.CreatedRevisionSinceRevision(lastRevision)
 	if err != nil {
 		return err
 	}
 
-	err = tags.Repoint(newLastRevision, "latest")
+	o.ui.PrintLinef("Tagging new revision '%s' as '%s'", newLastRevision.Name, ctlservice.TagsLatest)
+
+	err = tags.Repoint(newLastRevision, ctlservice.TagsLatest)
 	if err != nil {
 		return err
 	}
 
 	// If there was no last revision, let's tag new revision as previous
 	if lastRevision != nil {
-		err = tags.Repoint(lastRevision, "previous")
+		o.ui.PrintLinef("Tagging older revision '%s' as '%s'", lastRevision.Name, ctlservice.TagsPrevious)
+
+		err = tags.Repoint(lastRevision, ctlservice.TagsPrevious)
 		if err != nil {
 			return err
 		}
 	} else {
-		err = tags.Repoint(newLastRevision, "previous")
+		o.ui.PrintLinef("Tagging new revision '%s' as '%s'", newLastRevision.Name, ctlservice.TagsPrevious)
+
+		err = tags.Repoint(newLastRevision, ctlservice.TagsPrevious)
 		if err != nil {
 			return err
 		}
