@@ -1,4 +1,8 @@
-## Tags
+## Traffic Splitting WIP
+
+**Currently does not work with latest Knative Serving**
+
+### Tags
 
 Each tag identifies single revision within a service. CLI uses Kubernetes labels to store tag information. Tags can be used to reference particular revision when changing traffic configuration. By default, CLI will apply two tags: `latest` and `previous`.
 
@@ -8,9 +12,7 @@ $ knctl -n default tag revision --revision hello:latest -t stable
 $ knctl list revisions --service hello
 ```
 
-## Traffic Splitting
-
-**Currently non-functional**
+### Routing
 
 ```
 $ export KNCTL_NAMESPACE=default
