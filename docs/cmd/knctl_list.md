@@ -1,10 +1,10 @@
 ## knctl list
 
-List resources (services, revisions, builds, pods, ingresses)
+List (builds, domains, ingresses, pods, revisions, routes, services)
 
 ### Synopsis
 
-List resources (services, revisions, builds, pods, ingresses)
+List (builds, domains, ingresses, pods, revisions, routes, services)
 
 ```
 knctl list [flags]
@@ -29,7 +29,7 @@ knctl list [flags]
 
 ### SEE ALSO
 
-* [knctl](knctl.md)	 - knctl controls Knative resources
+* [knctl](knctl.md)	 - knctl controls Knative resources (annotate, build, create, curl, delete, deploy, install, list, logs, open, route, tag, untag, version)
 * [knctl list builds](knctl_list_builds.md)	 - List builds
 * [knctl list domains](knctl_list_domains.md)	 - List domains
 * [knctl list ingresses](knctl_list_ingresses.md)	 - List ingresses

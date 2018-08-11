@@ -24,8 +24,7 @@ func NewAnnotateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "annotate",
 		Aliases: []string{"ann"},
-		Short:   "Annotate resources (revision)",
-		RunE:    ShowHelp,
+		Short:   "Annotate",
 	}
 	return cmd
 }

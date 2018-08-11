@@ -40,5 +40,5 @@ knctl tag revision [flags]
 
 ### SEE ALSO
 
-* [knctl tag](knctl_tag.md)	 - Tag resources (revision)
+* [knctl tag](knctl_tag.md)	 - Tag (revision)
 

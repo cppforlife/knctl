@@ -23,8 +23,7 @@ import (
 func NewUntagCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "untag",
-		Short: "Untag resources (revision)",
-		RunE:  ShowHelp,
+		Short: "Untag",
 	}
 	return cmd
 }

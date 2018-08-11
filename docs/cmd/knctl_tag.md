@@ -1,10 +1,10 @@
 ## knctl tag
 
-Tag resources (revision)
+Tag (revision)
 
 ### Synopsis
 
-Tag resources (revision)
+Tag (revision)
 
 ```
 knctl tag [flags]
@@ -29,6 +29,6 @@ knctl tag [flags]
 
 ### SEE ALSO
 
-* [knctl](knctl.md)	 - knctl controls Knative resources
+* [knctl](knctl.md)	 - knctl controls Knative resources (annotate, build, create, curl, delete, deploy, install, list, logs, open, route, tag, untag, version)
 * [knctl tag revision](knctl_tag_revision.md)	 - Tag revision
 

@@ -19,6 +19,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/spf13/cobra"
@@ -66,7 +67,7 @@ Knative docs: https://github.com/knative/docs.`,
 		// TODO bash completion
 	}
 
-	cmd.SetOutput(uiWriter{o.ui}) // setting output for cmd.Help()
+	cmd.SetOutput(uiBlockWriter{o.ui}) // setting output for cmd.Help()
 
 	o.UIFlags.Set(cmd)
 	o.KubeconfigFlags.Set(cmd)
@@ -118,13 +119,59 @@ Knative docs: https://github.com/knative/docs.`,
 	untagCmd.AddCommand(NewUntagRevisionCmd(NewUntagRevisionOptions(o.ui, o.depsFactory)))
 	cmd.AddCommand(untagCmd)
 
-	VisitCommands(cmd, func(c *cobra.Command) {
-		if c.Args == nil {
-			c.Args = cobra.NoArgs
-		}
-	})
+	VisitCommands(cmd, reconfigureCmdWithSubcmd)
+	VisitCommands(cmd, reconfigureLeafCmd)
 
 	return cmd
+}
+
+func reconfigureCmdWithSubcmd(cmd *cobra.Command) {
+	if len(cmd.Commands()) == 0 {
+		return
+	}
+
+	if cmd.Args == nil {
+		cmd.Args = cobra.ArbitraryArgs
+	}
+	if cmd.RunE == nil {
+		cmd.RunE = ShowSubcommands
+	}
+
+	var strs []string
+	for _, subcmd := range cmd.Commands() {
+		strs = append(strs, subcmd.Use)
+	}
+
+	cmd.Short += " (" + strings.Join(strs, ", ") + ")"
+}
+
+func reconfigureLeafCmd(cmd *cobra.Command) {
+	if len(cmd.Commands()) > 0 {
+		return
+	}
+
+	if cmd.RunE == nil {
+		panic(fmt.Sprintf("Internal: Command '%s' does not set RunE", cmd.CommandPath()))
+	}
+
+	if cmd.Args == nil {
+		origRunE := cmd.RunE
+		cmd.RunE = func(cmd2 *cobra.Command, args []string) error {
+			if len(args) > 0 {
+				return fmt.Errorf("command '%s' does not accept extra arguments '%s'", args[0], cmd2.CommandPath())
+			}
+			return origRunE(cmd2, args)
+		}
+		cmd.Args = cobra.ArbitraryArgs
+	}
+}
+
+func ShowSubcommands(cmd *cobra.Command, args []string) error {
+	var strs []string
+	for _, subcmd := range cmd.Commands() {
+		strs = append(strs, subcmd.Use)
+	}
+	return fmt.Errorf("Use one of available subcommands: %s", strings.Join(strs, ", "))
 }
 
 func ShowHelp(cmd *cobra.Command, args []string) error {
@@ -139,13 +186,13 @@ func VisitCommands(cmd *cobra.Command, f func(*cobra.Command)) {
 	}
 }
 
-type uiWriter struct {
+type uiBlockWriter struct {
 	ui ui.UI
 }
 
-var _ io.Writer = uiWriter{}
+var _ io.Writer = uiBlockWriter{}
 
-func (w uiWriter) Write(p []byte) (n int, err error) {
+func (w uiBlockWriter) Write(p []byte) (n int, err error) {
 	w.ui.PrintBlock(p)
 	return len(p), nil
 }

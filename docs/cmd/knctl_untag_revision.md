@@ -40,5 +40,5 @@ knctl untag revision [flags]
 
 ### SEE ALSO
 
-* [knctl untag](knctl_untag.md)	 - Untag resources (revision)
+* [knctl untag](knctl_untag.md)	 - Untag (revision)
 

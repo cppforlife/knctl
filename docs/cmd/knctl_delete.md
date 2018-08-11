@@ -1,10 +1,10 @@
 ## knctl delete
 
-Delete resource (service, revision, route, build)
+Delete (build, revision, route, service)
 
 ### Synopsis
 
-Delete resource (service, revision, route, build)
+Delete (build, revision, route, service)
 
 ```
 knctl delete [flags]
@@ -29,7 +29,7 @@ knctl delete [flags]
 
 ### SEE ALSO
 
-* [knctl](knctl.md)	 - knctl controls Knative resources
+* [knctl](knctl.md)	 - knctl controls Knative resources (annotate, build, create, curl, delete, deploy, install, list, logs, open, route, tag, untag, version)
 * [knctl delete build](knctl_delete_build.md)	 - Delete build
 * [knctl delete revision](knctl_delete_revision.md)	 - Delete revision
 * [knctl delete route](knctl_delete_route.md)	 - Delete route

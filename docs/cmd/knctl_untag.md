@@ -1,10 +1,10 @@
 ## knctl untag
 
-Untag resources (revision)
+Untag (revision)
 
 ### Synopsis
 
-Untag resources (revision)
+Untag (revision)
 
 ```
 knctl untag [flags]
@@ -29,6 +29,6 @@ knctl untag [flags]
 
 ### SEE ALSO
 
-* [knctl](knctl.md)	 - knctl controls Knative resources
+* [knctl](knctl.md)	 - knctl controls Knative resources (annotate, build, create, curl, delete, deploy, install, list, logs, open, route, tag, untag, version)
 * [knctl untag revision](knctl_untag_revision.md)	 - Untag revision
 

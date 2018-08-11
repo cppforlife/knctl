@@ -1,10 +1,10 @@
 ## knctl create
 
-Create resources (namespace, service-account, basic-auth-secret, ssh-auth-secret)
+Create (basic-auth-secret, domain, namespace, service-account, ssh-auth-secret)
 
 ### Synopsis
 
-Create resources (namespace, service-account, basic-auth-secret, ssh-auth-secret)
+Create (basic-auth-secret, domain, namespace, service-account, ssh-auth-secret)
 
 ```
 knctl create [flags]
@@ -29,7 +29,7 @@ knctl create [flags]
 
 ### SEE ALSO
 
-* [knctl](knctl.md)	 - knctl controls Knative resources
+* [knctl](knctl.md)	 - knctl controls Knative resources (annotate, build, create, curl, delete, deploy, install, list, logs, open, route, tag, untag, version)
 * [knctl create basic-auth-secret](knctl_create_basic-auth-secret.md)	 - Create basic auth secret
 * [knctl create domain](knctl_create_domain.md)	 - Create domain
 * [knctl create namespace](knctl_create_namespace.md)	 - Create namespace

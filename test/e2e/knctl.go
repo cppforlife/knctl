@@ -35,6 +35,7 @@ type Knctl struct {
 type RunOpts struct {
 	NoNamespace  bool
 	AllowError   bool
+	StderrWriter io.Writer
 	StdoutWriter io.Writer
 	CancelCh     chan struct{}
 	Redact       bool
@@ -52,11 +53,21 @@ func (k Knctl) RunWithOpts(args []string, opts RunOpts) (string, error) {
 		args = append(args, []string{"-n", k.namespace}...)
 	}
 
-	var stderr bytes.Buffer
-	var stdout bytes.Buffer
+	var stderr, stdout bytes.Buffer
 
 	cmd := exec.Command("knctl", args...)
-	cmd.Stderr = &stderr
+
+	if opts.StderrWriter != nil {
+		cmd.Stderr = opts.StderrWriter
+	} else {
+		cmd.Stderr = &stderr
+	}
+
+	if opts.StdoutWriter != nil {
+		cmd.Stdout = opts.StdoutWriter
+	} else {
+		cmd.Stdout = &stdout
+	}
 
 	if opts.CancelCh != nil {
 		go func() {
@@ -65,12 +76,6 @@ func (k Knctl) RunWithOpts(args []string, opts RunOpts) (string, error) {
 				cmd.Process.Signal(os.Interrupt)
 			}
 		}()
-	}
-
-	if opts.StdoutWriter != nil {
-		cmd.Stdout = opts.StdoutWriter
-	} else {
-		cmd.Stdout = &stdout
 	}
 
 	err := cmd.Run()

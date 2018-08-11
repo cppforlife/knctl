@@ -24,8 +24,7 @@ func NewListCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"l"},
-		Short:   "List resources (services, revisions, builds, pods, ingresses)",
-		RunE:    ShowHelp,
+		Short:   "List",
 	}
 	return cmd
 }

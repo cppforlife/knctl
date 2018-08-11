@@ -24,8 +24,7 @@ func NewDeleteCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "delete",
 		Aliases: []string{"del"},
-		Short:   "Delete resource (service, revision, route, build)",
-		RunE:    ShowHelp,
+		Short:   "Delete",
 	}
 	return cmd
 }

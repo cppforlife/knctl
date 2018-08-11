@@ -23,8 +23,7 @@ import (
 func NewTagCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "tag",
-		Short: "Tag resources (revision)",
-		RunE:  ShowHelp,
+		Short: "Tag",
 	}
 	return cmd
 }

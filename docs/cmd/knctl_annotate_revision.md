@@ -40,5 +40,5 @@ knctl annotate revision [flags]
 
 ### SEE ALSO
 
-* [knctl annotate](knctl_annotate.md)	 - Annotate resources (revision)
+* [knctl annotate](knctl_annotate.md)	 - Annotate (revision, service)
 
