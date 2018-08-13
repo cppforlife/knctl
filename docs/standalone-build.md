@@ -10,7 +10,7 @@ $ knctl create namespace -n standalone-build
 $ export KNCTL_NAMESPACE=standalone-build
 ```
 
-Create Docker Hub secret where images will be pushed (assumes that pushing needs authentication, but pulling does not)
+Create Docker Hub secret for pushing images
 
 ```bash
 $ knctl create basic-auth-secret -s docker-reg1 --docker-hub -u <your-username> -p <your-password>
