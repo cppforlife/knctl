@@ -36,9 +36,9 @@ knctl create basic-auth-secret [flags]
 ### Options
 
 ```
-      --docker-hub         Use Docker Hub registry (automatically fills 'type' and 'url')
+      --docker-hub         Preconfigure type and url for Docker Hub registry
       --for-pulling        Convert to pull secret ('kubernetes.io/dockerconfigjson' type)
-      --gcr                Use gcr.io registry (automatically fills 'type' and 'url')
+      --gcr                Preconfigure type and url for gcr.io registry
       --generate-name      Set to generate name
   -h, --help               help for basic-auth-secret
   -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)

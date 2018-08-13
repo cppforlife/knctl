@@ -52,8 +52,8 @@ func (s *BasicAuthSecretCreateFlags) Set(cmd *cobra.Command) {
 		cmd.MarkFlagRequired("password")
 	}
 
-	cmd.Flags().BoolVar(&s.DockerHub, "docker-hub", false, "Use Docker Hub registry (automatically fills 'type' and 'url')")
-	cmd.Flags().BoolVar(&s.GCR, "gcr", false, "Use gcr.io registry (automatically fills 'type' and 'url')")
+	cmd.Flags().BoolVar(&s.DockerHub, "docker-hub", false, "Preconfigure type and url for Docker Hub registry")
+	cmd.Flags().BoolVar(&s.GCR, "gcr", false, "Preconfigure type and url for gcr.io registry")
 
 	cmd.Flags().BoolVar(&s.ForPulling, "for-pulling", false, "Convert to pull secret ('kubernetes.io/dockerconfigjson' type)")
 }
