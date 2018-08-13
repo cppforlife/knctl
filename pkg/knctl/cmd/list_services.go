@@ -62,6 +62,9 @@ func (o *ListServicesOptions) Run() error {
 		return err
 	}
 
+	internalDomainHeader := uitable.NewHeader("Internal Domain")
+	internalDomainHeader.Hidden = true
+
 	table := uitable.Table{
 		Title: fmt.Sprintf("Services in namespace '%s'", o.NamespaceFlags.Name),
 
@@ -70,7 +73,7 @@ func (o *ListServicesOptions) Run() error {
 		Header: []uitable.Header{
 			uitable.NewHeader("Name"),
 			uitable.NewHeader("Domain"),
-			uitable.NewHeader("Internal Domain"),
+			internalDomainHeader,
 			uitable.NewHeader("Annotations"),
 			uitable.NewHeader("Age"),
 		},

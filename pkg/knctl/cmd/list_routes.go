@@ -64,6 +64,9 @@ func (o *ListRoutesOptions) Run() error {
 		return err
 	}
 
+	internalDomainHeader := uitable.NewHeader("Internal Domain")
+	internalDomainHeader.Hidden = true
+
 	table := uitable.Table{
 		Title: fmt.Sprintf("Routes in namespace '%s'", o.NamespaceFlags.Name),
 
@@ -75,7 +78,7 @@ func (o *ListRoutesOptions) Run() error {
 			uitable.NewHeader("All Traffic Assigned"),
 			uitable.NewHeader("Ready"),
 			uitable.NewHeader("Domain"),
-			uitable.NewHeader("Internal Domain"),
+			internalDomainHeader,
 			uitable.NewHeader("Age"),
 		},
 
