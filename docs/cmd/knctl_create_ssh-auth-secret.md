@@ -6,6 +6,7 @@ Create SSH auth secret
 
 Create SSH auth secret.
 
+Use 'kubectl get secret -n <namespace>' to list secrets.
 Use 'kubectl delete secret <name> -n <namespace>' to delete secret.
 
 ```

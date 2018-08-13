@@ -6,6 +6,7 @@ Create service account
 
 Create service account.
 
+Use 'kubectl get serviceaccount -n <namespace>' to list service accounts.
 Use 'kubectl delete serviceaccount <name> -n <namespace>' to delete service account.
 
 ```
