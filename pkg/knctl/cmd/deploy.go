@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"github.com/cppforlife/go-cli-ui/ui"
+	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	"github.com/spf13/cobra"
@@ -86,10 +87,12 @@ func (o *DeployOptions) Run() error {
 		return err
 	}
 
-	err = serviceObj.CreateOrUpdate()
+	createdService, err := serviceObj.CreateOrUpdate()
 	if err != nil {
 		return err
 	}
+
+	o.printTable(createdService)
 
 	tags := ctlservice.NewTags(servingClient)
 
@@ -156,4 +159,20 @@ func (o *DeployOptions) updateRevisionTags(
 	}
 
 	return nil
+}
+
+func (o *DeployOptions) printTable(svc *v1alpha1.Service) {
+	table := uitable.Table{
+		Header: []uitable.Header{
+			uitable.NewHeader("Name"),
+		},
+
+		Transpose: true,
+
+		Rows: [][]uitable.Value{
+			{uitable.NewValueString(svc.Name)},
+		},
+	}
+
+	o.ui.PrintTable(table)
 }

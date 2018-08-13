@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/cppforlife/go-cli-ui/ui"
+	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -91,10 +92,12 @@ func (o *CreateBasicAuthSecretOptions) Run() error {
 		secret = o.buildBasicAuthSecret()
 	}
 
-	_, err = coreClient.CoreV1().Secrets(o.SecretFlags.NamespaceFlags.Name).Create(secret)
+	createdSecret, err := coreClient.CoreV1().Secrets(o.SecretFlags.NamespaceFlags.Name).Create(secret)
 	if err != nil {
 		return fmt.Errorf("Creating basic auth secret: %s", err)
 	}
+
+	o.printTable(createdSecret)
 
 	return nil
 }
@@ -146,4 +149,22 @@ func (o *CreateBasicAuthSecretOptions) buildBasicAuthSecret() *corev1.Secret {
 	}
 
 	return secret
+}
+
+func (o *CreateBasicAuthSecretOptions) printTable(s *corev1.Secret) {
+	table := uitable.Table{
+		Header: []uitable.Header{
+			uitable.NewHeader("Name"),
+			uitable.NewHeader("Type"),
+		},
+
+		Transpose: true,
+
+		Rows: [][]uitable.Value{
+			{uitable.NewValueString(s.Name)},
+			{uitable.NewValueString(string(s.Type))},
+		},
+	}
+
+	o.ui.PrintTable(table)
 }

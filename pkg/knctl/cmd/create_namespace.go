@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/cppforlife/go-cli-ui/ui"
+	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -67,10 +68,12 @@ func (o *CreateNamespaceOptions) Run() error {
 		}),
 	}
 
-	_, err = coreClient.CoreV1().Namespaces().Create(namespace)
+	createdNamespace, err := coreClient.CoreV1().Namespaces().Create(namespace)
 	if err != nil {
 		return fmt.Errorf("Creating namespace: %s", err)
 	}
+
+	o.printTable(createdNamespace)
 
 	// TODO idempotent?
 
@@ -80,4 +83,20 @@ func (o *CreateNamespaceOptions) Run() error {
 	}
 
 	return nil
+}
+
+func (o *CreateNamespaceOptions) printTable(ns *corev1.Namespace) {
+	table := uitable.Table{
+		Header: []uitable.Header{
+			uitable.NewHeader("Name"),
+		},
+
+		Transpose: true,
+
+		Rows: [][]uitable.Value{
+			{uitable.NewValueString(ns.Name)},
+		},
+	}
+
+	o.ui.PrintTable(table)
 }

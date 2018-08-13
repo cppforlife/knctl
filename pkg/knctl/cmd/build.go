@@ -18,8 +18,9 @@ package cmd
 
 import (
 	"github.com/cppforlife/go-cli-ui/ui"
+	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 	ctlbuild "github.com/cppforlife/knctl/pkg/knctl/build"
-	buildv1alpha1 "github.com/knative/build/pkg/apis/build/v1alpha1"
+	"github.com/knative/build/pkg/apis/build/v1alpha1"
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -64,7 +65,7 @@ func (o *BuildOptions) Run() error {
 
 	buildsClient := buildClient.BuildV1alpha1().Builds(o.BuildFlags.NamespaceFlags.Name)
 
-	build := &buildv1alpha1.Build{
+	build := &v1alpha1.Build{
 		ObjectMeta: o.BuildCreateFlags.GenerateNameFlags.Apply(metav1.ObjectMeta{
 			Name:      o.BuildFlags.Name,
 			Namespace: o.BuildFlags.NamespaceFlags.Name,
@@ -72,15 +73,17 @@ func (o *BuildOptions) Run() error {
 		Spec: ctlbuild.BuildSpec{}.Build(o.BuildCreateFlags.BuildSpecOpts),
 	}
 
-	build, err = buildsClient.Create(build)
+	createdBuild, err := buildsClient.Create(build)
 	if err != nil {
 		return err // TODO allow updating build?
 	}
 
+	o.printTable(createdBuild)
+
 	cancelCh := make(chan struct{})
 	o.cancelSignals.Watch(func() { close(cancelCh) })
 
-	buildObj := ctlbuild.NewBuild(build, buildsClient, coreClient.CoreV1())
+	buildObj := ctlbuild.NewBuild(createdBuild, buildsClient, coreClient.CoreV1())
 
 	err = buildObj.TailLogs(o.ui, cancelCh)
 	if err != nil {
@@ -88,4 +91,20 @@ func (o *BuildOptions) Run() error {
 	}
 
 	return buildObj.Error(cancelCh)
+}
+
+func (o *BuildOptions) printTable(b *v1alpha1.Build) {
+	table := uitable.Table{
+		Header: []uitable.Header{
+			uitable.NewHeader("Name"),
+		},
+
+		Transpose: true,
+
+		Rows: [][]uitable.Value{
+			{uitable.NewValueString(b.Name)},
+		},
+	}
+
+	o.ui.PrintTable(table)
 }

@@ -20,9 +20,11 @@ import (
 	"fmt"
 
 	"github.com/cppforlife/go-cli-ui/ui"
+	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 type CreateServiceAccountOptions struct {
@@ -69,6 +71,19 @@ func (o *CreateServiceAccountOptions) Run() error {
 		}),
 	}
 
+	o.populateSecrets(serviceAccount, coreClient)
+
+	createdServiceAccount, err := coreClient.CoreV1().ServiceAccounts(o.ServiceAccountFlags.NamespaceFlags.Name).Create(serviceAccount)
+	if err != nil {
+		return fmt.Errorf("Creating service account: %s", err)
+	}
+
+	o.printTable(createdServiceAccount)
+
+	return nil
+}
+
+func (o *CreateServiceAccountOptions) populateSecrets(sa *corev1.ServiceAccount, coreClient kubernetes.Interface) error {
 	for _, secretName := range o.ServiceAccountCreateFlags.Secrets {
 		secret, err := coreClient.CoreV1().Secrets(o.ServiceAccountFlags.NamespaceFlags.Name).Get(secretName, metav1.GetOptions{})
 		if err != nil {
@@ -76,21 +91,32 @@ func (o *CreateServiceAccountOptions) Run() error {
 		}
 
 		if secret.Type == corev1.SecretTypeDockerConfigJson {
-			serviceAccount.ImagePullSecrets = append(serviceAccount.ImagePullSecrets, corev1.LocalObjectReference{Name: secretName})
+			sa.ImagePullSecrets = append(sa.ImagePullSecrets, corev1.LocalObjectReference{Name: secretName})
 		} else {
-			serviceAccount.Secrets = append(serviceAccount.Secrets, corev1.ObjectReference{Name: secretName})
+			sa.Secrets = append(sa.Secrets, corev1.ObjectReference{Name: secretName})
 		}
 	}
 
 	// Explicit image pull secrets
 	for _, secretName := range o.ServiceAccountCreateFlags.ImagePullSecrets {
-		serviceAccount.ImagePullSecrets = append(serviceAccount.ImagePullSecrets, corev1.LocalObjectReference{Name: secretName})
-	}
-
-	_, err = coreClient.CoreV1().ServiceAccounts(o.ServiceAccountFlags.NamespaceFlags.Name).Create(serviceAccount)
-	if err != nil {
-		return fmt.Errorf("Creating service account: %s", err)
+		sa.ImagePullSecrets = append(sa.ImagePullSecrets, corev1.LocalObjectReference{Name: secretName})
 	}
 
 	return nil
+}
+
+func (o *CreateServiceAccountOptions) printTable(sa *corev1.ServiceAccount) {
+	table := uitable.Table{
+		Header: []uitable.Header{
+			uitable.NewHeader("Name"),
+		},
+
+		Transpose: true,
+
+		Rows: [][]uitable.Value{
+			{uitable.NewValueString(sa.Name)},
+		},
+	}
+
+	o.ui.PrintTable(table)
 }

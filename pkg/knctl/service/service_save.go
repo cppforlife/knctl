@@ -19,32 +19,33 @@ package service
 import (
 	"fmt"
 
+	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (s Service) CreateOrUpdate() error {
-	_, createErr := s.servingClient.ServingV1alpha1().Services(s.service.Namespace).Create(&s.service)
+func (s Service) CreateOrUpdate() (*v1alpha1.Service, error) {
+	createdService, createErr := s.servingClient.ServingV1alpha1().Services(s.service.Namespace).Create(&s.service)
 	if createErr != nil {
 		if errors.IsAlreadyExists(createErr) {
 			origService, err := s.servingClient.ServingV1alpha1().Services(s.service.Namespace).Get(s.service.Name, metav1.GetOptions{})
 			if err != nil {
-				return fmt.Errorf("Creating service: %s", createErr)
+				return nil, fmt.Errorf("Creating service: %s", createErr)
 			}
 
 			// TODO currently replaces everything
 			s.service.ResourceVersion = origService.ResourceVersion
 
-			_, updateErr := s.servingClient.ServingV1alpha1().Services(s.service.Namespace).Update(&s.service)
+			updatedService, updateErr := s.servingClient.ServingV1alpha1().Services(s.service.Namespace).Update(&s.service)
 			if updateErr != nil {
-				return fmt.Errorf("Updating service: %s", updateErr)
+				return nil, fmt.Errorf("Updating service: %s", updateErr)
 			}
 
-			return nil
+			return updatedService, nil
 		}
 
-		return fmt.Errorf("Creating service: %s", createErr)
+		return nil, fmt.Errorf("Creating service: %s", createErr)
 	}
 
-	return nil
+	return createdService, nil
 }
