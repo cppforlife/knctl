@@ -103,32 +103,5 @@ func (o *CurlOptions) ingressAddress() (string, error) {
 		return "", err
 	}
 
-	services, err := IngressServices{coreClient}.List()
-	if err != nil {
-		return "", err
-	}
-
-	for _, svc := range services.Items {
-		addrs := []string{}
-		ports := []int32{}
-
-		for _, ing := range svc.Status.LoadBalancer.Ingress {
-			if len(ing.IP) > 0 {
-				addrs = append(addrs, ing.IP)
-			}
-			if len(ing.Hostname) > 0 {
-				addrs = append(addrs, ing.Hostname)
-			}
-		}
-
-		for _, port := range svc.Spec.Ports {
-			ports = append(ports, port.Port)
-		}
-
-		if len(addrs) > 0 && len(ports) > 0 {
-			return fmt.Sprintf("%s:%d", addrs[0], ports[0]), nil
-		}
-	}
-
-	return "", fmt.Errorf("Expected to find at least one ingress address")
+	return IngressServices{coreClient}.PreferredAddress()
 }

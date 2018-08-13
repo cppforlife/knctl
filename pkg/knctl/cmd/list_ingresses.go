@@ -50,7 +50,7 @@ func (o *ListIngressesOptions) Run() error {
 		return err
 	}
 
-	services, err := IngressServices{coreClient}.List()
+	ingSvcs, err := IngressServices{coreClient}.List()
 	if err != nil {
 		return err
 	}
@@ -72,28 +72,18 @@ func (o *ListIngressesOptions) Run() error {
 		},
 	}
 
-	for _, svc := range services.Items {
-		addrs := []string{}
+	for _, svc := range ingSvcs {
 		ports := []string{} // TODO int32
 
-		for _, ing := range svc.Status.LoadBalancer.Ingress {
-			if len(ing.IP) > 0 {
-				addrs = append(addrs, ing.IP)
-			}
-			if len(ing.Hostname) > 0 {
-				addrs = append(addrs, ing.Hostname)
-			}
-		}
-
-		for _, port := range svc.Spec.Ports {
-			ports = append(ports, strconv.Itoa(int(port.Port)))
+		for _, port := range svc.Ports() {
+			ports = append(ports, strconv.Itoa(int(port)))
 		}
 
 		table.Rows = append(table.Rows, []uitable.Value{
-			uitable.NewValueString(svc.Name),
-			uitable.NewValueStrings(addrs),
+			uitable.NewValueString(svc.Name()),
+			uitable.NewValueStrings(svc.Addresses()),
 			uitable.NewValueStrings(ports),
-			NewValueAge(svc.CreationTimestamp.Time),
+			NewValueAge(svc.CreationTime()),
 		})
 	}
 

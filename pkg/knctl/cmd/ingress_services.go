@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -29,7 +30,27 @@ type IngressServices struct {
 	coreClient kubernetes.Interface
 }
 
-func (s IngressServices) List() (*corev1.ServiceList, error) {
+type IngressService interface {
+	Name() string
+	Addresses() []string
+	Ports() []int32
+	CreationTime() time.Time
+}
+
+type IngressServiceLoadBalancer struct {
+	corev1.Service
+}
+
+var _ IngressService = IngressServiceLoadBalancer{}
+
+type IngressServiceNodePort struct {
+	coreClient kubernetes.Interface
+	corev1.Service
+}
+
+var _ IngressService = IngressServiceNodePort{}
+
+func (s IngressServices) List() ([]IngressService, error) {
 	listOpts := metav1.ListOptions{
 		LabelSelector: labels.Set(map[string]string{
 			"knative": "ingressgateway",
@@ -43,5 +64,105 @@ func (s IngressServices) List() (*corev1.ServiceList, error) {
 		return nil, fmt.Errorf("Listing services in istio namespace: %s", err)
 	}
 
-	return services, nil
+	var ingSvcs []IngressService
+
+	for _, svc := range services.Items {
+		switch svc.Spec.Type {
+		case corev1.ServiceTypeLoadBalancer:
+			ingSvcs = append(ingSvcs, IngressServiceLoadBalancer{svc})
+
+		case corev1.ServiceTypeNodePort:
+			ingSvcs = append(ingSvcs, IngressServiceNodePort{s.coreClient, svc})
+
+		case corev1.ServiceTypeClusterIP, corev1.ServiceTypeExternalName:
+			// TODO ing service
+		}
+	}
+
+	return ingSvcs, nil
+}
+
+func (s IngressServices) PreferredAddress() (string, error) {
+	ingSvcs, err := s.List()
+	if err != nil {
+		return "", err
+	}
+
+	for _, svc := range ingSvcs {
+		addrs := svc.Addresses()
+		ports := svc.Ports()
+
+		if len(addrs) > 0 && len(ports) > 0 {
+			return fmt.Sprintf("%s:%d", addrs[0], ports[0]), nil
+		}
+	}
+
+	return "", fmt.Errorf("Expected to find at least one ingress address")
+}
+
+func (s IngressServiceLoadBalancer) Name() string { return s.Service.Name }
+
+func (s IngressServiceLoadBalancer) CreationTime() time.Time {
+	return s.CreationTimestamp.Time
+}
+
+func (s IngressServiceLoadBalancer) Addresses() []string {
+	addrs := []string{}
+
+	for _, ing := range s.Status.LoadBalancer.Ingress {
+		if len(ing.IP) > 0 {
+			addrs = append(addrs, ing.IP)
+		}
+		if len(ing.Hostname) > 0 {
+			addrs = append(addrs, ing.Hostname)
+		}
+	}
+
+	return addrs
+}
+
+func (s IngressServiceLoadBalancer) Ports() []int32 {
+	ports := []int32{}
+
+	for _, port := range s.Spec.Ports {
+		ports = append(ports, port.Port)
+	}
+
+	return ports
+}
+
+func (s IngressServiceNodePort) Name() string { return s.Service.Name }
+
+func (s IngressServiceNodePort) CreationTime() time.Time {
+	return s.CreationTimestamp.Time
+}
+
+func (s IngressServiceNodePort) Addresses() []string {
+	addrs := []string{}
+
+	nodes, err := s.coreClient.CoreV1().Nodes().List(metav1.ListOptions{})
+	if err != nil {
+		return nil // TODO propagate error
+	}
+
+	for _, node := range nodes.Items {
+		for _, addr := range node.Status.Addresses {
+			switch addr.Type {
+			case corev1.NodeHostName, corev1.NodeExternalIP, corev1.NodeExternalDNS:
+				addrs = append(addrs, addr.Address)
+			}
+		}
+	}
+
+	return addrs
+}
+
+func (s IngressServiceNodePort) Ports() []int32 {
+	ports := []int32{}
+
+	for _, port := range s.Spec.Ports {
+		ports = append(ports, port.NodePort)
+	}
+
+	return ports
 }
