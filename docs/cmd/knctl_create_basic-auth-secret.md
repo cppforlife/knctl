@@ -40,7 +40,7 @@ knctl create basic-auth-secret [flags]
       --gcr                Use gcr.io registry (automatically fills 'type' and 'url')
   -h, --help               help for basic-auth-secret
   -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)
-  -p, --password string    Set password
+  -p, --password string    Set password ($KNCTL_BASIC_AUTH_SECRET_PASSWORD)
   -s, --secret string      Specified secret
       --type string        Set type (example: docker, ssh)
       --url string         Set url (example: https://index.docker.io/v1/, https://github.com)

@@ -18,6 +18,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
@@ -40,8 +42,11 @@ func (s *BasicAuthSecretCreateFlags) Set(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&s.Username, "username", "u", "", "Set username")
 	cmd.MarkFlagRequired("username")
 
-	cmd.Flags().StringVarP(&s.Password, "password", "p", "", "Set password")
-	cmd.MarkFlagRequired("password")
+	defaultPassword := os.Getenv("KNCTL_BASIC_AUTH_SECRET_PASSWORD")
+	cmd.Flags().StringVarP(&s.Password, "password", "p", defaultPassword, "Set password ($KNCTL_BASIC_AUTH_SECRET_PASSWORD)")
+	if len(defaultPassword) == 0 {
+		cmd.MarkFlagRequired("password")
+	}
 
 	cmd.Flags().BoolVar(&s.DockerHub, "docker-hub", false, "Use Docker Hub registry (automatically fills 'type' and 'url')")
 	cmd.Flags().BoolVar(&s.GCR, "gcr", false, "Use gcr.io registry (automatically fills 'type' and 'url')")
