@@ -17,6 +17,7 @@ limitations under the License.
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/cppforlife/go-cli-ui/ui"
@@ -51,6 +52,9 @@ Use 'kubectl delete secret <name> -n <namespace>' to delete secret.`,
   # Create Docker registry basic auth secret 'secret1' in namespace 'ns1'
   knctl create basic-auth-secret -s secret1 --docker-hub --username username --password password -n ns1
 
+  # Create Docker registry basic auth secret 'secret1' for pulling images in namespace 'ns1'
+  knctl create basic-auth-secret -s secret1 --docker-hub --username username --password password --for-pulling -n ns1
+
   # Create GCR.io registry basic auth secret 'secret1' in namespace 'ns1'
   knctl create basic-auth-secret -s secret1 --gcr --username username --password password -n ns1
 
@@ -74,6 +78,56 @@ func (o *CreateBasicAuthSecretOptions) Run() error {
 		return err
 	}
 
+	var secret *corev1.Secret
+
+	if o.BasicAuthSecretCreateFlags.ForPulling {
+		secret, err = o.buildPullSecret()
+		if err != nil {
+			return err
+		}
+	} else {
+		secret = o.buildBasicAuthSecret()
+	}
+
+	_, err = coreClient.CoreV1().Secrets(o.SecretFlags.NamespaceFlags.Name).Create(secret)
+	if err != nil {
+		return fmt.Errorf("Creating basic auth secret: %s", err)
+	}
+
+	return nil
+}
+
+func (o *CreateBasicAuthSecretOptions) buildPullSecret() (*corev1.Secret, error) {
+	content := map[string]interface{}{
+		"auths": map[string]interface{}{
+			o.BasicAuthSecretCreateFlags.URL: map[string]interface{}{
+				"username": o.BasicAuthSecretCreateFlags.Username,
+				"password": o.BasicAuthSecretCreateFlags.Password,
+				"email":    "noop",
+			},
+		},
+	}
+
+	contentBytes, err := json.Marshal(content)
+	if err != nil {
+		return nil, err
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      o.SecretFlags.Name, // TODO generate name
+			Namespace: o.SecretFlags.NamespaceFlags.Name,
+		},
+		Type: corev1.SecretTypeDockerConfigJson,
+		StringData: map[string]string{
+			corev1.DockerConfigJsonKey: string(contentBytes),
+		},
+	}
+
+	return secret, nil
+}
+
+func (o *CreateBasicAuthSecretOptions) buildBasicAuthSecret() *corev1.Secret {
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      o.SecretFlags.Name, // TODO generate name
@@ -89,10 +143,5 @@ func (o *CreateBasicAuthSecretOptions) Run() error {
 		},
 	}
 
-	_, err = coreClient.CoreV1().Secrets(o.SecretFlags.NamespaceFlags.Name).Create(secret)
-	if err != nil {
-		return fmt.Errorf("Creating basic auth secret: %s", err)
-	}
-
-	return nil
+	return secret
 }

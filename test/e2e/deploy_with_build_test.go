@@ -136,12 +136,14 @@ func TestDeployWithBuildPrivateImage(t *testing.T) {
 			"-p", env.BuildDockerPassword,
 		}, RunOpts{Redact: true})
 
-		kubectl.RunWithOpts([]string{
-			"create", "secret", "docker-registry", pullDockerSecretName,
-			"--docker-server", "https://index.docker.io",
-			"--docker-username", env.BuildDockerUsername,
-			"--docker-password", env.BuildDockerPassword,
-			"--docker-email", "foo",
+		knctl.RunWithOpts([]string{
+			"create",
+			"basic-auth-secret",
+			"-s", pullDockerSecretName,
+			"--docker-hub",
+			"-u", env.BuildDockerUsername,
+			"-p", env.BuildDockerPassword,
+			"--for-pulling",
 		}, RunOpts{Redact: true})
 
 		knctl.Run([]string{
@@ -149,7 +151,7 @@ func TestDeployWithBuildPrivateImage(t *testing.T) {
 			"service-account",
 			"-a", buildServiceAccountName,
 			"-s", pushPullDockerSecretName,
-			"-p", pullDockerSecretName,
+			"-s", pullDockerSecretName,
 		})
 	})
 

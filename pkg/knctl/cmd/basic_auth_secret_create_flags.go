@@ -29,6 +29,8 @@ type BasicAuthSecretCreateFlags struct {
 
 	DockerHub bool
 	GCR       bool
+
+	ForPulling bool
 }
 
 func (s *BasicAuthSecretCreateFlags) Set(cmd *cobra.Command) {
@@ -43,6 +45,8 @@ func (s *BasicAuthSecretCreateFlags) Set(cmd *cobra.Command) {
 
 	cmd.Flags().BoolVar(&s.DockerHub, "docker-hub", false, "Use Docker Hub registry (automatically fills 'type' and 'url')")
 	cmd.Flags().BoolVar(&s.GCR, "gcr", false, "Use gcr.io registry (automatically fills 'type' and 'url')")
+
+	cmd.Flags().BoolVar(&s.ForPulling, "for-pulling", false, "Convert to pull secret ('kubernetes.io/dockerconfigjson' type)")
 }
 
 func (s *BasicAuthSecretCreateFlags) BackfillTypeAndURL() error {

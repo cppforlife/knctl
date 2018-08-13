@@ -19,17 +19,13 @@ $ knctl create basic-auth-secret -s docker-reg1 --docker-hub -u <your-username> 
 If necessary, create Docker Hub secret for pulling images
 
 ```bash
-$ kubectl -n deploy-from-git create secret docker-registry docker-reg2 \
-    --docker-server https://index.docker.io \
-    --docker-username <your-username> \
-    --docker-password <your-password> \
-    --docker-email noop
+$ knctl create basic-auth-secret -s docker-reg2 --docker-hub -u <your-username> -p <your-password> --for-pulling
 ```
 
 Create service account that references above credentials
 
 ```bash
-$ knctl create service-account -a serv-acct1 -s docker-reg1 [ -p docker-reg2 ]
+$ knctl create service-account -a serv-acct1 -s docker-reg1 [ -s docker-reg2 ]
 ```
 
 Deploy service that builds image from a Git repo, and then deploys it

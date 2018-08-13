@@ -22,6 +22,9 @@ knctl create basic-auth-secret [flags]
   # Create Docker registry basic auth secret 'secret1' in namespace 'ns1'
   knctl create basic-auth-secret -s secret1 --docker-hub --username username --password password -n ns1
 
+  # Create Docker registry basic auth secret 'secret1' for pulling images in namespace 'ns1'
+  knctl create basic-auth-secret -s secret1 --docker-hub --username username --password password --for-pulling -n ns1
+
   # Create GCR.io registry basic auth secret 'secret1' in namespace 'ns1'
   knctl create basic-auth-secret -s secret1 --gcr --username username --password password -n ns1
 
@@ -33,6 +36,7 @@ knctl create basic-auth-secret [flags]
 
 ```
       --docker-hub         Use Docker Hub registry (automatically fills 'type' and 'url')
+      --for-pulling        Convert to pull secret ('kubernetes.io/dockerconfigjson' type)
       --gcr                Use gcr.io registry (automatically fills 'type' and 'url')
   -h, --help               help for basic-auth-secret
   -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)

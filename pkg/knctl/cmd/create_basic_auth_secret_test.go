@@ -119,6 +119,32 @@ func TestNewCreateBasicAuthSecretCmd_OkGCR(t *testing.T) {
 	})
 }
 
+func TestNewCreateBasicAuthSecretCmd_OkForPulling(t *testing.T) {
+	realCmd := NewCreateBasicAuthSecretOptions(nil, NewDepsFactoryImpl())
+	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd))
+	cmd.Execute([]string{
+		"--namespace", "test-namespace",
+		"--secret", "test-secret",
+		"--type", "test-type",
+		"--url", "test-url",
+		"--username", "test-username",
+		"--password", "test-password",
+		"--for-pulling",
+	})
+	cmd.ExpectReachesExecution()
+
+	DeepEqual(t, realCmd.SecretFlags,
+		SecretFlags{NamespaceFlags{"test-namespace"}, "test-secret"})
+
+	DeepEqual(t, realCmd.BasicAuthSecretCreateFlags, BasicAuthSecretCreateFlags{
+		Type:       "test-type",
+		URL:        "test-url",
+		Username:   "test-username",
+		Password:   "test-password",
+		ForPulling: true,
+	})
+}
+
 func TestNewCreateBasicAuthSecretCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewCreateBasicAuthSecretOptions(nil, NewDepsFactoryImpl())
 	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd))

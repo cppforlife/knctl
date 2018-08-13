@@ -69,9 +69,19 @@ func (o *CreateServiceAccountOptions) Run() error {
 	}
 
 	for _, secretName := range o.ServiceAccountCreateFlags.Secrets {
-		serviceAccount.Secrets = append(serviceAccount.Secrets, corev1.ObjectReference{Name: secretName})
+		secret, err := coreClient.CoreV1().Secrets(o.ServiceAccountFlags.NamespaceFlags.Name).Get(secretName, metav1.GetOptions{})
+		if err != nil {
+			return fmt.Errorf("Getting secret '%s': %s", secretName, err)
+		}
+
+		if secret.Type == corev1.SecretTypeDockerConfigJson {
+			serviceAccount.ImagePullSecrets = append(serviceAccount.ImagePullSecrets, corev1.LocalObjectReference{Name: secretName})
+		} else {
+			serviceAccount.Secrets = append(serviceAccount.Secrets, corev1.ObjectReference{Name: secretName})
+		}
 	}
 
+	// Explicit image pull secrets
 	for _, secretName := range o.ServiceAccountCreateFlags.ImagePullSecrets {
 		serviceAccount.ImagePullSecrets = append(serviceAccount.ImagePullSecrets, corev1.LocalObjectReference{Name: secretName})
 	}
