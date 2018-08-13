@@ -22,8 +22,9 @@ import (
 
 func NewCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create",
-		Short: "Create",
+		Use:     "create",
+		Aliases: []string{"c"},
+		Short:   "Create",
 	}
 	return cmd
 }

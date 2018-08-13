@@ -40,8 +40,9 @@ func NewCreateBasicAuthSecretOptions(ui ui.UI, depsFactory DepsFactory) *CreateB
 
 func NewCreateBasicAuthSecretCmd(o *CreateBasicAuthSecretOptions) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "basic-auth-secret",
-		Short: "Create basic auth secret",
+		Use:     "basic-auth-secret",
+		Aliases: []string{"bas"},
+		Short:   "Create basic auth secret",
 		Long: `Create basic auth secret.
 
 Use 'kubectl delete secret <name> -n <namespace>' to delete secret.`,

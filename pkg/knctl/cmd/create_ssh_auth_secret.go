@@ -39,8 +39,9 @@ func NewCreateSSHAuthSecretOptions(ui ui.UI, depsFactory DepsFactory) *CreateSSH
 
 func NewCreateSSHAuthSecretCmd(o *CreateSSHAuthSecretOptions) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "ssh-auth-secret",
-		Short: "Create SSH auth secret",
+		Use:     "ssh-auth-secret",
+		Aliases: []string{"sas"},
+		Short:   "Create SSH auth secret",
 		Long: `Create SSH auth secret.
 
 Use 'kubectl delete secret <name> -n <namespace>' to delete secret.`,
