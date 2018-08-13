@@ -25,7 +25,7 @@ $ knctl create basic-auth-secret -s docker-reg2 --docker-hub -u <your-username> 
 Create service account that references above credentials
 
 ```bash
-$ knctl create service-account -a serv-acct1 -s docker-reg1 [ -s docker-reg2 ]
+$ knctl create service-account -a serv-acct1 -s docker-reg1 [-s docker-reg2]
 ```
 
 Deploy service that builds image from a Git repo, and then deploys it
