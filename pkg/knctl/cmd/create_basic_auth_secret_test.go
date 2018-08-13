@@ -93,6 +93,19 @@ func TestNewCreateBasicAuthSecretCmd_OkDockerHub(t *testing.T) {
 		Password:  "test-password",
 		DockerHub: true,
 	})
+
+	err := realCmd.BasicAuthSecretCreateFlags.BackfillTypeAndURL()
+	if err != nil {
+		t.Fatalf("Error: %s", err)
+	}
+
+	DeepEqual(t, realCmd.BasicAuthSecretCreateFlags, BasicAuthSecretCreateFlags{
+		Type:      "docker",
+		URL:       "https://index.docker.io/v1/",
+		Username:  "test-username",
+		Password:  "test-password",
+		DockerHub: true,
+	})
 }
 
 func TestNewCreateBasicAuthSecretCmd_OkGCR(t *testing.T) {
@@ -113,6 +126,19 @@ func TestNewCreateBasicAuthSecretCmd_OkGCR(t *testing.T) {
 	DeepEqual(t, realCmd.BasicAuthSecretCreateFlags, BasicAuthSecretCreateFlags{
 		Type:     "",
 		URL:      "",
+		Username: "test-username",
+		Password: "test-password",
+		GCR:      true,
+	})
+
+	err := realCmd.BasicAuthSecretCreateFlags.BackfillTypeAndURL()
+	if err != nil {
+		t.Fatalf("Error: %s", err)
+	}
+
+	DeepEqual(t, realCmd.BasicAuthSecretCreateFlags, BasicAuthSecretCreateFlags{
+		Type:     "docker",
+		URL:      "https://gcr.io",
 		Username: "test-username",
 		Password: "test-password",
 		GCR:      true,
