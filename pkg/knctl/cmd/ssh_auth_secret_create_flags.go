@@ -39,5 +39,4 @@ func (s *SSHAuthSecretCreateFlags) Set(cmd *cobra.Command) {
 	}
 
 	cmd.Flags().StringVar(&s.KnownHosts, "known-hosts", "", "Set known hosts")
-	cmd.MarkFlagRequired("known-hosts")
 }

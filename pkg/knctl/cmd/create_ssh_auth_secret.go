@@ -71,8 +71,11 @@ func (o *CreateSSHAuthSecretOptions) Run() error {
 		Type: corev1.SecretTypeSSHAuth,
 		StringData: map[string]string{
 			corev1.SSHAuthPrivateKey: o.SSHAuthSecretCreateFlags.PrivateKey,
-			"known_hosts":            o.SSHAuthSecretCreateFlags.KnownHosts,
 		},
+	}
+
+	if len(o.SSHAuthSecretCreateFlags.KnownHosts) > 0 {
+		secret.StringData["known_hosts"] = o.SSHAuthSecretCreateFlags.KnownHosts
 	}
 
 	_, err = coreClient.CoreV1().Secrets(o.SecretFlags.NamespaceFlags.Name).Create(secret)
