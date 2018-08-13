@@ -63,6 +63,16 @@ func (o *CreateSSHAuthSecretOptions) Run() error {
 		return err
 	}
 
+	err = o.SSHAuthSecretCreateFlags.BackfillPrivateKey()
+	if err != nil {
+		return err
+	}
+
+	err = o.SSHAuthSecretCreateFlags.Validate()
+	if err != nil {
+		return err
+	}
+
 	coreClient, err := o.depsFactory.CoreClient()
 	if err != nil {
 		return err

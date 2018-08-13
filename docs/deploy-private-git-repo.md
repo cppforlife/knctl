@@ -13,7 +13,11 @@ $ export KNCTL_NAMESPACE=deploy-from-git
 Create SSH secret to pull Git repository
 
 ```bash
-$ knctl create ssh-auth-secret -s git1 --github --private-key "..."
+$ knctl create ssh-auth-secret -s git1 --github --private-key-path ~/.ssh/
+
+# ... or for non-github.com urls ...
+
+$ knctl create ssh-auth-secret -s git1 --type git --url gitlab.com --private-key-path ~/.ssh/
 ```
 
 Create Docker Hub secret for pushing images

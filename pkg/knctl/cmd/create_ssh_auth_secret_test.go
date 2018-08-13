@@ -108,5 +108,5 @@ func TestNewCreateSSHAuthSecretCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewCreateSSHAuthSecretOptions(nil, NewDepsFactoryImpl())
 	cmd := NewTestCmd(t, NewCreateSSHAuthSecretCmd(realCmd))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"namespace", "private-key", "secret"})
+	cmd.ExpectRequiredFlags([]string{"namespace", "secret"})
 }
