@@ -30,10 +30,20 @@ type Env struct {
 	BuildGitRevisionV1 string
 	BuildGitRevisionV2 string
 
+	BuildPrivateGit EnvBuildPrivateGit
+
 	BuildPublicImage    string // push with auth, pull w/o auth
 	BuildPrivateImage   string // push and pull requires auth
 	BuildDockerUsername string
 	BuildDockerPassword string
+}
+
+type EnvBuildPrivateGit struct {
+	URL        string // push and pull requires auth
+	SSHPullKey string // key for pulling
+	Revision   string
+	RevisionV1 string
+	RevisionV2 string
 }
 
 func BuildEnv(t *testing.T) Env {
@@ -44,6 +54,15 @@ func BuildEnv(t *testing.T) Env {
 		BuildGitRevision:   os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION"),
 		BuildGitRevisionV1: os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION_V1"), // See deploy_with_build_test.go for usage
 		BuildGitRevisionV2: os.Getenv("KNCTL_E2E_BUILD_GIT_REVISION_V2"),
+
+		// See deploy_build_private_git_private_image_test.go for usage
+		BuildPrivateGit: EnvBuildPrivateGit{
+			URL:        os.Getenv("KNCTL_E2E_BUILD_PRIVATE_GIT_URL"),
+			SSHPullKey: os.Getenv("KNCTL_E2E_BUILD_PRIVATE_GIT_SSH_PULL_KEY"),
+			Revision:   os.Getenv("KNCTL_E2E_BUILD_PRIVATE_GIT_REVISION"),
+			RevisionV1: os.Getenv("KNCTL_E2E_BUILD_PRIVATE_GIT_REVISION_V1"),
+			RevisionV2: os.Getenv("KNCTL_E2E_BUILD_PRIVATE_GIT_REVISION_V2"),
+		},
 
 		BuildPublicImage:    os.Getenv("KNCTL_E2E_BUILD_PUBLIC_IMAGE"),
 		BuildPrivateImage:   os.Getenv("KNCTL_E2E_BUILD_PRIVATE_IMAGE"),
@@ -72,6 +91,22 @@ func (e Env) Validate(t *testing.T) {
 	}
 	if len(e.BuildGitRevisionV2) == 0 {
 		errStrs = append(errStrs, "Expected BuildGitRevisionV2 to be non-empty")
+	}
+
+	if len(e.BuildPrivateGit.URL) == 0 {
+		errStrs = append(errStrs, "Expected BuildPrivateGit.URL to be non-empty")
+	}
+	if len(e.BuildPrivateGit.SSHPullKey) == 0 {
+		errStrs = append(errStrs, "Expected BuildPrivateGit.SSHPullKey to be non-empty")
+	}
+	if len(e.BuildPrivateGit.Revision) == 0 {
+		errStrs = append(errStrs, "Expected BuildPrivateGit.Revision to be non-empty")
+	}
+	if len(e.BuildPrivateGit.RevisionV1) == 0 {
+		errStrs = append(errStrs, "Expected BuildPrivateGit.RevisionV1 to be non-empty")
+	}
+	if len(e.BuildPrivateGit.RevisionV2) == 0 {
+		errStrs = append(errStrs, "Expected BuildPrivateGit.RevisionV2 to be non-empty")
 	}
 
 	if len(e.BuildPublicImage) == 0 {

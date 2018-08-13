@@ -33,7 +33,7 @@ type SSHAuthSecretCreateFlags struct {
 func (s *SSHAuthSecretCreateFlags) Set(cmd *cobra.Command) {
 	s.GenerateNameFlags.Set(cmd)
 
-	cmd.Flags().StringVar(&s.URL, "url", "", "Set url (example: https://github.com)")
+	cmd.Flags().StringVar(&s.URL, "url", "", "Set url (example: github.com)")
 	cmd.MarkFlagRequired("url")
 
 	defaultKey := os.Getenv("KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY")
