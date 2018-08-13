@@ -16,4 +16,9 @@
 
 set -e -x -u
 
-KNCTL_KUBECONFIG= KNCTL_NAMESPACE= GOCACHE=off go test ./pkg/... -test.v $@
+export KNCTL_NAMESPACE=
+export KNCTL_KUBECONFIG=
+export KNCTL_BASIC_AUTH_SECRET_PASSWORD=
+export KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY=
+
+GOCACHE=off go test ./pkg/... -test.v $@

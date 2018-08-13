@@ -17,6 +17,8 @@ limitations under the License.
 package cmd
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
@@ -30,8 +32,11 @@ func (s *SSHAuthSecretCreateFlags) Set(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&s.URL, "url", "", "Set url (example: https://github.com)")
 	cmd.MarkFlagRequired("url")
 
-	cmd.Flags().StringVar(&s.PrivateKey, "private-key", "", "Set private key in PEM format")
-	cmd.MarkFlagRequired("private-key")
+	defaultKey := os.Getenv("KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY")
+	cmd.Flags().StringVar(&s.PrivateKey, "private-key", defaultKey, "Set private key in PEM format ($KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY)")
+	if len(defaultKey) == 0 {
+		cmd.MarkFlagRequired("private-key")
+	}
 
 	cmd.Flags().StringVar(&s.KnownHosts, "known-hosts", "", "Set known hosts")
 	cmd.MarkFlagRequired("known-hosts")

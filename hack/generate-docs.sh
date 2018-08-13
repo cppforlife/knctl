@@ -16,4 +16,9 @@
 
 set -e -x -u
 
-KNCTL_KUBECONFIG= KNCTL_NAMESPACE= go run ./hack/generate-docs.go
+export KNCTL_NAMESPACE=
+export KNCTL_KUBECONFIG=
+export KNCTL_BASIC_AUTH_SECRET_PASSWORD=
+export KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY=
+
+go run ./hack/generate-docs.go
