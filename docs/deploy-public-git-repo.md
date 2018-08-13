@@ -10,13 +10,13 @@ $ knctl create namespace -n deploy-from-git
 $ export KNCTL_NAMESPACE=deploy-from-git
 ```
 
-Create Docker Hub secret where images will be pushed
+Create Docker Hub secret for pushing images
 
 ```bash
 $ knctl create basic-auth-secret -s docker-reg1 --docker-hub -u <your-username> -p <your-password>
 ```
 
-If Docker repository is private, there is no need to create this secret (and use below); otherwise, create Docker Hub secret for pulling images
+If necessary, create Docker Hub secret for pulling images
 
 ```bash
 $ kubectl -n deploy-from-git create secret docker-registry docker-reg2 \
