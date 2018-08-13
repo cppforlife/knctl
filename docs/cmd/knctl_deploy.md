@@ -25,7 +25,8 @@ knctl deploy [flags]
 
 ```
   -e, --env strings              Set environment variable (format: key=value) (can be specified multiple times)
-      --git-revision string      Set Git revision (Examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
+      --generate-name            Set to generate name
+      --git-revision string      Set Git revision (examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
       --git-url string           Set Git URL
   -h, --help                     help for deploy
   -i, --image string             Set image URL

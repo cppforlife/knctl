@@ -63,13 +63,13 @@ func (o *CreateSSHAuthSecretOptions) Run() error {
 	}
 
 	secret := &corev1.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      o.SecretFlags.Name, // TODO generate name
+		ObjectMeta: o.SSHAuthSecretCreateFlags.GenerateNameFlags.Apply(metav1.ObjectMeta{
+			Name:      o.SecretFlags.Name,
 			Namespace: o.SecretFlags.NamespaceFlags.Name,
 			Annotations: map[string]string{
 				"build.knative.dev/git-0": o.SSHAuthSecretCreateFlags.URL,
 			},
-		},
+		}),
 		Type: corev1.SecretTypeSSHAuth,
 		StringData: map[string]string{
 			corev1.SSHAuthPrivateKey: o.SSHAuthSecretCreateFlags.PrivateKey,

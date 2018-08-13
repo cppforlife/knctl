@@ -41,11 +41,14 @@ func TestNewBuildCmd_Ok(t *testing.T) {
 		BuildFlags{NamespaceFlags{"test-namespace"}, "test-build"})
 
 	DeepEqual(t, realCmd.BuildCreateFlags, BuildCreateFlags{
-		ctlbuild.BuildSpecOpts{
-			GitURL:             "test-git-url",
-			GitRevision:        "test-git-revision",
-			ServiceAccountName: "test-service-account",
-			Image:              "test-image",
+		GenerateNameFlags{},
+		BuildCreateArgsFlags{
+			ctlbuild.BuildSpecOpts{
+				GitURL:             "test-git-url",
+				GitRevision:        "test-git-revision",
+				ServiceAccountName: "test-service-account",
+				Image:              "test-image",
+			},
 		},
 	})
 }
@@ -67,11 +70,14 @@ func TestNewBuildCmd_OkLongFlagNames(t *testing.T) {
 		BuildFlags{NamespaceFlags{"test-namespace"}, "test-build"})
 
 	DeepEqual(t, realCmd.BuildCreateFlags, BuildCreateFlags{
-		ctlbuild.BuildSpecOpts{
-			GitURL:             "test-git-url",
-			GitRevision:        "test-git-revision",
-			ServiceAccountName: "test-service-account",
-			Image:              "test-image",
+		GenerateNameFlags{},
+		BuildCreateArgsFlags{
+			ctlbuild.BuildSpecOpts{
+				GitURL:             "test-git-url",
+				GitRevision:        "test-git-revision",
+				ServiceAccountName: "test-service-account",
+				Image:              "test-image",
+			},
 		},
 	})
 }

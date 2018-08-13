@@ -32,11 +32,11 @@ type ServiceSpec struct{}
 func (ServiceSpec) Build(serviceFlags ServiceFlags, deployFlags DeployFlags) (v1alpha1.Service, error) {
 	var buildSpec *buildv1alpha1.BuildSpec
 
-	if deployFlags.BuildCreateFlags.GitURL != "" {
+	if deployFlags.BuildCreateArgsFlags.GitURL != "" {
 		// TODO assumes that same image is used for building and running
-		deployFlags.BuildCreateFlags.Image = deployFlags.Image
+		deployFlags.BuildCreateArgsFlags.Image = deployFlags.Image
 
-		spec := ctlbuild.BuildSpec{}.Build(deployFlags.BuildCreateFlags.BuildSpecOpts)
+		spec := ctlbuild.BuildSpec{}.Build(deployFlags.BuildCreateArgsFlags.BuildSpecOpts)
 		buildSpec = &spec
 	}
 
@@ -53,11 +53,10 @@ func (ServiceSpec) Build(serviceFlags ServiceFlags, deployFlags DeployFlags) (v1
 	}
 
 	service := v1alpha1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: serviceFlags.Name,
-			// TODO generate name
+		ObjectMeta: deployFlags.GenerateNameFlags.Apply(metav1.ObjectMeta{
+			Name:      serviceFlags.Name,
 			Namespace: serviceFlags.NamespaceFlags.Name,
-		},
+		}),
 		Spec: v1alpha1.ServiceSpec{
 			RunLatest: &v1alpha1.RunLatestType{
 				Configuration: v1alpha1.ConfigurationSpec{
@@ -65,7 +64,7 @@ func (ServiceSpec) Build(serviceFlags ServiceFlags, deployFlags DeployFlags) (v1
 					RevisionTemplate: v1alpha1.RevisionTemplateSpec{
 						Spec: v1alpha1.RevisionSpec{
 							// TODO service account may be different for runtime vs build
-							ServiceAccountName: deployFlags.BuildCreateFlags.ServiceAccountName,
+							ServiceAccountName: deployFlags.BuildCreateArgsFlags.ServiceAccountName,
 							Container:          serviceCont,
 						},
 					},

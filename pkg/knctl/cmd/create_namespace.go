@@ -29,7 +29,8 @@ type CreateNamespaceOptions struct {
 	ui          ui.UI
 	depsFactory DepsFactory
 
-	NamespaceFlags NamespaceFlags
+	NamespaceFlags    NamespaceFlags
+	GenerateNameFlags GenerateNameFlags
 }
 
 func NewCreateNamespaceOptions(ui ui.UI, depsFactory DepsFactory) *CreateNamespaceOptions {
@@ -50,6 +51,7 @@ Use 'kubectl delete ns <name>' to delete namespace.`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.NamespaceFlags.Set(cmd)
+	o.GenerateNameFlags.Set(cmd)
 	return cmd
 }
 
@@ -60,9 +62,9 @@ func (o *CreateNamespaceOptions) Run() error {
 	}
 
 	namespace := &corev1.Namespace{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: o.NamespaceFlags.Name, // TODO generate name
-		},
+		ObjectMeta: o.GenerateNameFlags.Apply(metav1.ObjectMeta{
+			Name: o.NamespaceFlags.Name,
+		}),
 	}
 
 	_, err = coreClient.CoreV1().Namespaces().Create(namespace)

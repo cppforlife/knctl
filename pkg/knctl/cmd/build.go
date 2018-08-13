@@ -47,7 +47,7 @@ func NewBuildCmd(o *BuildOptions) *cobra.Command {
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.BuildFlags.Set(cmd)
-	o.BuildCreateFlags.Set(cmd, BuildCreateFlagsOpts{})
+	o.BuildCreateFlags.Set(cmd)
 	return cmd
 }
 
@@ -65,10 +65,10 @@ func (o *BuildOptions) Run() error {
 	buildsClient := buildClient.BuildV1alpha1().Builds(o.BuildFlags.NamespaceFlags.Name)
 
 	build := &buildv1alpha1.Build{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      o.BuildFlags.Name, // TODO generate name
+		ObjectMeta: o.BuildCreateFlags.GenerateNameFlags.Apply(metav1.ObjectMeta{
+			Name:      o.BuildFlags.Name,
 			Namespace: o.BuildFlags.NamespaceFlags.Name,
-		},
+		}),
 		Spec: ctlbuild.BuildSpec{}.Build(o.BuildCreateFlags.BuildSpecOpts),
 	}
 

@@ -23,6 +23,7 @@ knctl create namespace [flags]
 ### Options
 
 ```
+      --generate-name      Set to generate name
   -h, --help               help for namespace
   -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)
 ```

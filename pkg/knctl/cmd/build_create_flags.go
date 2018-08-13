@@ -22,29 +22,28 @@ import (
 )
 
 type BuildCreateFlags struct {
+	GenerateNameFlags GenerateNameFlags
+	BuildCreateArgsFlags
+}
+
+type BuildCreateArgsFlags struct {
 	ctlbuild.BuildSpecOpts
 }
 
-type BuildCreateFlagsOpts struct {
-	Optional bool
-	NoImage  bool
+func (s *BuildCreateFlags) Set(cmd *cobra.Command) {
+	s.GenerateNameFlags.Set(cmd)
+
+	s.BuildCreateArgsFlags.Set(cmd)
+	cmd.MarkFlagRequired("git-url")
+	cmd.MarkFlagRequired("git-revision")
+
+	cmd.Flags().StringVarP(&s.Image, "image", "i", "", "Set image URL")
+	cmd.MarkFlagRequired("image")
 }
 
-func (s *BuildCreateFlags) Set(cmd *cobra.Command, opts BuildCreateFlagsOpts) {
+func (s *BuildCreateArgsFlags) Set(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&s.GitURL, "git-url", "", "Set Git URL")
-	if !opts.Optional {
-		cmd.MarkFlagRequired("git-url")
-	}
-
-	cmd.Flags().StringVar(&s.GitRevision, "git-revision", "", "Set Git revision (Examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)")
-	if !opts.Optional {
-		cmd.MarkFlagRequired("git-revision")
-	}
+	cmd.Flags().StringVar(&s.GitRevision, "git-revision", "", "Set Git revision (examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)")
 
 	cmd.Flags().StringVar(&s.ServiceAccountName, "service-account", "", "Set service account name for building") // TODO separate
-
-	if !opts.NoImage {
-		cmd.Flags().StringVarP(&s.Image, "image", "i", "", "Set image URL")
-		cmd.MarkFlagRequired("image")
-	}
 }

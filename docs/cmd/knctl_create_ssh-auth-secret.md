@@ -24,6 +24,7 @@ knctl create ssh-auth-secret [flags]
 ### Options
 
 ```
+      --generate-name        Set to generate name
   -h, --help                 help for ssh-auth-secret
       --known-hosts string   Set known hosts
   -n, --namespace string     Specified namespace ($KNCTL_NAMESPACE)

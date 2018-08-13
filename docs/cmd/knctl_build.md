@@ -22,7 +22,8 @@ knctl build [flags]
 
 ```
   -b, --build string             Specified build
-      --git-revision string      Set Git revision (Examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
+      --generate-name            Set to generate name
+      --git-revision string      Set Git revision (examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
       --git-url string           Set Git URL
   -h, --help                     help for build
   -i, --image string             Set image URL

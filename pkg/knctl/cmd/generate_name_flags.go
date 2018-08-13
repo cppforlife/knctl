@@ -18,24 +18,21 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type DeployFlags struct {
-	GenerateNameFlags    GenerateNameFlags
-	BuildCreateArgsFlags BuildCreateArgsFlags
-
-	Image string
-	Env   []string
+type GenerateNameFlags struct {
+	GenerateName bool
 }
 
-func (s *DeployFlags) Set(cmd *cobra.Command) {
-	s.GenerateNameFlags.Set(cmd)
-	s.BuildCreateArgsFlags.Set(cmd)
+func (s *GenerateNameFlags) Set(cmd *cobra.Command) {
+	cmd.Flags().BoolVar(&s.GenerateName, "generate-name", false, "Set to generate name")
+}
 
-	// TODO separate service account for pulling?
-
-	cmd.Flags().StringVarP(&s.Image, "image", "i", "", "Set image URL")
-	cmd.MarkFlagRequired("image")
-
-	cmd.Flags().StringSliceVarP(&s.Env, "env", "e", nil, "Set environment variable (format: key=value) (can be specified multiple times)")
+func (s *GenerateNameFlags) Apply(meta metav1.ObjectMeta) metav1.ObjectMeta {
+	if s.GenerateName {
+		meta.GenerateName = meta.Name + "-"
+		meta.Name = ""
+	}
+	return meta
 }

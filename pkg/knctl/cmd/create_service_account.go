@@ -63,10 +63,10 @@ func (o *CreateServiceAccountOptions) Run() error {
 	}
 
 	serviceAccount := &corev1.ServiceAccount{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      o.ServiceAccountFlags.Name, // TODO generate name
+		ObjectMeta: o.ServiceAccountCreateFlags.GenerateNameFlags.Apply(metav1.ObjectMeta{
+			Name:      o.ServiceAccountFlags.Name,
 			Namespace: o.ServiceAccountFlags.NamespaceFlags.Name,
-		},
+		}),
 	}
 
 	for _, secretName := range o.ServiceAccountCreateFlags.Secrets {

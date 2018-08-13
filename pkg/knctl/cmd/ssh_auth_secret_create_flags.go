@@ -23,12 +23,16 @@ import (
 )
 
 type SSHAuthSecretCreateFlags struct {
+	GenerateNameFlags GenerateNameFlags
+
 	URL        string
 	PrivateKey string
 	KnownHosts string
 }
 
 func (s *SSHAuthSecretCreateFlags) Set(cmd *cobra.Command) {
+	s.GenerateNameFlags.Set(cmd)
+
 	cmd.Flags().StringVar(&s.URL, "url", "", "Set url (example: https://github.com)")
 	cmd.MarkFlagRequired("url")
 

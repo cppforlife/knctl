@@ -24,6 +24,8 @@ import (
 )
 
 type BasicAuthSecretCreateFlags struct {
+	GenerateNameFlags GenerateNameFlags
+
 	Type     string
 	URL      string
 	Username string
@@ -36,6 +38,8 @@ type BasicAuthSecretCreateFlags struct {
 }
 
 func (s *BasicAuthSecretCreateFlags) Set(cmd *cobra.Command) {
+	s.GenerateNameFlags.Set(cmd)
+
 	cmd.Flags().StringVar(&s.Type, "type", "", "Set type (example: docker, ssh)")
 	cmd.Flags().StringVar(&s.URL, "url", "", "Set url (example: https://index.docker.io/v1/, https://github.com)")
 

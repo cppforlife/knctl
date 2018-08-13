@@ -24,6 +24,7 @@ knctl create service-account [flags]
 ### Options
 
 ```
+      --generate-name               Set to generate name
   -h, --help                        help for service-account
   -p, --image-pull-secret strings   Set image pull secret (format: secret-name) (can be specified multiple times)
   -n, --namespace string            Specified namespace ($KNCTL_NAMESPACE)

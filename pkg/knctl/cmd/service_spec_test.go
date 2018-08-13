@@ -37,7 +37,7 @@ func TestServiceSpecWithBuildConfiguration(t *testing.T) {
 	}
 
 	deployFlags := DeployFlags{
-		BuildCreateFlags: BuildCreateFlags{
+		BuildCreateArgsFlags: BuildCreateArgsFlags{
 			ctlbuild.BuildSpecOpts{
 				GitURL:             "test-git-url",
 				GitRevision:        "test-git-revision",

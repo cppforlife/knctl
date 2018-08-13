@@ -116,10 +116,10 @@ func (o *CreateBasicAuthSecretOptions) buildPullSecret() (*corev1.Secret, error)
 	}
 
 	secret := &corev1.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      o.SecretFlags.Name, // TODO generate name
+		ObjectMeta: o.BasicAuthSecretCreateFlags.GenerateNameFlags.Apply(metav1.ObjectMeta{
+			Name:      o.SecretFlags.Name,
 			Namespace: o.SecretFlags.NamespaceFlags.Name,
-		},
+		}),
 		Type: corev1.SecretTypeDockerConfigJson,
 		StringData: map[string]string{
 			corev1.DockerConfigJsonKey: string(contentBytes),
@@ -131,13 +131,13 @@ func (o *CreateBasicAuthSecretOptions) buildPullSecret() (*corev1.Secret, error)
 
 func (o *CreateBasicAuthSecretOptions) buildBasicAuthSecret() *corev1.Secret {
 	secret := &corev1.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      o.SecretFlags.Name, // TODO generate name
+		ObjectMeta: o.BasicAuthSecretCreateFlags.GenerateNameFlags.Apply(metav1.ObjectMeta{
+			Name:      o.SecretFlags.Name,
 			Namespace: o.SecretFlags.NamespaceFlags.Name,
 			Annotations: map[string]string{
 				fmt.Sprintf("build.knative.dev/%s-0", o.BasicAuthSecretCreateFlags.Type): o.BasicAuthSecretCreateFlags.URL,
 			},
-		},
+		}),
 		Type: corev1.SecretTypeBasicAuth,
 		StringData: map[string]string{
 			corev1.BasicAuthUsernameKey: o.BasicAuthSecretCreateFlags.Username,

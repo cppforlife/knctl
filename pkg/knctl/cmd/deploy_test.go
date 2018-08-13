@@ -43,7 +43,7 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 		ServiceFlags{NamespaceFlags{"test-namespace"}, "test-service"})
 
 	DeepEqual(t, realCmd.DeployFlags, DeployFlags{
-		BuildCreateFlags: BuildCreateFlags{
+		BuildCreateArgsFlags: BuildCreateArgsFlags{
 			ctlbuild.BuildSpecOpts{
 				GitURL:             "test-git-url",
 				GitRevision:        "test-git-revision",
@@ -74,7 +74,7 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 		ServiceFlags{NamespaceFlags{"test-namespace"}, "test-service"})
 
 	DeepEqual(t, realCmd.DeployFlags, DeployFlags{
-		BuildCreateFlags: BuildCreateFlags{
+		BuildCreateArgsFlags: BuildCreateArgsFlags{
 			ctlbuild.BuildSpecOpts{
 				GitURL:             "test-git-url",
 				GitRevision:        "test-git-revision",
