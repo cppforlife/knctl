@@ -25,11 +25,13 @@ knctl create ssh-auth-secret [flags]
 
 ```
       --generate-name        Set to generate name
+      --github               Preconfigure type and url for Github.com Git access
   -h, --help                 help for ssh-auth-secret
       --known-hosts string   Set known hosts
   -n, --namespace string     Specified namespace ($KNCTL_NAMESPACE)
       --private-key string   Set private key in PEM format ($KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY)
   -s, --secret string        Specified secret
+      --type string          Set type (example: git)
       --url string           Set url (example: github.com)
 ```
 

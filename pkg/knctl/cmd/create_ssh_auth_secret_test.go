@@ -67,9 +67,46 @@ func TestNewCreateSSHAuthSecretCmd_OkLongFlagNames(t *testing.T) {
 	})
 }
 
+func TestNewCreateSSHAuthSecretCmd_OkGithub(t *testing.T) {
+	realCmd := NewCreateSSHAuthSecretOptions(nil, NewDepsFactoryImpl())
+	cmd := NewTestCmd(t, NewCreateSSHAuthSecretCmd(realCmd))
+	cmd.Execute([]string{
+		"--namespace", "test-namespace",
+		"--secret", "test-secret",
+		"--private-key", "test-private-key-pem",
+		"--known-hosts", "test-known-hosts",
+		"--github",
+	})
+	cmd.ExpectReachesExecution()
+
+	DeepEqual(t, realCmd.SecretFlags,
+		SecretFlags{NamespaceFlags{"test-namespace"}, "test-secret"})
+
+	DeepEqual(t, realCmd.SSHAuthSecretCreateFlags, SSHAuthSecretCreateFlags{
+		Type:       "",
+		URL:        "",
+		PrivateKey: "test-private-key-pem",
+		KnownHosts: "test-known-hosts",
+		Github:     true,
+	})
+
+	err := realCmd.SSHAuthSecretCreateFlags.BackfillTypeAndURL()
+	if err != nil {
+		t.Fatalf("Error: %s", err)
+	}
+
+	DeepEqual(t, realCmd.SSHAuthSecretCreateFlags, SSHAuthSecretCreateFlags{
+		Type:       "git",
+		URL:        "github.com",
+		PrivateKey: "test-private-key-pem",
+		KnownHosts: "test-known-hosts",
+		Github:     true,
+	})
+}
+
 func TestNewCreateSSHAuthSecretCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewCreateSSHAuthSecretOptions(nil, NewDepsFactoryImpl())
 	cmd := NewTestCmd(t, NewCreateSSHAuthSecretCmd(realCmd))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"namespace", "private-key", "secret", "url"})
+	cmd.ExpectRequiredFlags([]string{"namespace", "private-key", "secret"})
 }

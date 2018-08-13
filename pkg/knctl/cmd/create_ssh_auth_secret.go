@@ -58,6 +58,11 @@ Use 'kubectl delete secret <name> -n <namespace>' to delete secret.`,
 }
 
 func (o *CreateSSHAuthSecretOptions) Run() error {
+	err := o.SSHAuthSecretCreateFlags.BackfillTypeAndURL()
+	if err != nil {
+		return err
+	}
+
 	coreClient, err := o.depsFactory.CoreClient()
 	if err != nil {
 		return err
@@ -68,7 +73,7 @@ func (o *CreateSSHAuthSecretOptions) Run() error {
 			Name:      o.SecretFlags.Name,
 			Namespace: o.SecretFlags.NamespaceFlags.Name,
 			Annotations: map[string]string{
-				"build.knative.dev/git-0": o.SSHAuthSecretCreateFlags.URL,
+				fmt.Sprintf("build.knative.dev/%s-0", o.SSHAuthSecretCreateFlags.Type): o.SSHAuthSecretCreateFlags.URL,
 			},
 		}),
 		Type: corev1.SecretTypeSSHAuth,

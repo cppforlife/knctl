@@ -17,6 +17,7 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -25,16 +26,19 @@ import (
 type SSHAuthSecretCreateFlags struct {
 	GenerateNameFlags GenerateNameFlags
 
+	Type       string
 	URL        string
 	PrivateKey string
 	KnownHosts string
+
+	Github bool
 }
 
 func (s *SSHAuthSecretCreateFlags) Set(cmd *cobra.Command) {
 	s.GenerateNameFlags.Set(cmd)
 
+	cmd.Flags().StringVar(&s.Type, "type", "", "Set type (example: git)")
 	cmd.Flags().StringVar(&s.URL, "url", "", "Set url (example: github.com)")
-	cmd.MarkFlagRequired("url")
 
 	defaultKey := os.Getenv("KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY")
 	cmd.Flags().StringVar(&s.PrivateKey, "private-key", defaultKey, "Set private key in PEM format ($KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY)")
@@ -43,4 +47,27 @@ func (s *SSHAuthSecretCreateFlags) Set(cmd *cobra.Command) {
 	}
 
 	cmd.Flags().StringVar(&s.KnownHosts, "known-hosts", "", "Set known hosts")
+
+	cmd.Flags().BoolVar(&s.Github, "github", false, "Preconfigure type and url for Github.com Git access")
+}
+
+func (s *SSHAuthSecretCreateFlags) BackfillTypeAndURL() error {
+	if s.Github {
+		if len(s.Type) != 0 || len(s.URL) != 0 {
+			return fmt.Errorf("Expected to not specify --type or --url when preconfigured flags are used")
+		}
+	}
+
+	switch {
+	case s.Github:
+		s.Type = "git"
+		s.URL = "github.com"
+
+	default:
+		if len(s.Type) == 0 || len(s.URL) == 0 {
+			return fmt.Errorf("Expected --type and --url to be non-empty when preconfigured flags are not used")
+		}
+	}
+
+	return nil
 }

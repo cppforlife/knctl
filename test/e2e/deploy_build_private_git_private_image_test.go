@@ -50,11 +50,15 @@ func TestDeployBuildPrivateGitPrivateImage(t *testing.T) {
 	defer cleanUp()
 
 	logger.Section("Add service account with Docker push secret", func() {
+		if !strings.Contains(env.BuildPrivateGit.URL, "github.com") {
+			t.Fatalf("Expected private Git URL '%s' to be github.com URL", env.BuildPrivateGit.URL)
+		}
+
 		knctl.RunWithOpts([]string{
 			"create",
 			"ssh-auth-secret",
 			"-s", pullGitSecretName,
-			"--url", "github.com",
+			"--github",
 			"--private-key", env.BuildPrivateGit.SSHPullKey,
 		}, RunOpts{Redact: true})
 
