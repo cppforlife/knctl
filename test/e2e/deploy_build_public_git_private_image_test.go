@@ -21,7 +21,7 @@ import (
 	"testing"
 )
 
-func TestDeployWithBuildPublicImage(t *testing.T) {
+func TestDeployBuildPublicGitPrivateImage(t *testing.T) {
 	logger := Logger{}
 	env := BuildEnv(t)
 	knctl := Knctl{t, env.Namespace, logger}
@@ -29,16 +29,18 @@ func TestDeployWithBuildPublicImage(t *testing.T) {
 	curl := Curl{t, knctl}
 
 	const (
-		serviceName              = "test-d-w-b-pub-i-service-name"
+		serviceName              = "test-d-b-pub-g-p-i-service-name"
 		pushPullDockerSecretName = serviceName + "-docker-secret"
+		pullDockerSecretName     = serviceName + "-p-docker-secret"
 		buildServiceAccountName  = serviceName + "-service-account"
-		expectedContent1         = "TestDeployWithBuild_ContentV1"
-		expectedContent2         = "TestDeployWithBuild_ContentV2"
+		expectedContent1         = "TestDeployBuild_ContentV1"
+		expectedContent2         = "TestDeployBuild_ContentV2"
 	)
 
 	cleanUp := func() {
 		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "secret", pushPullDockerSecretName}, RunOpts{AllowError: true})
+		kubectl.RunWithOpts([]string{"delete", "secret", pullDockerSecretName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "serviceaccount", buildServiceAccountName}, RunOpts{AllowError: true})
 	}
 
@@ -55,7 +57,23 @@ func TestDeployWithBuildPublicImage(t *testing.T) {
 			"-p", env.BuildDockerPassword,
 		}, RunOpts{Redact: true})
 
-		knctl.Run([]string{"create", "service-account", "-a", buildServiceAccountName, "-s", pushPullDockerSecretName})
+		knctl.RunWithOpts([]string{
+			"create",
+			"basic-auth-secret",
+			"-s", pullDockerSecretName,
+			"--docker-hub",
+			"-u", env.BuildDockerUsername,
+			"-p", env.BuildDockerPassword,
+			"--for-pulling",
+		}, RunOpts{Redact: true})
+
+		knctl.Run([]string{
+			"create",
+			"service-account",
+			"-a", buildServiceAccountName,
+			"-s", pushPullDockerSecretName,
+			"-s", pullDockerSecretName,
+		})
 	})
 
 	logger.Section("Deploy service v1", func() {
@@ -64,7 +82,7 @@ func TestDeployWithBuildPublicImage(t *testing.T) {
 			"-s", serviceName,
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevisionV1,
-			"-i", env.BuildPublicImage,
+			"-i", env.BuildPrivateImage,
 			"--service-account", buildServiceAccountName,
 			"-e", "SIMPLE_MSG=" + expectedContent1,
 		})
@@ -80,7 +98,7 @@ func TestDeployWithBuildPublicImage(t *testing.T) {
 			"-s", serviceName,
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevisionV2,
-			"-i", env.BuildPublicImage,
+			"-i", env.BuildPrivateImage,
 			"--service-account", buildServiceAccountName,
 			"-e", "SIMPLE_MSG_V2=" + expectedContent2,
 		})
