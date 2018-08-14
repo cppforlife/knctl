@@ -89,9 +89,14 @@ func (o *DeployOptions) Run() error {
 	buildObjFactory := ctlbuild.NewFactory(buildClient, coreClient, restConfig)
 	serviceObj := ctlservice.NewService(service, servingClient, buildClient, coreClient, buildObjFactory)
 
-	lastRevision, err := serviceObj.LastRevision()
-	if err != nil {
-		return err
+	var lastRevision *v1alpha1.Revision
+
+	// TODO find a better way to deal with generated service names
+	if !o.DeployFlags.GenerateNameFlags.GenerateName {
+		lastRevision, err = serviceObj.LastRevision()
+		if err != nil {
+			return err
+		}
 	}
 
 	createdService, err := serviceObj.CreateOrUpdate()
