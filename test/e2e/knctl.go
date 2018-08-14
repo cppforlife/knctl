@@ -37,7 +37,7 @@ type RunOpts struct {
 	AllowError   bool
 	StderrWriter io.Writer
 	StdoutWriter io.Writer
-	StdinReader io.Reader
+	StdinReader  io.Reader
 	CancelCh     chan struct{}
 	Redact       bool
 }

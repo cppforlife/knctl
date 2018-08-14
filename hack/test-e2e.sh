@@ -21,4 +21,4 @@ export KNCTL_KUBECONFIG=
 export KNCTL_BASIC_AUTH_SECRET_PASSWORD=
 export KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY=
 
-GOCACHE=off go test ./test/e2e/ -timeout 20m -test.v $@
+GOCACHE=off go test ./test/e2e/ -timeout 60m -test.v $@
