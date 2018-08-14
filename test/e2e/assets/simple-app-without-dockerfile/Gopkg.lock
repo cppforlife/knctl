@@ -1,0 +1,6 @@
+[solve-meta]
+  analyzer-name = "dep"
+  analyzer-version = 1
+  input-imports = []
+  solver-name = "gps-cdcl"
+  solver-version = 1

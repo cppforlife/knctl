@@ -64,6 +64,8 @@ func (k Kubectl) RunWithOpts(args []string, opts RunOpts) (string, error) {
 		cmd.Stdout = &stdout
 	}
 
+	cmd.Stdin = opts.StdinReader
+
 	err := cmd.Run()
 	if err != nil {
 		err = fmt.Errorf("Execution error: stderr: '%s' error: '%s'", stderr.String(), err)

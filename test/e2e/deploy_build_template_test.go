@@ -17,13 +17,14 @@ limitations under the License.
 package e2e
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
 
-func TestDeployBuildLocalDirPrivateImage(t *testing.T) {
+func TestDeployBuildTemplate(t *testing.T) {
 	logger := Logger{}
 	env := BuildEnv(t)
 	knctl := Knctl{t, env.Namespace, logger}
@@ -31,7 +32,8 @@ func TestDeployBuildLocalDirPrivateImage(t *testing.T) {
 	curl := Curl{t, knctl}
 
 	const (
-		serviceName              = "test-d-b-p-i-l-d-service-name"
+		serviceName              = "test-d-b-p-i-b-t-service-name"
+		buildTemplateName        = "test-d-b-p-i-b-t-build-tpl"
 		pushPullDockerSecretName = serviceName + "-docker-secret"
 		pullDockerSecretName     = serviceName + "-p-docker-secret"
 		buildServiceAccountName  = serviceName + "-service-account"
@@ -41,6 +43,7 @@ func TestDeployBuildLocalDirPrivateImage(t *testing.T) {
 
 	cleanUp := func() {
 		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
+		kubectl.RunWithOpts([]string{"delete", "buildtemplate.build.knative.dev/v1alpha1", buildTemplateName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "secret", pushPullDockerSecretName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "secret", pullDockerSecretName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "serviceaccount", buildServiceAccountName}, RunOpts{AllowError: true})
@@ -50,6 +53,10 @@ func TestDeployBuildLocalDirPrivateImage(t *testing.T) {
 	defer cleanUp()
 
 	logger.Section("Add service account with Docker push secret", func() {
+		kubectl.RunWithOpts([]string{"apply", "-f", "-"}, RunOpts{
+			StdinReader: strings.NewReader(fmt.Sprintf(buildpackTemplateYAML, buildTemplateName)),
+		})
+
 		knctl.RunWithOpts([]string{
 			"create",
 			"basic-auth-secret",
@@ -83,16 +90,18 @@ func TestDeployBuildLocalDirPrivateImage(t *testing.T) {
 		t.Fatalf("Expected not to fail getting current directory: %s", err)
 	}
 
-	sourceDir := filepath.Join(cwdPath, "assets", "simple-app")
+	sourceDir := filepath.Join(cwdPath, "assets", "simple-app-without-dockerfile")
 
 	logger.Section("Deploy service v1", func() {
 		knctl.Run([]string{
 			"deploy",
 			"-s", serviceName,
 			"-d", sourceDir,
+			"--template", buildTemplateName,
+			"--template-env", "GOPACKAGENAME=main",
 			"-i", env.BuildPrivateImage,
 			"--service-account", buildServiceAccountName,
-			"-e", "SIMPLE_MSG=" + expectedContent1,
+			"-e", "SIMPLE_MSG_WITHOUT_DOCKERFILE=" + expectedContent1,
 		})
 
 		curl.WaitForContent(serviceName, expectedContent1)
@@ -103,9 +112,11 @@ func TestDeployBuildLocalDirPrivateImage(t *testing.T) {
 			"deploy",
 			"-s", serviceName,
 			"-d", sourceDir,
+			"--template", buildTemplateName,
+			"--template-env", "GOPACKAGENAME=main",
 			"-i", env.BuildPrivateImage,
 			"--service-account", buildServiceAccountName,
-			"-e", "SIMPLE_MSG=" + expectedContent2,
+			"-e", "SIMPLE_MSG_WITHOUT_DOCKERFILE=" + expectedContent2,
 		})
 
 		curl.WaitForContent(serviceName, expectedContent2)
@@ -120,3 +131,59 @@ func TestDeployBuildLocalDirPrivateImage(t *testing.T) {
 		}
 	})
 }
+
+const (
+	// Taken from https://github.com/knative/build-templates/blob/26e2684ba2e5c1e94a1eddec0af3b2ae2e46ff85/buildpack/buildpack.yaml
+	buildpackTemplateYAML = `
+apiVersion: build.knative.dev/v1alpha1
+kind: BuildTemplate
+metadata:
+  name: %s
+spec:
+  parameters:
+  - name: IMAGE
+    description: The name of the image to push
+  - name: BUILDPACK_ORDER
+    description: A comma separated list of names or URLs for the buildpacks to use. Each buildpack is applied in order.
+    default: ""
+  - name: SKIP_DETECT
+    description: By default, the first buildpack to match is used. If true, detection is skipped and each buildpack contributes in order.
+    default: "false"
+  - name: DIRECTORY
+    description: The directory containing the app
+    default: /workspace
+  - name: CACHE
+    description: The name of the persistent app cache volume
+    default: app-cache
+
+  steps:
+  # In: a CF app in $DIRECTORY
+  # Out: a CF app droplet in /out
+  # Out: a build cache in /cache
+  - name: build
+    image: packs/cf:build
+    args: ["-skipDetect=${SKIP_DETECT}", "-buildpackOrder=${BUILDPACK_ORDER}"]
+    workingdir: "${DIRECTORY}"
+    volumeMounts:
+    - name: droplet
+      mountPath: /out
+    - name: "${CACHE}"
+      mountPath: /cache
+
+  # In: a CF app droplet in /in
+  # Out: an image published as $IMAGE
+  - name: export
+    image: packs/cf:export
+    workingdir: /in
+    args: ["${IMAGE}"]
+    volumeMounts:
+    - name: droplet
+      mountPath: /in
+
+  volumes:
+  - name: droplet
+    emptyDir: {}
+  - name: app-cache
+    emptyDir: {}
+`
+)
