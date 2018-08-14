@@ -18,15 +18,16 @@ package build
 
 import (
 	"github.com/cppforlife/go-cli-ui/ui"
+	"github.com/knative/build/pkg/apis/build/v1alpha1"
 )
 
-type GoogleBuilderLogs struct{}
-
-func NewGoogleBuilderLogs() GoogleBuilderLogs {
-	return GoogleBuilderLogs{}
+type NoopSource struct {
+	builder v1alpha1.BuildProvider
 }
 
-func (l GoogleBuilderLogs) Tail(ui ui.UI, cancelCh chan struct{}) error {
-	// TODO implement
+var _ Source = NoopSource{}
+
+func (s NoopSource) Upload(ui ui.UI, cancelCh chan struct{}) error {
+	ui.PrintLinef("Cannot upload source code to builder '%s'...\n", s.builder)
 	return nil
 }

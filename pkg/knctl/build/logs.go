@@ -21,38 +21,33 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/knative/build/pkg/apis/build/v1alpha1"
-	typedv1alpha1 "github.com/knative/build/pkg/client/clientset/versioned/typed/build/v1alpha1"
 	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 type Logs struct {
-	build            *v1alpha1.Build
-	buildsClient     typedv1alpha1.BuildInterface
+	waiter           BuildWaiter
 	podsGetterClient typedcorev1.PodsGetter
 }
 
-func NewLogs(
-	build *v1alpha1.Build,
-	buildsClient typedv1alpha1.BuildInterface,
-	podsGetterClient typedcorev1.PodsGetter,
-) Logs {
-	return Logs{build, buildsClient, podsGetterClient}
+func NewLogs(waiter BuildWaiter, podsGetterClient typedcorev1.PodsGetter) Logs {
+	return Logs{waiter, podsGetterClient}
 }
 
 func (l Logs) Tail(ui ui.UI, cancelCh chan struct{}) error {
-	// TODO no new build is kicked off on subsequent deploys?
 	ui.PrintLinef("Watching build logs...")
 
-	build, err := NewBuildWaiter(l.build, l.buildsClient).WaitForBuilderAssignment(cancelCh)
+	build, err := l.waiter.WaitForBuilderAssignment(cancelCh)
 	if err != nil {
 		return fmt.Errorf("Waiting for build to be assigned a builder: %s", err)
 	}
 
 	switch build.Status.Builder {
 	case v1alpha1.ClusterBuildProvider:
-		return NewClusterBuilderLogs(build, l.buildsClient, l.podsGetterClient).Tail(ui, cancelCh)
+		return NewClusterBuilderLogs(l.waiter, l.podsGetterClient).Tail(ui, cancelCh)
+
 	case v1alpha1.GoogleBuildProvider:
-		return NewGoogleBuilderLogs().Tail(ui, cancelCh)
+		return nil
+
 	default:
 		ui.PrintLinef("Cannot follow logs unknown builder '%s'...\n", build.Status.Builder)
 		return nil

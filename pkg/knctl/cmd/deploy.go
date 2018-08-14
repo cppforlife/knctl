@@ -19,6 +19,7 @@ package cmd
 import (
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
+	ctlbuild "github.com/cppforlife/knctl/pkg/knctl/build"
 	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	"github.com/spf13/cobra"
@@ -69,6 +70,11 @@ func (o *DeployOptions) Run() error {
 		return err
 	}
 
+	restConfig, err := o.depsFactory.RESTConfig()
+	if err != nil {
+		return err
+	}
+
 	// TODO should we just automatically label it?
 	err = NewIstio(coreClient).ExpectNamespaceToBeEnabled(o.ServiceFlags.NamespaceFlags.Name)
 	if err != nil {
@@ -80,7 +86,8 @@ func (o *DeployOptions) Run() error {
 		return err
 	}
 
-	serviceObj := ctlservice.NewService(service, servingClient, buildClient, coreClient)
+	buildObjFactory := ctlbuild.NewFactory(buildClient, coreClient, restConfig)
+	serviceObj := ctlservice.NewService(service, servingClient, buildClient, coreClient, buildObjFactory)
 
 	lastRevision, err := serviceObj.LastRevision()
 	if err != nil {
@@ -102,12 +109,19 @@ func (o *DeployOptions) Run() error {
 	}
 
 	if service.Spec.RunLatest.Configuration.Build != nil {
+		cancelCh := make(chan struct{})
+
 		buildObj, err := serviceObj.CreatedBuildSinceRevision(lastRevision)
 		if err != nil {
 			return err
 		}
 
-		cancelCh := make(chan struct{})
+		if len(o.DeployFlags.BuildCreateArgsFlags.SourceDirectory) > 0 {
+			err = buildObj.UploadSource(o.DeployFlags.BuildCreateArgsFlags.SourceDirectory, o.ui, cancelCh)
+			if err != nil {
+				return err
+			}
+		}
 
 		err = buildObj.TailLogs(o.ui, cancelCh)
 		if err != nil {

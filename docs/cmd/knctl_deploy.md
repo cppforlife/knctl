@@ -24,6 +24,7 @@ knctl deploy [flags]
 ### Options
 
 ```
+  -d, --directory string         Set source code directory
   -e, --env strings              Set environment variable (format: key=value) (can be specified multiple times)
       --generate-name            Set to generate name
       --git-revision string      Set Git revision (examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
@@ -33,6 +34,9 @@ knctl deploy [flags]
   -n, --namespace string         Specified namespace ($KNCTL_NAMESPACE)
   -s, --service string           Specified service
       --service-account string   Set service account name for building
+      --template string          Set template name
+      --template-arg strings     Set template argument (format: key=value) (can be specified multiple times)
+      --template-env strings     Set template environment variable (format: key=value) (can be specified multiple times)
 ```
 
 ### Options inherited from parent commands

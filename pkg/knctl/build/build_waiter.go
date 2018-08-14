@@ -21,24 +21,24 @@ import (
 	"time"
 
 	"github.com/knative/build/pkg/apis/build/v1alpha1"
-	typedv1alpha1 "github.com/knative/build/pkg/client/clientset/versioned/typed/build/v1alpha1"
+	buildclientset "github.com/knative/build/pkg/client/clientset/versioned"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type BuildWaiter struct {
-	build        *v1alpha1.Build
-	buildsClient typedv1alpha1.BuildInterface
+	build       *v1alpha1.Build
+	buildClient buildclientset.Interface
 }
 
-func NewBuildWaiter(build *v1alpha1.Build, buildsClient typedv1alpha1.BuildInterface) BuildWaiter {
-	return BuildWaiter{build, buildsClient}
+func NewBuildWaiter(build *v1alpha1.Build, buildClient buildclientset.Interface) BuildWaiter {
+	return BuildWaiter{build, buildClient}
 }
 
 func (w BuildWaiter) WaitForBuilderAssignment(cancelCh chan struct{}) (*v1alpha1.Build, error) {
 	for {
 		// TODO infinite retry
 
-		build, err := w.buildsClient.Get(w.build.Name, metav1.GetOptions{})
+		build, err := w.buildClient.BuildV1alpha1().Builds(w.build.Namespace).Get(w.build.Name, metav1.GetOptions{})
 		if err != nil {
 			return nil, fmt.Errorf("Getting build while waiting for builder assignment: %s", err)
 		}
@@ -60,7 +60,7 @@ func (w BuildWaiter) WaitForCompletion(cancelCh chan struct{}) (*v1alpha1.Build,
 	for {
 		// TODO infinite retry
 
-		build, err := w.buildsClient.Get(w.build.Name, metav1.GetOptions{})
+		build, err := w.buildClient.BuildV1alpha1().Builds(w.build.Namespace).Get(w.build.Name, metav1.GetOptions{})
 		if err != nil {
 			return nil, fmt.Errorf("Getting build while waiting for completion: %s", err)
 		}
@@ -83,7 +83,7 @@ func (w BuildWaiter) WaitForClusterBuilderPodAssignment(cancelCh chan struct{}) 
 	for {
 		// TODO infinite retry
 
-		build, err := w.buildsClient.Get(w.build.Name, metav1.GetOptions{})
+		build, err := w.buildClient.BuildV1alpha1().Builds(w.build.Namespace).Get(w.build.Name, metav1.GetOptions{})
 		if err != nil {
 			return nil, fmt.Errorf("Getting build while waiting for cluster build to assign pod: %s", err)
 		}

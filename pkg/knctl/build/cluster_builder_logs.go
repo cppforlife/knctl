@@ -21,28 +21,24 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/cppforlife/knctl/pkg/knctl/logs"
-	"github.com/knative/build/pkg/apis/build/v1alpha1"
-	typedv1alpha1 "github.com/knative/build/pkg/client/clientset/versioned/typed/build/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 type ClusterBuilderLogs struct {
-	build            *v1alpha1.Build
-	buildsClient     typedv1alpha1.BuildInterface
+	waiter           BuildWaiter
 	podsGetterClient typedcorev1.PodsGetter
 }
 
 func NewClusterBuilderLogs(
-	build *v1alpha1.Build,
-	buildsClient typedv1alpha1.BuildInterface,
+	waiter BuildWaiter,
 	podsGetterClient typedcorev1.PodsGetter,
 ) ClusterBuilderLogs {
-	return ClusterBuilderLogs{build, buildsClient, podsGetterClient}
+	return ClusterBuilderLogs{waiter, podsGetterClient}
 }
 
 func (l ClusterBuilderLogs) Tail(ui ui.UI, cancelCh chan struct{}) error { // TODO cancel
-	build, err := NewBuildWaiter(l.build, l.buildsClient).WaitForClusterBuilderPodAssignment(cancelCh)
+	build, err := l.waiter.WaitForClusterBuilderPodAssignment(cancelCh)
 	if err != nil {
 		return fmt.Errorf("Waiting for build to be assigned a pod: %s", err)
 	}
@@ -55,7 +51,7 @@ func (l ClusterBuilderLogs) Tail(ui ui.UI, cancelCh chan struct{}) error { // TO
 
 	pod, err := podsClient.Get(build.Status.Cluster.PodName, metav1.GetOptions{})
 	if err != nil {
-		return fmt.Errorf("Getting assinged building pod: %s", err)
+		return fmt.Errorf("Getting assigned building pod: %s", err)
 	}
 
 	cancelPodTailCh := make(chan struct{})

@@ -32,11 +32,15 @@ type ServiceSpec struct{}
 func (ServiceSpec) Build(serviceFlags ServiceFlags, deployFlags DeployFlags) (v1alpha1.Service, error) {
 	var buildSpec *buildv1alpha1.BuildSpec
 
-	if deployFlags.BuildCreateArgsFlags.GitURL != "" {
+	if deployFlags.BuildCreateArgsFlags.IsProvided() {
 		// TODO assumes that same image is used for building and running
 		deployFlags.BuildCreateArgsFlags.Image = deployFlags.Image
 
-		spec := ctlbuild.BuildSpec{}.Build(deployFlags.BuildCreateArgsFlags.BuildSpecOpts)
+		spec, err := ctlbuild.BuildSpec{}.Build(deployFlags.BuildCreateArgsFlags.BuildSpecOpts)
+		if err != nil {
+			return v1alpha1.Service{}, err
+		}
+
 		buildSpec = &spec
 	}
 

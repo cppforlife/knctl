@@ -33,10 +33,11 @@ import (
 )
 
 type Service struct {
-	service       v1alpha1.Service
-	servingClient servingclientset.Interface
-	buildClient   buildclientset.Interface
-	coreClient    kubernetes.Interface
+	service         v1alpha1.Service
+	servingClient   servingclientset.Interface
+	buildClient     buildclientset.Interface
+	coreClient      kubernetes.Interface
+	buildObjFactory ctlbuild.Factory
 }
 
 func NewService(
@@ -44,8 +45,9 @@ func NewService(
 	servingClient servingclientset.Interface,
 	buildClient buildclientset.Interface,
 	coreClient kubernetes.Interface,
+	buildObjFactory ctlbuild.Factory,
 ) Service {
-	return Service{service, servingClient, buildClient, coreClient}
+	return Service{service, servingClient, buildClient, coreClient, buildObjFactory}
 }
 
 func (l Service) CreatedBuildSinceRevision(lastRevision *v1alpha1.Revision) (ctlbuild.Build, error) {
@@ -110,7 +112,7 @@ func (l Service) CreatedBuildSinceRevision(lastRevision *v1alpha1.Revision) (ctl
 	for build := range buildsToWatchCh {
 		if build.Name == createdRevision.Name {
 			close(cancelResWatchCh)
-			return ctlbuild.NewBuild(&build, buildsClient, l.coreClient.CoreV1()), nil
+			return l.buildObjFactory.New(&build), nil
 		}
 	}
 

@@ -32,18 +32,33 @@ type BuildCreateArgsFlags struct {
 
 func (s *BuildCreateFlags) Set(cmd *cobra.Command) {
 	s.GenerateNameFlags.Set(cmd)
-
 	s.BuildCreateArgsFlags.Set(cmd)
-	cmd.MarkFlagRequired("git-url")
-	cmd.MarkFlagRequired("git-revision")
 
 	cmd.Flags().StringVarP(&s.Image, "image", "i", "", "Set image URL")
 	cmd.MarkFlagRequired("image")
 }
 
+func (s *BuildCreateFlags) Validate() error {
+	return s.BuildCreateArgsFlags.Validate()
+}
+
 func (s *BuildCreateArgsFlags) Set(cmd *cobra.Command) {
+	cmd.Flags().StringVarP(&s.SourceDirectory, "directory", "d", "", "Set source code directory")
+
 	cmd.Flags().StringVar(&s.GitURL, "git-url", "", "Set Git URL")
 	cmd.Flags().StringVar(&s.GitRevision, "git-revision", "", "Set Git revision (examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)")
 
 	cmd.Flags().StringVar(&s.ServiceAccountName, "service-account", "", "Set service account name for building") // TODO separate
+
+	cmd.Flags().StringVar(&s.Template, "template", "", "Set template name")
+	cmd.Flags().StringSliceVar(&s.TemplateArgs, "template-arg", nil, "Set template argument (format: key=value) (can be specified multiple times)")
+	cmd.Flags().StringSliceVar(&s.TemplateEnv, "template-env", nil, "Set template environment variable (format: key=value) (can be specified multiple times)")
+}
+
+func (s *BuildCreateArgsFlags) IsProvided() bool {
+	return len(s.SourceDirectory) > 0 || len(s.GitURL) > 0
+}
+
+func (s *BuildCreateArgsFlags) Validate() error {
+	return nil // TODO better error messages?
 }

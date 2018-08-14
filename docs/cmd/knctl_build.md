@@ -22,6 +22,7 @@ knctl build [flags]
 
 ```
   -b, --build string             Specified build
+  -d, --directory string         Set source code directory
       --generate-name            Set to generate name
       --git-revision string      Set Git revision (examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
       --git-url string           Set Git URL
@@ -29,6 +30,9 @@ knctl build [flags]
   -i, --image string             Set image URL
   -n, --namespace string         Specified namespace ($KNCTL_NAMESPACE)
       --service-account string   Set service account name for building
+      --template string          Set template name
+      --template-arg strings     Set template argument (format: key=value) (can be specified multiple times)
+      --template-env strings     Set template environment variable (format: key=value) (can be specified multiple times)
 ```
 
 ### Options inherited from parent commands

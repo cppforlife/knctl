@@ -21,31 +21,34 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui" // TODO replace
 	"github.com/knative/build/pkg/apis/build/v1alpha1"
-	typedv1alpha1 "github.com/knative/build/pkg/client/clientset/versioned/typed/build/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
-	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 type Build struct {
-	build            *v1alpha1.Build
-	buildsClient     typedv1alpha1.BuildInterface
-	podsGetterClient typedcorev1.PodsGetter
+	waiter        BuildWaiter
+	logs          Logs
+	sourceFactory SourceFactory
 }
 
-func NewBuild(
-	build *v1alpha1.Build,
-	buildsClient typedv1alpha1.BuildInterface,
-	podsGetterClient typedcorev1.PodsGetter,
-) Build {
-	return Build{build, buildsClient, podsGetterClient}
+func NewBuild(waiter BuildWaiter, logs Logs, sourceFactory SourceFactory) Build {
+	return Build{waiter, logs, sourceFactory}
 }
 
 func (b Build) TailLogs(ui ui.UI, cancelCh chan struct{}) error {
-	return NewLogs(b.build, b.buildsClient, b.podsGetterClient).Tail(ui, cancelCh)
+	return b.logs.Tail(ui, cancelCh)
+}
+
+func (b Build) UploadSource(dirPath string, ui ui.UI, cancelCh chan struct{}) error {
+	build, err := b.waiter.WaitForBuilderAssignment(cancelCh)
+	if err != nil {
+		return fmt.Errorf("Waiting for build to be assigned a builder: %s", err)
+	}
+
+	return b.sourceFactory.New(build.Status.Builder, dirPath).Upload(ui, cancelCh)
 }
 
 func (b Build) Error(cancelCh chan struct{}) error {
-	build, err := NewBuildWaiter(b.build, b.buildsClient).WaitForCompletion(cancelCh)
+	build, err := b.waiter.WaitForCompletion(cancelCh)
 	if err != nil {
 		return err
 	}

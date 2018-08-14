@@ -63,17 +63,24 @@ func (o *BuildOptions) Run() error {
 		return err
 	}
 
-	buildsClient := buildClient.BuildV1alpha1().Builds(o.BuildFlags.NamespaceFlags.Name)
+	restConfig, err := o.depsFactory.RESTConfig()
+	if err != nil {
+		return err
+	}
 
 	build := &v1alpha1.Build{
 		ObjectMeta: o.BuildCreateFlags.GenerateNameFlags.Apply(metav1.ObjectMeta{
 			Name:      o.BuildFlags.Name,
 			Namespace: o.BuildFlags.NamespaceFlags.Name,
 		}),
-		Spec: ctlbuild.BuildSpec{}.Build(o.BuildCreateFlags.BuildSpecOpts),
 	}
 
-	createdBuild, err := buildsClient.Create(build)
+	build.Spec, err = ctlbuild.BuildSpec{}.Build(o.BuildCreateFlags.BuildSpecOpts)
+	if err != nil {
+		return err
+	}
+
+	createdBuild, err := buildClient.BuildV1alpha1().Builds(o.BuildFlags.NamespaceFlags.Name).Create(build)
 	if err != nil {
 		return err // TODO allow updating build?
 	}
@@ -83,7 +90,15 @@ func (o *BuildOptions) Run() error {
 	cancelCh := make(chan struct{})
 	o.cancelSignals.Watch(func() { close(cancelCh) })
 
-	buildObj := ctlbuild.NewBuild(createdBuild, buildsClient, coreClient.CoreV1())
+	buildObjFactory := ctlbuild.NewFactory(buildClient, coreClient, restConfig)
+	buildObj := buildObjFactory.New(createdBuild)
+
+	if len(o.BuildCreateFlags.BuildCreateArgsFlags.SourceDirectory) > 0 {
+		err = buildObj.UploadSource(o.BuildCreateFlags.BuildCreateArgsFlags.SourceDirectory, o.ui, cancelCh)
+		if err != nil {
+			return err
+		}
+	}
 
 	err = buildObj.TailLogs(o.ui, cancelCh)
 	if err != nil {

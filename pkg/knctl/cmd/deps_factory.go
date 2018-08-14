@@ -31,6 +31,7 @@ type DepsFactory interface {
 	ServingClient() (servingclientset.Interface, error)
 	BuildClient() (buildclientset.Interface, error)
 	CoreClient() (kubernetes.Interface, error)
+	RESTConfig() (*rest.Config, error)
 }
 
 type DepsFactoryImpl struct {
@@ -83,6 +84,10 @@ func (f *DepsFactoryImpl) CoreClient() (kubernetes.Interface, error) {
 	}
 
 	return clientset, nil
+}
+
+func (f *DepsFactoryImpl) RESTConfig() (*rest.Config, error) {
+	return f.config()
 }
 
 func (f *DepsFactoryImpl) ConfigureConfigPath(path string) {
