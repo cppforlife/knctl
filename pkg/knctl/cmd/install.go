@@ -135,7 +135,7 @@ type NamespaceReadiness struct {
 func (n NamespaceReadiness) Monitor() error {
 	var nonReadyPodNames []string
 
-	for i := 0; i < 600; i++ {
+	for i := 0; i < 1000; i++ {
 		allReady := true
 		nonReadyPodNames = []string{}
 
