@@ -26,12 +26,15 @@ import (
 )
 
 func TestBuildSpec(t *testing.T) {
-	spec := ctlbuild.BuildSpec{}.Build(ctlbuild.BuildSpecOpts{
+	spec, err := ctlbuild.BuildSpec{}.Build(ctlbuild.BuildSpecOpts{
 		ServiceAccountName: "test-service-account",
 		GitURL:             "test-git-url",
 		GitRevision:        "test-git-revision",
 		Image:              "test-image",
 	})
+	if err != nil {
+		t.Fatalf("Expected build spec to build successfully: %s", err)
+	}
 
 	expectedSpec := v1alpha1.BuildSpec{
 		ServiceAccountName: "test-service-account",
@@ -50,6 +53,91 @@ func TestBuildSpec(t *testing.T) {
 					"--destination=test-image",
 				},
 			},
+		},
+	}
+
+	if !reflect.DeepEqual(spec, expectedSpec) {
+		t.Fatalf("Expect spec '%#v' to equal '%#v'", spec, expectedSpec)
+	}
+}
+
+func TestBuildSpecWithSourceDirectory(t *testing.T) {
+	spec, err := ctlbuild.BuildSpec{}.Build(ctlbuild.BuildSpecOpts{
+		ServiceAccountName: "test-service-account",
+		SourceDirectory:    "test-source-dir",
+		Image:              "test-image",
+	})
+	if err != nil {
+		t.Fatalf("Expected build spec to build successfully: %s", err)
+	}
+
+	expectedSpec := v1alpha1.BuildSpec{
+		ServiceAccountName: "test-service-account",
+		Source: &v1alpha1.SourceSpec{
+			Custom: &corev1.Container{
+				Image:   "ubuntu:xenial",
+				Command: []string{"/bin/bash"},
+				Args: []string{
+					"-c",
+					"touch /tmp/SOURCE_UPLOAD_DONE; while [ -f /tmp/SOURCE_UPLOAD_DONE ]; do sleep 1; done",
+				},
+			},
+		},
+		Steps: []corev1.Container{
+			{
+				Name:  "build-and-push",
+				Image: "gcr.io/kaniko-project/executor",
+				Args: []string{
+					"--dockerfile=/workspace/Dockerfile",
+					"--destination=test-image",
+				},
+			},
+		},
+	}
+
+	if !reflect.DeepEqual(spec, expectedSpec) {
+		t.Fatalf("Expect spec '%#v' to equal '%#v'", spec, expectedSpec)
+	}
+}
+
+func TestBuildSpecWithCustomBuildTemplate(t *testing.T) {
+	spec, err := ctlbuild.BuildSpec{}.Build(ctlbuild.BuildSpecOpts{
+		ServiceAccountName: "test-service-account",
+		GitURL:             "test-git-url",
+		GitRevision:        "test-git-revision",
+		Template:           "test-template",
+		TemplateArgs:       []string{"test-template-arg-key=test-template-arg-val"},
+		TemplateEnv:        []string{"test-template-env-key=test-template-env-val"},
+		Image:              "test-image",
+	})
+	if err != nil {
+		t.Fatalf("Expected build spec to build successfully: %s", err)
+	}
+
+	expectedSpec := v1alpha1.BuildSpec{
+		ServiceAccountName: "test-service-account",
+		Source: &v1alpha1.SourceSpec{
+			Git: &v1alpha1.GitSourceSpec{
+				Url:      "test-git-url",
+				Revision: "test-git-revision",
+			},
+		},
+		Template: &v1alpha1.TemplateInstantiationSpec{
+			Name: "test-template",
+			Arguments: []v1alpha1.ArgumentSpec{
+				{
+					Name:  "test-template-arg-key",
+					Value: "test-template-arg-val",
+				},
+				{
+					Name:  "IMAGE",
+					Value: "test-image",
+				},
+			},
+			Env: []corev1.EnvVar{{
+				Name:  "test-template-env-key",
+				Value: "test-template-env-val",
+			}},
 		},
 	}
 

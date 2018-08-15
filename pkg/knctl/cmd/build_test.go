@@ -86,5 +86,5 @@ func TestNewBuildCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewBuildOptions(nil, NewDepsFactoryImpl(), CancelSignals{})
 	cmd := NewTestCmd(t, NewBuildCmd(realCmd))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"build", "git-revision", "git-url", "image", "namespace"})
+	cmd.ExpectRequiredFlags([]string{"build", "image", "namespace"})
 }

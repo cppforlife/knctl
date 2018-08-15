@@ -23,3 +23,5 @@ go build ./cmd/...
 ./knctl version
 
 ./hack/generate-docs.sh
+
+echo "Success"

@@ -16,11 +16,8 @@
 
 set -e -x -u
 
-export KNCTL_NAMESPACE=
-export KNCTL_KUBECONFIG=
-export KNCTL_BASIC_AUTH_SECRET_PASSWORD=
-export KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY=
+./hack/build.sh
 
-go run ./hack/generate-docs.go
+./hack/test.sh
 
-echo "Success"
+./hack/test-e2e.sh
