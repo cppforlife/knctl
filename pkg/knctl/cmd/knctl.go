@@ -74,6 +74,7 @@ Knative docs: https://github.com/knative/docs.`,
 
 	cmd.AddCommand(NewVersionCmd(NewVersionOptions(o.ui)))
 	cmd.AddCommand(NewInstallCmd(NewInstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags)))
+	cmd.AddCommand(NewUninstallCmd(NewUninstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags)))
 	cmd.AddCommand(NewDeployCmd(NewDeployOptions(o.ui, o.depsFactory)))
 	cmd.AddCommand(NewLogsCmd(NewLogsOptions(o.ui, o.depsFactory, CancelSignals{})))
 	cmd.AddCommand(NewOpenCmd(NewOpenOptions(o.ui, o.depsFactory)))
