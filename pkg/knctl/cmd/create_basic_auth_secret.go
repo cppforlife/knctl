@@ -160,10 +160,10 @@ func (o *CreateBasicAuthSecretOptions) printTable(s *corev1.Secret) {
 
 		Transpose: true,
 
-		Rows: [][]uitable.Value{
-			{uitable.NewValueString(s.Name)},
-			{uitable.NewValueString(string(s.Type))},
-		},
+		Rows: [][]uitable.Value{{
+			uitable.NewValueString(s.Name),
+			uitable.NewValueString(string(s.Type)),
+		}},
 	}
 
 	o.ui.PrintTable(table)
