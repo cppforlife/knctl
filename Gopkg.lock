@@ -446,7 +446,7 @@
   version = "kubernetes-1.10.0"
 
 [[projects]]
-  digest = "1:342032ebd161931a2197d48a40535f31af396bb3d467b3f088d65056b6ebe905"
+  digest = "1:447927940b065528a83cf6cc76e4678f6b95c6762503755f4b9c2cccf3be981f"
   name = "k8s.io/apimachinery"
   packages = [
     "pkg/api/equality",
@@ -471,6 +471,7 @@
     "pkg/selection",
     "pkg/types",
     "pkg/util/clock",
+    "pkg/util/duration",
     "pkg/util/errors",
     "pkg/util/framer",
     "pkg/util/httpstream",
@@ -585,6 +586,7 @@
     "k8s.io/apimachinery/pkg/fields",
     "k8s.io/apimachinery/pkg/labels",
     "k8s.io/apimachinery/pkg/types",
+    "k8s.io/apimachinery/pkg/util/duration",
     "k8s.io/apimachinery/pkg/watch",
     "k8s.io/client-go/kubernetes",
     "k8s.io/client-go/kubernetes/scheme",

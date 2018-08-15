@@ -17,10 +17,10 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"time"
 
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
+	"k8s.io/apimachinery/pkg/util/duration"
 )
 
 type ValueAge struct {
@@ -35,7 +35,7 @@ func (t ValueAge) String() string {
 	if t.T.IsZero() {
 		return ""
 	}
-	return t.fmtDuration(time.Now().Sub(t.T))
+	return duration.ShortHumanDuration(time.Now().Sub(t.T))
 }
 
 func (t ValueAge) Value() uitable.Value { return t }
@@ -49,26 +49,5 @@ func (t ValueAge) Compare(other uitable.Value) int {
 		return -1
 	default:
 		return 1
-	}
-}
-
-func (ValueAge) fmtDuration(d time.Duration) string {
-	d = d.Round(time.Minute)
-
-	days := d / (24 * time.Hour)
-	d -= days * 24 * time.Hour
-
-	hrs := d / time.Hour
-	d -= hrs * time.Hour
-
-	mins := d / time.Minute
-
-	switch {
-	case days > 0:
-		return fmt.Sprintf("%dd", days)
-	case hrs > 0:
-		return fmt.Sprintf("%dh", hrs)
-	default:
-		return fmt.Sprintf("%dm", mins)
 	}
 }
