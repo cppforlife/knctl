@@ -24,7 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (s Service) CreateOrUpdate() (*v1alpha1.Service, error) {
+func (s *Service) CreateOrUpdate() (*v1alpha1.Service, error) {
 	createdService, createErr := s.servingClient.ServingV1alpha1().Services(s.service.Namespace).Create(&s.service)
 	if createErr != nil {
 		if errors.IsAlreadyExists(createErr) {
@@ -41,11 +41,15 @@ func (s Service) CreateOrUpdate() (*v1alpha1.Service, error) {
 				return nil, fmt.Errorf("Updating service: %s", updateErr)
 			}
 
+			s.service = *updatedService
+
 			return updatedService, nil
 		}
 
 		return nil, fmt.Errorf("Creating service: %s", createErr)
 	}
+
+	s.service = *createdService
 
 	return createdService, nil
 }

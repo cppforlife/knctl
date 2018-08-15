@@ -140,7 +140,7 @@ func (o *DeployOptions) Run() error {
 }
 
 func (o *DeployOptions) updateRevisionTags(
-	serviceObj ctlservice.Service, tags ctlservice.Tags, lastRevision *v1alpha1.Revision) error {
+	serviceObj *ctlservice.Service, tags ctlservice.Tags, lastRevision *v1alpha1.Revision) error {
 
 	if lastRevision != nil {
 		o.ui.PrintLinef("Waiting for new revision (after revision '%s') to be created...", lastRevision.Name)

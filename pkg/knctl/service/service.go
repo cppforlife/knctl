@@ -46,11 +46,11 @@ func NewService(
 	buildClient buildclientset.Interface,
 	coreClient kubernetes.Interface,
 	buildObjFactory ctlbuild.Factory,
-) Service {
-	return Service{service, servingClient, buildClient, coreClient, buildObjFactory}
+) *Service {
+	return &Service{service, servingClient, buildClient, coreClient, buildObjFactory}
 }
 
-func (l Service) CreatedBuildSinceRevision(lastRevision *v1alpha1.Revision) (ctlbuild.Build, error) {
+func (l *Service) CreatedBuildSinceRevision(lastRevision *v1alpha1.Revision) (ctlbuild.Build, error) {
 	cancelResWatchCh := make(chan struct{})
 	revisionsToWatchCh := make(chan v1alpha1.Revision)
 	buildsToWatchCh := make(chan buildv1alpha1.Build)
@@ -119,7 +119,7 @@ func (l Service) CreatedBuildSinceRevision(lastRevision *v1alpha1.Revision) (ctl
 	return ctlbuild.Build{}, fmt.Errorf("Expected to find new build")
 }
 
-func (l Service) CreatedRevisionSinceRevision(lastRevision *v1alpha1.Revision) (*v1alpha1.Revision, error) {
+func (l *Service) CreatedRevisionSinceRevision(lastRevision *v1alpha1.Revision) (*v1alpha1.Revision, error) {
 	cancelResWatchCh := make(chan struct{})
 	revisionsToWatchCh := make(chan v1alpha1.Revision)
 
@@ -159,7 +159,7 @@ func (l Service) CreatedRevisionSinceRevision(lastRevision *v1alpha1.Revision) (
 	return createdRevision, nil
 }
 
-func (l Service) LastRevision() (*v1alpha1.Revision, error) {
+func (l *Service) LastRevision() (*v1alpha1.Revision, error) {
 	listOpts := metav1.ListOptions{
 		LabelSelector: labels.Set(map[string]string{
 			serving.ConfigurationLabelKey: l.service.Name,
