@@ -87,20 +87,20 @@ type UninstallationComponent struct {
 }
 
 func (c UninstallationComponent) Uninstall() error {
-	c.ui.PrintLinef("Uninstalling '%s' by removing namespace '%s'", c.Name, c.nsRemoval.Namespace)
+	c.ui.PrintLinef("Uninstalling %s", c.Name)
 
 	opts := []string{"--kubeconfig", c.kubeconfigFlags.Path, "delete", "namespace", c.nsRemoval.Namespace}
 
 	_, err := exec.Command("kubectl", opts...).Output()
 	if err != nil {
-		return fmt.Errorf("Uninstalling '%s': %s", c.Name, err)
+		return fmt.Errorf("Uninstalling %s: %s", c.Name, err)
 	}
 
 	return c.Monitor()
 }
 
 func (c UninstallationComponent) Monitor() error {
-	c.ui.PrintLinef("Waiting for '%s' to be removed...", c.nsRemoval.Namespace)
+	c.ui.PrintLinef("Waiting for namespace '%s' to be deleted...", c.nsRemoval.Namespace)
 	return c.nsRemoval.Monitor()
 }
 
@@ -116,10 +116,11 @@ func (n NamespaceRemoval) Monitor() error {
 			return err
 		}
 
-		found := false
+		var found bool
 		for _, namespace := range namespaces.Items {
 			if namespace.Name == n.Namespace {
 				found = true
+				break
 			}
 		}
 
