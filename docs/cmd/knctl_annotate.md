@@ -29,7 +29,7 @@ knctl annotate [flags]
 
 ### SEE ALSO
 
-* [knctl](knctl.md)	 - knctl controls Knative resources (annotate, build, create, curl, delete, deploy, install, list, logs, open, route, tag, untag, version)
+* [knctl](knctl.md)	 - knctl controls Knative resources (annotate, build, create, curl, delete, deploy, install, list, logs, open, route, tag, uninstall, untag, version)
 * [knctl annotate revision](knctl_annotate_revision.md)	 - Annotate revision
 * [knctl annotate service](knctl_annotate_service.md)	 - Annotate service
 

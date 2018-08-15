@@ -1,6 +1,6 @@
 ## knctl
 
-knctl controls Knative resources (annotate, build, create, curl, delete, deploy, install, list, logs, open, route, tag, untag, version)
+knctl controls Knative resources (annotate, build, create, curl, delete, deploy, install, list, logs, open, route, tag, uninstall, untag, version)
 
 ### Synopsis
 
@@ -39,6 +39,7 @@ knctl [flags]
 * [knctl open](knctl_open.md)	 - Open web browser pointing at a service domain
 * [knctl route](knctl_route.md)	 - Configure route
 * [knctl tag](knctl_tag.md)	 - Tag (revision)
+* [knctl uninstall](knctl_uninstall.md)	 - Uninstall Knative and Istio
 * [knctl untag](knctl_untag.md)	 - Untag (revision)
 * [knctl version](knctl_version.md)	 - Print client version
 
