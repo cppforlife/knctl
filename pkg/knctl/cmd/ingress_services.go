@@ -58,7 +58,7 @@ func (s IngressServices) List() ([]IngressService, error) {
 		}).String(),
 	}
 
-	istioNsName := NewIstio(s.coreClient).SystemNamespaceName()
+	istioNsName := NewIstio().SystemNamespaceName()
 
 	services, err := s.coreClient.CoreV1().Services(istioNsName).List(listOpts)
 	if err != nil {

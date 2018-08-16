@@ -77,11 +77,6 @@ func (o *CreateNamespaceOptions) Run() error {
 
 	// TODO idempotent?
 
-	err = NewIstio(coreClient).EnableNamespace(o.NamespaceFlags.Name)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 

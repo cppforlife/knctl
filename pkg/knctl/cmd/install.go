@@ -87,7 +87,7 @@ func (o *InstallOptions) Run() error {
 		return err
 	}
 
-	istio := NewIstio(coreClient)
+	istio := NewIstio()
 	knativeAsset := InstallKnativeFullAsset
 
 	if o.ExcludeMonitoring {
@@ -111,9 +111,7 @@ func (o *InstallOptions) Run() error {
 		}
 	}
 
-	o.ui.PrintLinef("Enabling Istio in namespace 'default'")
-
-	return istio.EnableNamespace("default")
+	return nil
 }
 
 type InstallationComponent struct {

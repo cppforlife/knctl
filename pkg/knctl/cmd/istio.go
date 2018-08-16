@@ -16,48 +16,10 @@ limitations under the License.
 
 package cmd
 
-import (
-	"fmt"
+type Istio struct{}
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-)
-
-const (
-	istioNsInjectionLabel   = "istio-injection"
-	istioNsInjectionEnabled = "enabled"
-)
-
-type Istio struct {
-	coreClient kubernetes.Interface
-}
-
-func NewIstio(coreClient kubernetes.Interface) Istio {
-	return Istio{coreClient}
+func NewIstio() Istio {
+	return Istio{}
 }
 
 func (i Istio) SystemNamespaceName() string { return "istio-system" }
-
-func (i Istio) EnableNamespace(namespaceName string) error {
-	ns, err := i.coreClient.CoreV1().Namespaces().Get(namespaceName, metav1.GetOptions{})
-	if err != nil {
-		return err
-	}
-
-	if ns.Labels == nil {
-		ns.Labels = map[string]string{}
-	}
-
-	if _, found := ns.Labels[istioNsInjectionLabel]; found {
-		return nil
-	}
-
-	ns.Labels[istioNsInjectionLabel] = istioNsInjectionEnabled
-
-	_, err = i.coreClient.CoreV1().Namespaces().Update(ns)
-	if err != nil {
-		return fmt.Errorf("Updating namespace: %s", err)
-	}
-
-	return nil
-}

@@ -59,7 +59,7 @@ func (o *UninstallOptions) Run() error {
 		return err
 	}
 
-	istio := NewIstio(coreClient)
+	istio := NewIstio()
 
 	components := []UninstallationComponent{
 		{"Istio", NamespaceRemoval{istio.SystemNamespaceName(), coreClient}, o.ui, o.kubeconfigFlags},
