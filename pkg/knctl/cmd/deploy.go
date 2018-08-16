@@ -75,12 +75,6 @@ func (o *DeployOptions) Run() error {
 		return err
 	}
 
-	// TODO should we just automatically label it?
-	err = NewIstio(coreClient).ExpectNamespaceToBeEnabled(o.ServiceFlags.NamespaceFlags.Name)
-	if err != nil {
-		return err
-	}
-
 	service, err := ServiceSpec{}.Build(o.ServiceFlags, o.DeployFlags)
 	if err != nil {
 		return err
