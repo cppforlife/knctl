@@ -25,6 +25,7 @@ import (
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apirand "k8s.io/apimachinery/pkg/util/rand"
 )
 
 type ServiceSpec struct{}
@@ -55,6 +56,12 @@ func (ServiceSpec) Build(serviceFlags ServiceFlags, deployFlags DeployFlags) (v1
 		}
 		serviceCont.Env = append(serviceCont.Env, corev1.EnvVar{Name: pieces[0], Value: pieces[1]})
 	}
+
+	// TODO it's convenient to force redeploy anytime deploy is issued
+	serviceCont.Env = append(serviceCont.Env, corev1.EnvVar{
+		Name:  "KNCTL_DEPLOY",
+		Value: apirand.String(10),
+	})
 
 	service := v1alpha1.Service{
 		ObjectMeta: deployFlags.GenerateNameFlags.Apply(metav1.ObjectMeta{

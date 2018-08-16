@@ -446,7 +446,7 @@
   version = "kubernetes-1.10.0"
 
 [[projects]]
-  digest = "1:447927940b065528a83cf6cc76e4678f6b95c6762503755f4b9c2cccf3be981f"
+  digest = "1:4f29b13bc99f553dfc9bbbb761bc1fc1bfff67dda12e7b70234d1cf3557273de"
   name = "k8s.io/apimachinery"
   packages = [
     "pkg/api/equality",
@@ -479,6 +479,7 @@
     "pkg/util/intstr",
     "pkg/util/json",
     "pkg/util/net",
+    "pkg/util/rand",
     "pkg/util/remotecommand",
     "pkg/util/runtime",
     "pkg/util/sets",
@@ -587,6 +588,7 @@
     "k8s.io/apimachinery/pkg/labels",
     "k8s.io/apimachinery/pkg/types",
     "k8s.io/apimachinery/pkg/util/duration",
+    "k8s.io/apimachinery/pkg/util/rand",
     "k8s.io/apimachinery/pkg/watch",
     "k8s.io/client-go/kubernetes",
     "k8s.io/client-go/kubernetes/scheme",
