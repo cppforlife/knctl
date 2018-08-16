@@ -61,16 +61,3 @@ func (i Istio) EnableNamespace(namespaceName string) error {
 
 	return nil
 }
-
-func (i Istio) ExpectNamespaceToBeEnabled(namespaceName string) error {
-	ns, err := i.coreClient.CoreV1().Namespaces().Get(namespaceName, metav1.GetOptions{})
-	if err != nil {
-		return err
-	}
-
-	if ns.Labels[istioNsInjectionLabel] != istioNsInjectionEnabled {
-		return fmt.Errorf("Expected namespace '%s' to have label '%s'", namespaceName, istioNsInjectionLabel)
-	}
-
-	return nil
-}
