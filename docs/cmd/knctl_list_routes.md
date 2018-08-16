@@ -22,7 +22,7 @@ knctl list routes [flags]
 
 ```
   -h, --help               help for routes
-  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)
+  -n, --namespace string   Specified namespace (or default from kubeconfig)
 ```
 
 ### Options inherited from parent commands

@@ -122,6 +122,7 @@ Knative docs: https://github.com/knative/docs.`,
 
 	VisitCommands(cmd, reconfigureCmdWithSubcmd)
 	VisitCommands(cmd, reconfigureLeafCmd)
+	VisitCommands(cmd, o.reconfigureNamespaceFlags)
 
 	return cmd
 }
@@ -164,6 +165,21 @@ func reconfigureLeafCmd(cmd *cobra.Command) {
 			return origRunE(cmd2, args)
 		}
 		cmd.Args = cobra.ArbitraryArgs
+	}
+}
+
+func (o *KnctlOptions) reconfigureNamespaceFlags(cmd *cobra.Command) {
+	if cmd.Flags().Lookup("namespace") != nil {
+		origPreRun := cmd.PreRun
+		cmd.PreRun = func(cmd2 *cobra.Command, args []string) {
+			f := cmd2.Flags().Lookup("namespace")
+			if f.Value == nil || f.Value.String() == "" {
+				f.Value.Set(o.depsFactory.DefaultNamespace())
+			}
+			if origPreRun != nil {
+				origPreRun(cmd, args)
+			}
+		}
 	}
 }
 

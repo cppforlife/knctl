@@ -25,7 +25,7 @@ knctl create namespace [flags]
 ```
       --generate-name      Set to generate name
   -h, --help               help for namespace
-  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)
+  -n, --namespace string   Specified namespace (or default from kubeconfig)
 ```
 
 ### Options inherited from parent commands

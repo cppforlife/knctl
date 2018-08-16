@@ -17,8 +17,6 @@ limitations under the License.
 package cmd
 
 import (
-	"os"
-
 	"github.com/spf13/cobra"
 )
 
@@ -27,9 +25,5 @@ type NamespaceFlags struct {
 }
 
 func (s *NamespaceFlags) Set(cmd *cobra.Command) {
-	defaultName := os.Getenv("KNCTL_NAMESPACE")
-	cmd.Flags().StringVarP(&s.Name, "namespace", "n", defaultName, "Specified namespace ($KNCTL_NAMESPACE)")
-	if len(defaultName) == 0 {
-		cmd.MarkFlagRequired("namespace")
-	}
+	cmd.Flags().StringVarP(&s.Name, "namespace", "n", "", "Specified namespace (or default from kubeconfig)")
 }
