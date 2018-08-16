@@ -4,6 +4,8 @@ Install Knative and Istio
 
 ### Synopsis
 
+Install Knative and Istio.
+
 Requires 'kubectl' command installed on a the system.
 
 ```
@@ -15,6 +17,7 @@ knctl install [flags]
 ```
   -m, --exclude-monitoring   Exclude installation of monitoring components
   -h, --help                 help for install
+  -p, --node-ports           Use service type NodePorts instead of type LoadBalancer
 ```
 
 ### Options inherited from parent commands

@@ -27,10 +27,12 @@ func TestNewInstallCmd_Ok(t *testing.T) {
 	cmd := NewTestCmd(t, NewInstallCmd(realCmd))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
+		"-p",
 		"-m",
 	})
 	cmd.ExpectReachesExecution()
 
+	DeepEqual(t, realCmd.NodePorts, true)
 	DeepEqual(t, realCmd.ExcludeMonitoring, true)
 }
 
@@ -38,10 +40,12 @@ func TestNewInstallCmd_OkLongFlagNames(t *testing.T) {
 	realCmd := NewInstallOptions(nil, NewDepsFactoryImpl(), &KubeconfigFlags{})
 	cmd := NewTestCmd(t, NewInstallCmd(realCmd))
 	cmd.Execute([]string{
+		"--node-ports",
 		"--exclude-monitoring",
 	})
 	cmd.ExpectReachesExecution()
 
+	DeepEqual(t, realCmd.NodePorts, true)
 	DeepEqual(t, realCmd.ExcludeMonitoring, true)
 }
 
@@ -51,5 +55,6 @@ func TestNewInstallCmd_OkMinimum(t *testing.T) {
 	cmd.Execute([]string{})
 	cmd.ExpectReachesExecution()
 
+	DeepEqual(t, realCmd.NodePorts, false)
 	DeepEqual(t, realCmd.ExcludeMonitoring, false)
 }
