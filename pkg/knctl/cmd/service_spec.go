@@ -58,10 +58,12 @@ func (ServiceSpec) Build(serviceFlags ServiceFlags, deployFlags DeployFlags) (v1
 	}
 
 	// TODO it's convenient to force redeploy anytime deploy is issued
-	serviceCont.Env = append(serviceCont.Env, corev1.EnvVar{
-		Name:  "KNCTL_DEPLOY",
-		Value: apirand.String(10),
-	})
+	if !deployFlags.RemoveKnctlDeployEnvVar {
+		serviceCont.Env = append(serviceCont.Env, corev1.EnvVar{
+			Name:  "KNCTL_DEPLOY",
+			Value: apirand.String(10),
+		})
+	}
 
 	service := v1alpha1.Service{
 		ObjectMeta: deployFlags.GenerateNameFlags.Apply(metav1.ObjectMeta{

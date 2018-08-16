@@ -46,6 +46,8 @@ func TestServiceSpecWithBuildConfiguration(t *testing.T) {
 		},
 		Image: "test-image",
 		Env:   []string{"test-env-key1=test-env-val1"},
+
+		RemoveKnctlDeployEnvVar: true,
 	}
 
 	spec, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
@@ -110,6 +112,8 @@ func TestServiceSpecWithoutBuildConfiguration(t *testing.T) {
 	deployFlags := DeployFlags{
 		Image: "test-image",
 		Env:   []string{"test-env-key1=test-env-val1"},
+
+		RemoveKnctlDeployEnvVar: true,
 	}
 
 	spec, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
@@ -155,6 +159,8 @@ func TestServiceSpecWithInvalidEnv(t *testing.T) {
 	deployFlags := DeployFlags{
 		Image: "test-image",
 		Env:   []string{"test-env-key1"},
+
+		RemoveKnctlDeployEnvVar: true,
 	}
 
 	_, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
@@ -178,6 +184,8 @@ func TestServiceSpecWithMultipleEnv(t *testing.T) {
 	deployFlags := DeployFlags{
 		Image: "test-image",
 		Env:   []string{"test-env-key1=test-env-val1", "test-env-key2=test-env-val2"},
+
+		RemoveKnctlDeployEnvVar: true,
 	}
 
 	spec, err := ServiceSpec{}.Build(serviceFlags, deployFlags)

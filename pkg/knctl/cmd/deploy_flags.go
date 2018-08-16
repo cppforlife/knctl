@@ -26,6 +26,8 @@ type DeployFlags struct {
 
 	Image string
 	Env   []string
+
+	RemoveKnctlDeployEnvVar bool
 }
 
 func (s *DeployFlags) Set(cmd *cobra.Command) {
