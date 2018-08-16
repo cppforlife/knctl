@@ -58,7 +58,7 @@ Hello World: new-value!
 List multiple revisions of the deployed service
 
 ```bash
-$ knctl -n default list revisions
+$ knctl -n default --service hello list revisions
 
 Revisions for service 'hello'
 

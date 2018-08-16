@@ -24,7 +24,8 @@ $ ./knctl version
 - [Manage domains](./docs/manage-domains.md)
 - [Traffic splitting WIP](./docs/traffic-splitting.md)
 - [Stanalone build](./docs/standalone-build.md)
-- [Misc](./docs/misc.md)
+- [Annotations](./docs/annotations.md)
+- [Ingresses](./docs/ingresses.md)
 - [Complete command reference](./docs/cmd/knctl.md)
 
 If you are interested in contributing, see [CONTRIBUTING.md](./CONTRIBUTING.md).

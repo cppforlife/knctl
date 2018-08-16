@@ -20,7 +20,7 @@ Succeeded
 Change default domain
 
 ```bash
-$ knctl create domain my-domain.test --default
+$ knctl create domain --domain my-domain.test --default
 ```
 
 Deploy sample service with new default domain

@@ -17,6 +17,8 @@ limitations under the License.
 package cmd_test
 
 import (
+	"io/ioutil"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -139,4 +141,82 @@ func TestNewKnctlCmd_ValidateAllCommandArgs(t *testing.T) {
 			t.Fatalf("Expected command '%v' to specify arg configuration", cmd)
 		}
 	})
+}
+
+func TestNewKnctlCmd_ValidateAllDocsCommandExamples(t *testing.T) {
+	const beginningDollar = "$ "
+	const trailingSlash = " \\"
+
+	verifyDocFile := func(content, location string) {
+		lines := strings.Split(content, "\n")
+
+		var cmdPieces []string
+		var addNamespace bool
+
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if len(line) == 0 || strings.HasPrefix(line, "#") {
+				continue
+			}
+
+			if strings.HasPrefix(line, "$ export KNCTL_NAMESPACE=") {
+				addNamespace = true
+				continue
+			}
+
+			if !strings.HasPrefix(line, beginningDollar+"knctl") && len(cmdPieces) == 0 {
+				continue
+			}
+
+			line = strings.TrimPrefix(line, beginningDollar)
+
+			var endsWithSlash bool
+
+			if strings.HasSuffix(line, trailingSlash) {
+				line = strings.TrimSuffix(line, trailingSlash)
+				endsWithSlash = true
+			}
+
+			cmdPieces = append(cmdPieces, strings.Split(line, " ")...)
+			if endsWithSlash {
+				continue
+			}
+
+			// recreate for every command since cobra persists some state
+			noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
+			rootCmd := NewKnctlCmd(NewDefaultKnctlOptions(noopUI))
+
+			if cmdPieces[0] != "knctl" {
+				t.Fatalf("Expected example command '%s' to start with 'knctl' (location: %s)", line, location)
+			}
+
+			if addNamespace {
+				cmdPieces = append(cmdPieces, []string{"-n", "ns1"}...)
+			}
+
+			testCmd := NewTestCmd(t, rootCmd)
+			testCmd.Execute(cmdPieces[1:])
+			testCmd.ExpectReachesExecution()
+
+			cmdPieces = []string{}
+		}
+	}
+
+	matches, err := filepath.Glob("../../../docs/*.md")
+	if err != nil {
+		t.Fatalf("Expected glob to not error: %s", err)
+	}
+
+	if len(matches) == 0 {
+		t.Fatalf("Expected glob to find at least one doc file")
+	}
+
+	for _, match := range matches {
+		content, err := ioutil.ReadFile(match)
+		if err != nil {
+			t.Fatalf("Expected file reading to succeed: %s", err)
+		}
+
+		verifyDocFile(string(content), match)
+	}
 }
