@@ -22,7 +22,7 @@ knctl delete route [flags]
 
 ```
   -h, --help               help for route
-  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)
+  -n, --namespace string   Specified namespace (or default from kubeconfig)
       --route string       Specified route
 ```
 

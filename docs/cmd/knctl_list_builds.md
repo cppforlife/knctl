@@ -22,7 +22,7 @@ knctl list builds [flags]
 
 ```
   -h, --help               help for builds
-  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)
+  -n, --namespace string   Specified namespace (or default from kubeconfig)
 ```
 
 ### Options inherited from parent commands

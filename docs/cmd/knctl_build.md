@@ -39,7 +39,7 @@ knctl build [flags]
       --git-url string           Set Git URL
   -h, --help                     help for build
   -i, --image string             Set image URL
-  -n, --namespace string         Specified namespace ($KNCTL_NAMESPACE)
+  -n, --namespace string         Specified namespace (or default from kubeconfig)
       --service-account string   Set service account name for building
       --template string          Set template name
       --template-arg strings     Set template argument (format: key=value) (can be specified multiple times)
