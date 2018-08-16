@@ -25,6 +25,7 @@ knctl curl [flags]
 ```
   -h, --help               help for curl
   -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)
+  -p, --port int32         Set port (default 80)
   -s, --service string     Specified service
 ```
 

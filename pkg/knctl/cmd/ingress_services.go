@@ -34,6 +34,7 @@ type IngressService interface {
 	Name() string
 	Addresses() []string
 	Ports() []int32
+	MappedPort(int32) int32
 	CreationTime() time.Time
 }
 
@@ -82,7 +83,7 @@ func (s IngressServices) List() ([]IngressService, error) {
 	return ingSvcs, nil
 }
 
-func (s IngressServices) PreferredAddress() (string, error) {
+func (s IngressServices) PreferredAddress(port int32) (string, error) {
 	ingSvcs, err := s.List()
 	if err != nil {
 		return "", err
@@ -90,10 +91,10 @@ func (s IngressServices) PreferredAddress() (string, error) {
 
 	for _, svc := range ingSvcs {
 		addrs := svc.Addresses()
-		ports := svc.Ports()
+		port = svc.MappedPort(port)
 
-		if len(addrs) > 0 && len(ports) > 0 {
-			return fmt.Sprintf("%s:%d", addrs[0], ports[0]), nil
+		if len(addrs) > 0 && port != 0 {
+			return fmt.Sprintf("%s:%d", addrs[0], port), nil
 		}
 	}
 
@@ -131,6 +132,15 @@ func (s IngressServiceLoadBalancer) Ports() []int32 {
 	return ports
 }
 
+func (s IngressServiceLoadBalancer) MappedPort(port int32) int32 {
+	for _, p := range s.Spec.Ports {
+		if p.Port == port {
+			return port
+		}
+	}
+	return 0
+}
+
 func (s IngressServiceNodePort) Name() string { return s.Service.Name }
 
 func (s IngressServiceNodePort) CreationTime() time.Time {
@@ -165,4 +175,13 @@ func (s IngressServiceNodePort) Ports() []int32 {
 	}
 
 	return ports
+}
+
+func (s IngressServiceNodePort) MappedPort(port int32) int32 {
+	for _, p := range s.Spec.Ports {
+		if p.Port == port {
+			return p.NodePort
+		}
+	}
+	return 0
 }

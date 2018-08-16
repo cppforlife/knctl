@@ -31,6 +31,7 @@ type CurlOptions struct {
 	depsFactory DepsFactory
 
 	ServiceFlags ServiceFlags
+	Port         int32
 }
 
 func NewCurlOptions(ui ui.UI, depsFactory DepsFactory) *CurlOptions {
@@ -50,6 +51,7 @@ Requires 'curl' command installed on the system.`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.ServiceFlags.Set(cmd)
+	cmd.Flags().Int32VarP(&o.Port, "port", "p", 80, "Set port")
 	return cmd
 }
 
@@ -59,13 +61,18 @@ func (o *CurlOptions) Run() error {
 		return err
 	}
 
-	ingressAddress, err := o.ingressAddress()
+	ingressAddress, err := o.preferredIngressAddress()
 	if err != nil {
 		return err
 	}
 
+	schema := "http"
+	if o.Port == 443 {
+		schema = "https"
+	}
+
 	cmdName := "curl"
-	cmdArgs := []string{"-H", "Host: " + serviceDomain, "http://" + ingressAddress} // TODO Determine protocol for the entrypoint
+	cmdArgs := []string{"-H", "Host: " + serviceDomain, schema + "://" + ingressAddress}
 
 	o.ui.PrintLinef("Running: %s '%s'", cmdName, strings.Join(cmdArgs, "' '"))
 
@@ -97,11 +104,11 @@ func (o *CurlOptions) serviceDomain() (string, error) {
 	return service.Status.Domain, nil
 }
 
-func (o *CurlOptions) ingressAddress() (string, error) {
+func (o *CurlOptions) preferredIngressAddress() (string, error) {
 	coreClient, err := o.depsFactory.CoreClient()
 	if err != nil {
 		return "", err
 	}
 
-	return IngressServices{coreClient}.PreferredAddress()
+	return IngressServices{coreClient}.PreferredAddress(o.Port)
 }
