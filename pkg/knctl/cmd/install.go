@@ -34,17 +34,17 @@ import (
 )
 
 var (
-	istioAsset = YAMLAsset{
-		URL:    "https://raw.githubusercontent.com/knative/serving/v0.1.0/third_party/istio-0.8.0/istio.yaml",
-		SHA256: "22b8ea622472d6253bf713d5767e9e179091e55e7e5aaf8fa0a586e5b57deb93",
+	InstallIstioAsset = InstallationAsset{
+		URL:    "https://raw.githubusercontent.com/knative/serving/4fcdd64a2c1a3ea111b9dbe4191b0f6612105535/third_party/istio-1.0.0/istio.yaml",
+		SHA256: "f1ec0ac4a056fe2d53550db76f260818ca009d598225f318320bafa42d23c4fb",
 	}
-	knativeFullAsset = YAMLAsset{
-		URL:    "https://github.com/knative/serving/releases/download/v0.1.0/release.yaml",
-		SHA256: "6e92473ed675003fd52cde4ba9dc409073dbc5d7259bd496c88fb5b99633795e",
+	InstallKnativeFullAsset = InstallationAsset{
+		URL:    "https://github.com/knative/serving/releases/download/v0.1.1/release.yaml",
+		SHA256: "81d619b995ee36650ac4fe5ba54705cde569a92457aee18a03a8a45e5a9b8b77",
 	}
-	knativeNoMonAsset = YAMLAsset{
-		URL:    "https://github.com/knative/serving/releases/download/v0.1.0/release-no-mon.yaml",
-		SHA256: "69408b14133242e4daa8f62719eab998200e3b453555e12b678c4ffade43e332",
+	InstallKnativeNoMonAsset = InstallationAsset{
+		URL:    "https://github.com/knative/serving/releases/download/v0.1.1/release-no-mon.yaml",
+		SHA256: "db82bf221513bf5738bec694f3654df6111d74ad5cd1f3d69cb25422755437a7",
 	}
 )
 
@@ -88,14 +88,14 @@ func (o *InstallOptions) Run() error {
 	}
 
 	istio := NewIstio(coreClient)
-	knativeAsset := knativeFullAsset
+	knativeAsset := InstallKnativeFullAsset
 
 	if o.ExcludeMonitoring {
-		knativeAsset = knativeNoMonAsset
+		knativeAsset = InstallKnativeNoMonAsset
 	}
 
 	components := []InstallationComponent{
-		{"Istio", YAMLSource{istioAsset, o.NodePorts}, NamespaceReadiness{istio.SystemNamespaceName(), coreClient}, o.ui, o.kubeconfigFlags},
+		{"Istio", YAMLSource{InstallIstioAsset, o.NodePorts}, NamespaceReadiness{istio.SystemNamespaceName(), coreClient}, o.ui, o.kubeconfigFlags},
 		{"Knative", YAMLSource{knativeAsset, o.NodePorts}, NamespaceReadiness{"knative-serving", coreClient}, o.ui, o.kubeconfigFlags},
 	}
 
@@ -155,7 +155,7 @@ func (c InstallationComponent) Monitor() error {
 }
 
 type YAMLSource struct {
-	Asset     YAMLAsset
+	Asset     InstallationAsset
 	NodePorts bool
 }
 
@@ -240,7 +240,7 @@ func (p PodReadiness) IsRunningOrComplete() bool {
 	return p.Pod.Status.Phase == corev1.PodRunning || p.Pod.Status.Phase == corev1.PodSucceeded
 }
 
-type YAMLAsset struct {
+type InstallationAsset struct {
 	URL    string
 	SHA256 string
 }

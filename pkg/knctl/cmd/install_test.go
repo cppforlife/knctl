@@ -58,3 +58,20 @@ func TestNewInstallCmd_OkMinimum(t *testing.T) {
 	DeepEqual(t, realCmd.NodePorts, false)
 	DeepEqual(t, realCmd.ExcludeMonitoring, false)
 }
+
+func TestNewInstallCmd_CheckInstallationAssets(t *testing.T) {
+	assets := []InstallationAsset{InstallIstioAsset, InstallKnativeFullAsset, InstallKnativeNoMonAsset}
+
+	for _, asset := range assets {
+		source := YAMLSource{asset, false}
+
+		content, err := source.Content()
+		if err != nil {
+			t.Fatalf("Expected asset '%s' to be successfuly checked: %s", asset, err)
+		}
+
+		if len(content) == 0 {
+			t.Fatalf("Expected asset content '%s' to be non-empty", asset)
+		}
+	}
+}
