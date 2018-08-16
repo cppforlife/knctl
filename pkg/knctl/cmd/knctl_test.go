@@ -78,26 +78,44 @@ func TestNewKnctlCmd_ValidateAllCommandExamples(t *testing.T) {
 	noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
 	rootCmd := NewKnctlCmd(NewDefaultKnctlOptions(noopUI))
 
+	const trailingSlash = " \\"
+
 	VisitCommands(rootCmd, func(cmd *cobra.Command) {
 		lines := strings.Split(cmd.Example, "\n")
+
+		var cmdPieces []string
+
 		for _, line := range lines {
 			line = strings.TrimSpace(line)
 			if len(line) == 0 || strings.HasPrefix(line, "#") {
 				continue
 			}
 
-			args := strings.Split(line, " ")
-			if args[0] != "knctl" {
-				t.Fatalf("Expected example command '%s' to start with 'knctl'", line)
+			var endsWithSlash bool
+
+			if strings.HasSuffix(line, trailingSlash) {
+				line = strings.TrimSuffix(line, trailingSlash)
+				endsWithSlash = true
+			}
+
+			cmdPieces = append(cmdPieces, strings.Split(line, " ")...)
+			if endsWithSlash {
+				continue
 			}
 
 			// recreate for every command since cobra persists some state
 			noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
 			rootCmd := NewKnctlCmd(NewDefaultKnctlOptions(noopUI))
 
+			if cmdPieces[0] != "knctl" {
+				t.Fatalf("Expected example command '%s' to start with 'knctl'", line)
+			}
+
 			testCmd := NewTestCmd(t, rootCmd)
-			testCmd.Execute(args[1:])
+			testCmd.Execute(cmdPieces[1:])
 			testCmd.ExpectReachesExecution()
+
+			cmdPieces = []string{}
 		}
 	})
 }

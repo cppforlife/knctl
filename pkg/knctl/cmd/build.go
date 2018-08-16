@@ -44,7 +44,18 @@ func NewBuildCmd(o *BuildOptions) *cobra.Command {
 		Short: "Build source code into image",
 		Example: `
   # Build Git repository into an image in namespace 'ns1'
-  knctl build -b build1 --git-url github.com/cppforlife/simple-app --git-revision master/head -i docker.io/cppforlife/simple-app -n ns1`, // TODO replace example
+  knctl build -b build1 --git-url github.com/cppforlife/simple-app --git-revision master -i docker.io/cppforlife/simple-app -n ns1
+
+  # Build from local source code in namespace 'ns1'
+  # ( related: https://github.com/cppforlife/knctl/blob/master/docs/deploy-source-directory.md )
+  knctl build -b build1 -d=. -i index.docker.io/your-account/your-image --service-account serv-acct1 -n ns1
+
+  # Build with custom build template in namespace 'ns1'
+  # ( related: https://github.com/cppforlife/knctl/blob/master/docs/deploy-custom-build-template.md )
+  knctl build -b build1 -n ns1 \
+      --git-url https://github.com/cppforlife/simple-app --git-revision master \
+      --template buildpack --template-env GOPACKAGENAME=main \
+      --service-account serv-acct1 --image index.docker.io/your-account/your-image`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.BuildFlags.Set(cmd)

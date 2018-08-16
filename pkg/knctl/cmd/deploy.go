@@ -46,7 +46,19 @@ func NewDeployCmd(o *DeployOptions) *cobra.Command {
   knctl deploy -s srv1 --image gcr.io/knative-samples/helloworld-go --env TARGET=123 -n ns1
 
   # Deploy service 'srv1' from Git repo and one environment variable in namespace 'ns1'
-  knctl deploy -s srv1 --image gcr.io/your-account/your-image --git-url https://github.com/cppforlife/simple-app --git-revision master --env TARGET=123 -n ns1`, // TODO replace example
+  knctl deploy -s srv1 --image gcr.io/your-account/your-image --git-url https://github.com/cppforlife/simple-app --git-revision master --env TARGET=123 -n ns1
+
+  # Deploy service 'srv1' from local source code in namespace 'ns1'
+  # ( https://github.com/cppforlife/knctl/blob/master/docs/deploy-source-directory.md )
+  knctl deploy -s srv1 -d=. --image index.docker.io/your-account/your-image --service-account serv-acct1 --env TARGET=123 -n ns1
+
+  # Deploy service 'srv1' with custom build template in namespace 'ns1'
+  # ( https://github.com/cppforlife/knctl/blob/master/docs/deploy-custom-build-template.md )
+  knctl deploy -s srv1 -n ns1 \
+      --git-url https://github.com/cppforlife/simple-app --git-revision master \
+      --template buildpack --template-env GOPACKAGENAME=main \
+      --service-account serv-acct1 --image index.docker.io/your-account/your-repo \
+      --env SIMPLE_MSG=123`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.ServiceFlags.Set(cmd)
