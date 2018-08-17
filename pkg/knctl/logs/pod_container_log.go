@@ -24,6 +24,7 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
@@ -89,23 +90,39 @@ func (l PodContainerLog) obtainStream(cancelCh chan struct{}) (io.ReadCloser, er
 	for {
 		// TODO infinite retry
 
-		logs := l.podsClient.GetLogs(l.pod.Name, &corev1.PodLogOptions{
-			Follow:    l.opts.Follow,
-			TailLines: l.opts.Lines,
-			Container: l.container,
-			// TODO other options
-		})
+		// It appears that GetLogs will successfully return log stream
+		// almost immediately after pod has been created; however,
+		// returned log stream will not carry any data, even after containers have started.
+		// Wait for pod object to have container status fields initialized
+		// since that appears to make GetLogs call return actual log stream.
+		if l.readyToGetLogs() {
+			logs := l.podsClient.GetLogs(l.pod.Name, &corev1.PodLogOptions{
+				Follow:    l.opts.Follow,
+				TailLines: l.opts.Lines,
+				Container: l.container,
+				// TODO other options
+			})
 
-		stream, err := logs.Stream()
-		if err == nil {
-			return stream, nil
+			stream, err := logs.Stream()
+			if err == nil {
+				return stream, nil
+			}
 		}
 
 		select {
 		case <-cancelCh:
 			return nil, nil
 		default:
-			time.Sleep(1 * time.Second)
+			time.Sleep(500 * time.Millisecond)
 		}
 	}
+}
+
+func (l PodContainerLog) readyToGetLogs() bool {
+	pod, err := l.podsClient.Get(l.pod.Name, metav1.GetOptions{})
+	if err != nil {
+		return false
+	}
+
+	return len(pod.Status.ContainerStatuses) > 0 || len(pod.Status.InitContainerStatuses) > 0
 }
