@@ -42,7 +42,7 @@ func NewRouteOptions(ui ui.UI, depsFactory DepsFactory) *RouteOptions {
 	return &RouteOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewRouteCmd(o *RouteOptions) *cobra.Command {
+func NewRouteCmd(o *RouteOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "route",
 		Short: "Configure route",
@@ -54,8 +54,8 @@ func NewRouteCmd(o *RouteOptions) *cobra.Command {
   knctl route --route rt1 -p svc1:previous=100% -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.RouteFlags.Set(cmd)
-	o.TrafficFlags.Set(cmd)
+	o.RouteFlags.Set(cmd, flagsFactory)
+	o.TrafficFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

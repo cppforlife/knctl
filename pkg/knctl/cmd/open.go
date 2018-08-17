@@ -36,7 +36,7 @@ func NewOpenOptions(ui ui.UI, depsFactory DepsFactory) *OpenOptions {
 	return &OpenOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewOpenCmd(o *OpenOptions) *cobra.Command {
+func NewOpenCmd(o *OpenOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "open",
 		Short: "Open web browser pointing at a service domain",
@@ -48,7 +48,7 @@ Requires 'open' command installed on the system.`,
 knctl open -s svc1 -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.ServiceFlags.Set(cmd)
+	o.ServiceFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

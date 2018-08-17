@@ -35,7 +35,7 @@ func NewVersionOptions(ui ui.UI) *VersionOptions {
 	return &VersionOptions{ui}
 }
 
-func NewVersionCmd(o *VersionOptions) *cobra.Command {
+func NewVersionCmd(o *VersionOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "Print client version",

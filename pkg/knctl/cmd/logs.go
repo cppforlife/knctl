@@ -42,7 +42,7 @@ func NewLogsOptions(ui ui.UI, depsFactory DepsFactory, cancelSignals CancelSigna
 	return &LogsOptions{ui: ui, depsFactory: depsFactory, cancelSignals: cancelSignals}
 }
 
-func NewLogsCmd(o *LogsOptions) *cobra.Command {
+func NewLogsCmd(o *LogsOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "logs",
 		Short: "Print logs",
@@ -55,7 +55,7 @@ func NewLogsCmd(o *LogsOptions) *cobra.Command {
   knctl logs -f -s svc1 -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.ServiceFlags.Set(cmd)
+	o.ServiceFlags.Set(cmd, flagsFactory)
 
 	cmd.Flags().BoolVarP(&o.Follow, "follow", "f", false, "As new revisions are added, new pod logs will be printed")
 	cmd.Flags().Int64VarP(&o.Lines, "lines", "l", 10, "Number of lines")

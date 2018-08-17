@@ -29,7 +29,7 @@ func TestCLIErrorsForFlagsBeforeExtraArgs(t *testing.T) {
 	var stderr bytes.Buffer
 
 	_, err := knctl.RunWithOpts(
-		[]string{"create", "namespace", "test-ns"},
+		[]string{"build", "test-arg"},
 		RunOpts{StderrWriter: &stderr, NoNamespace: true, AllowError: true},
 	)
 
@@ -40,7 +40,7 @@ func TestCLIErrorsForFlagsBeforeExtraArgs(t *testing.T) {
 	stderrStr := stderr.String()
 
 	// Required flag error is more friendlier than command does not accept extra arg
-	if !strings.Contains(stderrStr, `Error: required flag(s) "namespace" not set`) {
+	if !strings.Contains(stderrStr, `Error: required flag(s) "build", "image" not set`) {
 		t.Fatalf("Expected to find required flag error, but was '%s'", stderrStr)
 	}
 }

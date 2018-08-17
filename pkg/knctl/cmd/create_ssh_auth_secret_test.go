@@ -24,7 +24,7 @@ import (
 
 func TestNewCreateSSHAuthSecretCmd_Ok(t *testing.T) {
 	realCmd := NewCreateSSHAuthSecretOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCreateSSHAuthSecretCmd(realCmd))
+	cmd := NewTestCmd(t, NewCreateSSHAuthSecretCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
@@ -47,7 +47,7 @@ func TestNewCreateSSHAuthSecretCmd_Ok(t *testing.T) {
 
 func TestNewCreateSSHAuthSecretCmd_OkLongFlagNames(t *testing.T) {
 	realCmd := NewCreateSSHAuthSecretOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCreateSSHAuthSecretCmd(realCmd))
+	cmd := NewTestCmd(t, NewCreateSSHAuthSecretCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--secret", "test-secret",
@@ -69,7 +69,7 @@ func TestNewCreateSSHAuthSecretCmd_OkLongFlagNames(t *testing.T) {
 
 func TestNewCreateSSHAuthSecretCmd_OkGithub(t *testing.T) {
 	realCmd := NewCreateSSHAuthSecretOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCreateSSHAuthSecretCmd(realCmd))
+	cmd := NewTestCmd(t, NewCreateSSHAuthSecretCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--secret", "test-secret",
@@ -106,7 +106,7 @@ func TestNewCreateSSHAuthSecretCmd_OkGithub(t *testing.T) {
 
 func TestNewCreateSSHAuthSecretCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewCreateSSHAuthSecretOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCreateSSHAuthSecretCmd(realCmd))
+	cmd := NewTestCmd(t, NewCreateSSHAuthSecretCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"namespace", "secret"})
+	cmd.ExpectRequiredFlags([]string{"secret"})
 }

@@ -33,7 +33,7 @@ func NewListIngressesOptions(ui ui.UI, depsFactory DepsFactory) *ListIngressesOp
 	return &ListIngressesOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewListIngressesCmd(o *ListIngressesOptions) *cobra.Command {
+func NewListIngressesCmd(o *ListIngressesOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "ingresses",
 		Aliases: []string{"i", "is", "ing", "ings", "ingress"},

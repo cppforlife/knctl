@@ -27,7 +27,7 @@ type KubeconfigFlags struct {
 	Path string
 }
 
-func (f *KubeconfigFlags) Set(cmd *cobra.Command) {
+func (f *KubeconfigFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
 	defaultPath := os.Getenv("KNCTL_KUBECONFIG")
 	if len(defaultPath) == 0 {
 		defaultPath = filepath.Join(f.homeDir(), ".kube", "config")

@@ -39,7 +39,7 @@ func NewCreateServiceAccountOptions(ui ui.UI, depsFactory DepsFactory) *CreateSe
 	return &CreateServiceAccountOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewCreateServiceAccountCmd(o *CreateServiceAccountOptions) *cobra.Command {
+func NewCreateServiceAccountCmd(o *CreateServiceAccountOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "service-account",
 		Aliases: []string{"sa"},
@@ -53,8 +53,8 @@ Use 'kubectl delete serviceaccount <name> -n <namespace>' to delete service acco
   knctl create service-account -a sa1 --secret secret1 --secret secret2 -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.ServiceAccountFlags.Set(cmd)
-	o.ServiceAccountCreateFlags.Set(cmd)
+	o.ServiceAccountFlags.Set(cmd, flagsFactory)
+	o.ServiceAccountCreateFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

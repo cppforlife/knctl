@@ -38,7 +38,7 @@ func NewListBuildsOptions(ui ui.UI, depsFactory DepsFactory) *ListBuildsOptions 
 	return &ListBuildsOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewListBuildsCmd(o *ListBuildsOptions) *cobra.Command {
+func NewListBuildsCmd(o *ListBuildsOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "builds",
 		Aliases: []string{"bs", "build"},
@@ -49,7 +49,7 @@ func NewListBuildsCmd(o *ListBuildsOptions) *cobra.Command {
   knctl list builds -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.NamespaceFlags.Set(cmd)
+	o.NamespaceFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

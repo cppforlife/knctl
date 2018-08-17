@@ -41,7 +41,7 @@ func NewUninstallOptions(ui ui.UI, depsFactory DepsFactory, kubeconfigFlags *Kub
 	return &UninstallOptions{ui: ui, depsFactory: depsFactory, kubeconfigFlags: kubeconfigFlags}
 }
 
-func NewUninstallCmd(o *UninstallOptions) *cobra.Command {
+func NewUninstallCmd(o *UninstallOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "uninstall",
 		Short: "Uninstall Knative and Istio",

@@ -24,7 +24,7 @@ import (
 
 func TestNewCreateNamespaceCmd_Ok(t *testing.T) {
 	realCmd := NewCreateNamespaceOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCreateNamespaceCmd(realCmd))
+	cmd := NewTestCmd(t, NewCreateNamespaceCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
@@ -37,7 +37,7 @@ func TestNewCreateNamespaceCmd_Ok(t *testing.T) {
 
 func TestNewCreateNamespaceCmd_OkLongFlagNames(t *testing.T) {
 	realCmd := NewCreateNamespaceOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCreateNamespaceCmd(realCmd))
+	cmd := NewTestCmd(t, NewCreateNamespaceCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 	})
@@ -47,9 +47,9 @@ func TestNewCreateNamespaceCmd_OkLongFlagNames(t *testing.T) {
 		NamespaceFlags{"test-namespace"})
 }
 
-func TestNewCreateNamespaceCmd_RequiredFlags(t *testing.T) {
+func TestNewCreateNamespaceCmd_OkMinimum(t *testing.T) {
 	realCmd := NewCreateNamespaceOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCreateNamespaceCmd(realCmd))
+	cmd := NewTestCmd(t, NewCreateNamespaceCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"namespace"})
+	cmd.ExpectReachesExecution()
 }

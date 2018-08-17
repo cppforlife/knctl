@@ -24,13 +24,14 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	. "github.com/cppforlife/knctl/pkg/knctl/cmd"
+	"github.com/cppforlife/knctl/pkg/knctl/cobrautil"
 	"github.com/spf13/cobra"
 )
 
 func TestNewKnctlCmd_Ok(t *testing.T) {
 	noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-	realCmd := NewDefaultKnctlOptions(noopUI)
-	cobraCmd := NewKnctlCmd(realCmd)
+	realCmd := NewKnctlOptions(noopUI, NewDepsFactoryImpl())
+	cobraCmd := NewKnctlCmd(realCmd, FlagsFactory{})
 
 	cmd := NewTestCmd(t, cobraCmd)
 	cmd.ExpectBasicConfig()
@@ -45,8 +46,8 @@ func TestNewKnctlCmd_Ok(t *testing.T) {
 
 func TestNewKnctlCmd_OkMinimum(t *testing.T) {
 	noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-	realCmd := NewDefaultKnctlOptions(noopUI)
-	cmd := NewTestCmd(t, NewKnctlCmd(realCmd))
+	realCmd := NewKnctlOptions(noopUI, NewDepsFactoryImpl())
+	cmd := NewTestCmd(t, NewKnctlCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectReachesExecution()
 
@@ -55,8 +56,8 @@ func TestNewKnctlCmd_OkMinimum(t *testing.T) {
 
 func TestNewKnctlCmd_OkUIFlags(t *testing.T) {
 	noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-	realCmd := NewDefaultKnctlOptions(noopUI)
-	cmd := NewTestCmd(t, NewKnctlCmd(realCmd))
+	realCmd := NewKnctlOptions(noopUI, NewDepsFactoryImpl())
+	cmd := NewTestCmd(t, NewKnctlCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--tty",
 		"--no-color",
@@ -78,11 +79,11 @@ func TestNewKnctlCmd_OkUIFlags(t *testing.T) {
 
 func TestNewKnctlCmd_ValidateAllCommandExamples(t *testing.T) {
 	noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-	rootCmd := NewKnctlCmd(NewDefaultKnctlOptions(noopUI))
+	rootCmd := NewDefaultKnctlCmd(noopUI)
 
 	const trailingSlash = " \\"
 
-	VisitCommands(rootCmd, func(cmd *cobra.Command) {
+	cobrautil.VisitCommands(rootCmd, func(cmd *cobra.Command) {
 		lines := strings.Split(cmd.Example, "\n")
 
 		var cmdPieces []string
@@ -107,7 +108,7 @@ func TestNewKnctlCmd_ValidateAllCommandExamples(t *testing.T) {
 
 			// recreate for every command since cobra persists some state
 			noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-			rootCmd := NewKnctlCmd(NewDefaultKnctlOptions(noopUI))
+			rootCmd := NewDefaultKnctlCmd(noopUI)
 
 			if cmdPieces[0] != "knctl" {
 				t.Fatalf("Expected example command '%s' to start with 'knctl'", line)
@@ -124,9 +125,9 @@ func TestNewKnctlCmd_ValidateAllCommandExamples(t *testing.T) {
 
 func TestNewKnctlCmd_ValidateAllCommandBasicConfig(t *testing.T) {
 	noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-	rootCmd := NewKnctlCmd(NewDefaultKnctlOptions(noopUI))
+	rootCmd := NewDefaultKnctlCmd(noopUI)
 
-	VisitCommands(rootCmd, func(cmd *cobra.Command) {
+	cobrautil.VisitCommands(rootCmd, func(cmd *cobra.Command) {
 		testCmd := NewTestCmd(t, cmd)
 		testCmd.ExpectBasicConfig()
 	})
@@ -134,9 +135,9 @@ func TestNewKnctlCmd_ValidateAllCommandBasicConfig(t *testing.T) {
 
 func TestNewKnctlCmd_ValidateAllCommandArgs(t *testing.T) {
 	noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-	rootCmd := NewKnctlCmd(NewDefaultKnctlOptions(noopUI))
+	rootCmd := NewDefaultKnctlCmd(noopUI)
 
-	VisitCommands(rootCmd, func(cmd *cobra.Command) {
+	cobrautil.VisitCommands(rootCmd, func(cmd *cobra.Command) {
 		if cmd.Args == nil {
 			t.Fatalf("Expected command '%v' to specify arg configuration", cmd)
 		}
@@ -184,7 +185,7 @@ func TestNewKnctlCmd_ValidateAllDocsCommandExamples(t *testing.T) {
 
 			// recreate for every command since cobra persists some state
 			noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-			rootCmd := NewKnctlCmd(NewDefaultKnctlOptions(noopUI))
+			rootCmd := NewDefaultKnctlCmd(noopUI)
 
 			if cmdPieces[0] != "knctl" {
 				t.Fatalf("Expected example command '%s' to start with 'knctl' (location: %s)", line, location)

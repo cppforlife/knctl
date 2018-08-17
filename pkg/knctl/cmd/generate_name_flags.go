@@ -25,7 +25,7 @@ type GenerateNameFlags struct {
 	GenerateName bool
 }
 
-func (s *GenerateNameFlags) Set(cmd *cobra.Command) {
+func (s *GenerateNameFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
 	cmd.Flags().BoolVar(&s.GenerateName, "generate-name", false, "Set to generate name")
 }
 

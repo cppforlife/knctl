@@ -24,6 +24,6 @@ type TrafficFlags struct {
 	Percentages []string
 }
 
-func (s *TrafficFlags) Set(cmd *cobra.Command) {
+func (s *TrafficFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
 	cmd.Flags().StringSliceVarP(&s.Percentages, "percentage", "p", nil, "Set percentage (format: revision=percentage, example: latest=100%) (can be specified multiple times)")
 }

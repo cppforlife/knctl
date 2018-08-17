@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/cppforlife/go-cli-ui/ui"
+	"github.com/cppforlife/knctl/pkg/knctl/cobrautil"
 	"github.com/spf13/cobra"
 )
 
@@ -33,15 +34,18 @@ type KnctlOptions struct {
 	KubeconfigFlags KubeconfigFlags
 }
 
-func NewDefaultKnctlOptions(ui *ui.ConfUI) *KnctlOptions {
-	return NewKnctlOptions(ui, NewDepsFactoryImpl())
-}
-
 func NewKnctlOptions(ui *ui.ConfUI, depsFactory DepsFactory) *KnctlOptions {
 	return &KnctlOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewKnctlCmd(o *KnctlOptions) *cobra.Command {
+func NewDefaultKnctlCmd(ui *ui.ConfUI) *cobra.Command {
+	depsFactory := NewDepsFactoryImpl()
+	options := NewKnctlOptions(ui, depsFactory)
+	flagsFactory := NewFlagsFactory(depsFactory)
+	return NewKnctlCmd(options, flagsFactory)
+}
+
+func NewKnctlCmd(o *KnctlOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "knctl",
 		Short: "knctl controls Knative resources",
@@ -69,60 +73,60 @@ Knative docs: https://github.com/knative/docs.`,
 
 	cmd.SetOutput(uiBlockWriter{o.ui}) // setting output for cmd.Help()
 
-	o.UIFlags.Set(cmd)
-	o.KubeconfigFlags.Set(cmd)
+	o.UIFlags.Set(cmd, flagsFactory)
+	o.KubeconfigFlags.Set(cmd, flagsFactory)
 
-	cmd.AddCommand(NewVersionCmd(NewVersionOptions(o.ui)))
-	cmd.AddCommand(NewInstallCmd(NewInstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags)))
-	cmd.AddCommand(NewUninstallCmd(NewUninstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags)))
-	cmd.AddCommand(NewDeployCmd(NewDeployOptions(o.ui, o.depsFactory)))
-	cmd.AddCommand(NewLogsCmd(NewLogsOptions(o.ui, o.depsFactory, CancelSignals{})))
-	cmd.AddCommand(NewOpenCmd(NewOpenOptions(o.ui, o.depsFactory)))
-	cmd.AddCommand(NewCurlCmd(NewCurlOptions(o.ui, o.depsFactory)))
-	cmd.AddCommand(NewBuildCmd(NewBuildOptions(o.ui, o.depsFactory, CancelSignals{})))
-	cmd.AddCommand(NewRouteCmd(NewRouteOptions(o.ui, o.depsFactory)))
+	cmd.AddCommand(NewVersionCmd(NewVersionOptions(o.ui), flagsFactory))
+	cmd.AddCommand(NewInstallCmd(NewInstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags), flagsFactory))
+	cmd.AddCommand(NewUninstallCmd(NewUninstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags), flagsFactory))
+	cmd.AddCommand(NewDeployCmd(NewDeployOptions(o.ui, o.depsFactory), flagsFactory))
+	cmd.AddCommand(NewLogsCmd(NewLogsOptions(o.ui, o.depsFactory, CancelSignals{}), flagsFactory))
+	cmd.AddCommand(NewOpenCmd(NewOpenOptions(o.ui, o.depsFactory), flagsFactory))
+	cmd.AddCommand(NewCurlCmd(NewCurlOptions(o.ui, o.depsFactory), flagsFactory))
+	cmd.AddCommand(NewBuildCmd(NewBuildOptions(o.ui, o.depsFactory, CancelSignals{}), flagsFactory))
+	cmd.AddCommand(NewRouteCmd(NewRouteOptions(o.ui, o.depsFactory), flagsFactory))
 
 	createCmd := NewCreateCmd()
-	createCmd.AddCommand(NewCreateNamespaceCmd(NewCreateNamespaceOptions(o.ui, o.depsFactory)))
-	createCmd.AddCommand(NewCreateServiceAccountCmd(NewCreateServiceAccountOptions(o.ui, o.depsFactory)))
-	createCmd.AddCommand(NewCreateBasicAuthSecretCmd(NewCreateBasicAuthSecretOptions(o.ui, o.depsFactory)))
-	createCmd.AddCommand(NewCreateSSHAuthSecretCmd(NewCreateSSHAuthSecretOptions(o.ui, o.depsFactory)))
-	createCmd.AddCommand(NewCreateDomainCmd(NewCreateDomainOptions(o.ui, o.depsFactory)))
+	createCmd.AddCommand(NewCreateNamespaceCmd(NewCreateNamespaceOptions(o.ui, o.depsFactory), flagsFactory))
+	createCmd.AddCommand(NewCreateServiceAccountCmd(NewCreateServiceAccountOptions(o.ui, o.depsFactory), flagsFactory))
+	createCmd.AddCommand(NewCreateBasicAuthSecretCmd(NewCreateBasicAuthSecretOptions(o.ui, o.depsFactory), flagsFactory))
+	createCmd.AddCommand(NewCreateSSHAuthSecretCmd(NewCreateSSHAuthSecretOptions(o.ui, o.depsFactory), flagsFactory))
+	createCmd.AddCommand(NewCreateDomainCmd(NewCreateDomainOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(createCmd)
 
 	listCmd := NewListCmd()
-	listCmd.AddCommand(NewListServicesCmd(NewListServicesOptions(o.ui, o.depsFactory)))
-	listCmd.AddCommand(NewListRevisionsCmd(NewListRevisionsOptions(o.ui, o.depsFactory)))
-	listCmd.AddCommand(NewListPodsCmd(NewListPodsOptions(o.ui, o.depsFactory)))
-	listCmd.AddCommand(NewListBuildsCmd(NewListBuildsOptions(o.ui, o.depsFactory)))
-	listCmd.AddCommand(NewListRoutesCmd(NewListRoutesOptions(o.ui, o.depsFactory)))
-	listCmd.AddCommand(NewListDomainsCmd(NewListDomainsOptions(o.ui, o.depsFactory)))
-	listCmd.AddCommand(NewListIngressesCmd(NewListIngressesOptions(o.ui, o.depsFactory)))
+	listCmd.AddCommand(NewListServicesCmd(NewListServicesOptions(o.ui, o.depsFactory), flagsFactory))
+	listCmd.AddCommand(NewListRevisionsCmd(NewListRevisionsOptions(o.ui, o.depsFactory), flagsFactory))
+	listCmd.AddCommand(NewListPodsCmd(NewListPodsOptions(o.ui, o.depsFactory), flagsFactory))
+	listCmd.AddCommand(NewListBuildsCmd(NewListBuildsOptions(o.ui, o.depsFactory), flagsFactory))
+	listCmd.AddCommand(NewListRoutesCmd(NewListRoutesOptions(o.ui, o.depsFactory), flagsFactory))
+	listCmd.AddCommand(NewListDomainsCmd(NewListDomainsOptions(o.ui, o.depsFactory), flagsFactory))
+	listCmd.AddCommand(NewListIngressesCmd(NewListIngressesOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(listCmd)
 
 	deleteCmd := NewDeleteCmd()
-	deleteCmd.AddCommand(NewDeleteServiceCmd(NewDeleteServiceOptions(o.ui, o.depsFactory)))
-	deleteCmd.AddCommand(NewDeleteRevisionCmd(NewDeleteRevisionOptions(o.ui, o.depsFactory)))
-	deleteCmd.AddCommand(NewDeleteBuildCmd(NewDeleteBuildOptions(o.ui, o.depsFactory)))
-	deleteCmd.AddCommand(NewDeleteRouteCmd(NewDeleteRouteOptions(o.ui, o.depsFactory)))
+	deleteCmd.AddCommand(NewDeleteServiceCmd(NewDeleteServiceOptions(o.ui, o.depsFactory), flagsFactory))
+	deleteCmd.AddCommand(NewDeleteRevisionCmd(NewDeleteRevisionOptions(o.ui, o.depsFactory), flagsFactory))
+	deleteCmd.AddCommand(NewDeleteBuildCmd(NewDeleteBuildOptions(o.ui, o.depsFactory), flagsFactory))
+	deleteCmd.AddCommand(NewDeleteRouteCmd(NewDeleteRouteOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(deleteCmd)
 
 	annotateCmd := NewAnnotateCmd()
-	annotateCmd.AddCommand(NewAnnotateServiceCmd(NewAnnotateServiceOptions(o.ui, o.depsFactory)))
-	annotateCmd.AddCommand(NewAnnotateRevisionCmd(NewAnnotateRevisionOptions(o.ui, o.depsFactory)))
+	annotateCmd.AddCommand(NewAnnotateServiceCmd(NewAnnotateServiceOptions(o.ui, o.depsFactory), flagsFactory))
+	annotateCmd.AddCommand(NewAnnotateRevisionCmd(NewAnnotateRevisionOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(annotateCmd)
 
 	tagCmd := NewTagCmd()
-	tagCmd.AddCommand(NewTagRevisionCmd(NewTagRevisionOptions(o.ui, o.depsFactory)))
+	tagCmd.AddCommand(NewTagRevisionCmd(NewTagRevisionOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(tagCmd)
 
 	untagCmd := NewUntagCmd()
-	untagCmd.AddCommand(NewUntagRevisionCmd(NewUntagRevisionOptions(o.ui, o.depsFactory)))
+	untagCmd.AddCommand(NewUntagRevisionCmd(NewUntagRevisionOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(untagCmd)
 
-	VisitCommands(cmd, reconfigureCmdWithSubcmd)
-	VisitCommands(cmd, reconfigureLeafCmd)
-	VisitCommands(cmd, o.reconfigureNamespaceFlags)
+	cobrautil.VisitCommands(cmd, reconfigureCmdWithSubcmd)
+	cobrautil.VisitCommands(cmd, reconfigureLeafCmd)
+	cobrautil.VisitCommands(cmd, cobrautil.ResolveFlagsForCmd)
 
 	return cmd
 }
@@ -168,21 +172,6 @@ func reconfigureLeafCmd(cmd *cobra.Command) {
 	}
 }
 
-func (o *KnctlOptions) reconfigureNamespaceFlags(cmd *cobra.Command) {
-	if cmd.Flags().Lookup("namespace") != nil {
-		origPreRun := cmd.PreRun
-		cmd.PreRun = func(cmd2 *cobra.Command, args []string) {
-			f := cmd2.Flags().Lookup("namespace")
-			if f.Value == nil || f.Value.String() == "" {
-				f.Value.Set(o.depsFactory.DefaultNamespace())
-			}
-			if origPreRun != nil {
-				origPreRun(cmd, args)
-			}
-		}
-	}
-}
-
 func ShowSubcommands(cmd *cobra.Command, args []string) error {
 	var strs []string
 	for _, subcmd := range cmd.Commands() {
@@ -194,13 +183,6 @@ func ShowSubcommands(cmd *cobra.Command, args []string) error {
 func ShowHelp(cmd *cobra.Command, args []string) error {
 	cmd.Help()
 	return fmt.Errorf("Invalid command - see available commands/subcommands above")
-}
-
-func VisitCommands(cmd *cobra.Command, f func(*cobra.Command)) {
-	f(cmd)
-	for _, child := range cmd.Commands() {
-		VisitCommands(child, f)
-	}
 }
 
 type uiBlockWriter struct {

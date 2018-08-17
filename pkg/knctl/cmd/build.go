@@ -38,7 +38,7 @@ func NewBuildOptions(ui ui.UI, depsFactory DepsFactory, cancelSignals CancelSign
 	return &BuildOptions{ui: ui, depsFactory: depsFactory, cancelSignals: cancelSignals}
 }
 
-func NewBuildCmd(o *BuildOptions) *cobra.Command {
+func NewBuildCmd(o *BuildOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "build",
 		Short: "Build source code into image",
@@ -58,8 +58,8 @@ func NewBuildCmd(o *BuildOptions) *cobra.Command {
       --service-account serv-acct1 --image index.docker.io/your-account/your-image`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.BuildFlags.Set(cmd)
-	o.BuildCreateFlags.Set(cmd)
+	o.BuildFlags.Set(cmd, flagsFactory)
+	o.BuildCreateFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

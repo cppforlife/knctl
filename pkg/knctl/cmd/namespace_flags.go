@@ -17,13 +17,72 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+	"os"
+
+	"github.com/cppforlife/knctl/pkg/knctl/cobrautil"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 type NamespaceFlags struct {
 	Name string
 }
 
-func (s *NamespaceFlags) Set(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&s.Name, "namespace", "n", "", "Specified namespace (or default from kubeconfig)")
+func (s *NamespaceFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
+	name := flagsFactory.NewNamespaceNameFlag(&s.Name)
+	cmd.Flags().VarP(name, "namespace", "n", "Specified namespace (or default from kubeconfig)")
+}
+
+type NamespaceNameFlag struct {
+	value       *string
+	depsFactory DepsFactory
+}
+
+var _ pflag.Value = &NamespaceNameFlag{}
+var _ cobrautil.ResolvableFlag = &NamespaceNameFlag{}
+
+func NewNamespaceNameFlag(value *string, depsFactory DepsFactory) *NamespaceNameFlag {
+	return &NamespaceNameFlag{value, depsFactory}
+}
+
+func (s *NamespaceNameFlag) Set(val string) error {
+	*s.value = val
+	return nil
+}
+
+func (s *NamespaceNameFlag) Type() string   { return "string" }
+func (s *NamespaceNameFlag) String() string { return "" } // default for usage
+
+func (s *NamespaceNameFlag) Resolve() error {
+	value, err := s.resolveValue()
+	if err != nil {
+		return err
+	}
+
+	*s.value = value
+
+	return nil
+}
+
+func (s *NamespaceNameFlag) resolveValue() (string, error) {
+	if s.value != nil && len(*s.value) > 0 {
+		return *s.value, nil
+	}
+
+	envVal := os.Getenv("KNCTL_NAMESPACE")
+	if len(envVal) > 0 {
+		return envVal, nil
+	}
+
+	configVal, err := s.depsFactory.DefaultNamespace()
+	if err != nil {
+		return configVal, nil
+	}
+
+	if len(configVal) > 0 {
+		return configVal, nil
+	}
+
+	return "", fmt.Errorf("Expected to non-empty namespace name")
 }

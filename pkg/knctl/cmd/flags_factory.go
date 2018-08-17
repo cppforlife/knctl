@@ -14,20 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package cmd
 
-import (
-	"log"
+type FlagsFactory struct {
+	depsFactory DepsFactory
+}
 
-	"github.com/spf13/cobra/doc"
-	"github.com/cppforlife/knctl/pkg/knctl/cmd"
-)
+func NewFlagsFactory(depsFactory DepsFactory) FlagsFactory {
+	return FlagsFactory{depsFactory}
+}
 
-func main() {
-	rootCmd := cmd.NewDefaultKnctlCmd(nil)
-
-	err := doc.GenMarkdownTree(rootCmd, "./docs/cmd/")
-	if err != nil {
-		log.Fatal(err)
-	}
+func (f FlagsFactory) NewNamespaceNameFlag(str *string) *NamespaceNameFlag {
+	return NewNamespaceNameFlag(str, f.depsFactory)
 }

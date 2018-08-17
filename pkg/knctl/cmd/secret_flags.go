@@ -25,8 +25,8 @@ type SecretFlags struct {
 	Name           string
 }
 
-func (s *SecretFlags) Set(cmd *cobra.Command) {
-	s.NamespaceFlags.Set(cmd)
+func (s *SecretFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
+	s.NamespaceFlags.Set(cmd, flagsFactory)
 
 	cmd.Flags().StringVarP(&s.Name, "secret", "s", "", "Specified secret")
 	cmd.MarkFlagRequired("secret")

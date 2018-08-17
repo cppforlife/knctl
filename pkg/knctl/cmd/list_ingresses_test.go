@@ -24,7 +24,7 @@ import (
 
 func TestNewListIngressesCmd_OkMinimum(t *testing.T) {
 	realCmd := NewListIngressesOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewListIngressesCmd(realCmd))
+	cmd := NewTestCmd(t, NewListIngressesCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{})
 	cmd.ExpectReachesExecution()

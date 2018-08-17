@@ -35,7 +35,7 @@ func NewDeleteRouteOptions(ui ui.UI, depsFactory DepsFactory) *DeleteRouteOption
 	return &DeleteRouteOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewDeleteRouteCmd(o *DeleteRouteOptions) *cobra.Command {
+func NewDeleteRouteCmd(o *DeleteRouteOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "route",
 		Short: "Delete route",
@@ -44,7 +44,7 @@ func NewDeleteRouteCmd(o *DeleteRouteOptions) *cobra.Command {
   knctl delete route --route route1 -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.RouteFlags.Set(cmd)
+	o.RouteFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

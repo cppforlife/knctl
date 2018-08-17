@@ -40,8 +40,8 @@ type SSHAuthSecretCreateFlags struct {
 	Github bool
 }
 
-func (s *SSHAuthSecretCreateFlags) Set(cmd *cobra.Command) {
-	s.GenerateNameFlags.Set(cmd)
+func (s *SSHAuthSecretCreateFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
+	s.GenerateNameFlags.Set(cmd, flagsFactory)
 
 	cmd.Flags().StringVar(&s.Type, "type", "", "Set type (example: git)")
 	cmd.Flags().StringVar(&s.URL, "url", "", "Set url (example: github.com)")

@@ -24,7 +24,7 @@ import (
 
 func TestNewDeleteRevisionCmd_Ok(t *testing.T) {
 	realCmd := NewDeleteRevisionOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewDeleteRevisionCmd(realCmd))
+	cmd := NewTestCmd(t, NewDeleteRevisionCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
@@ -38,7 +38,7 @@ func TestNewDeleteRevisionCmd_Ok(t *testing.T) {
 
 func TestNewDeleteRevisionCmd_OkLongFlagNames(t *testing.T) {
 	realCmd := NewDeleteRevisionOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewDeleteRevisionCmd(realCmd))
+	cmd := NewTestCmd(t, NewDeleteRevisionCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--revision", "test-revision",
@@ -51,7 +51,7 @@ func TestNewDeleteRevisionCmd_OkLongFlagNames(t *testing.T) {
 
 func TestNewDeleteRevisionCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewDeleteRevisionOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewDeleteRevisionCmd(realCmd))
+	cmd := NewTestCmd(t, NewDeleteRevisionCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"namespace", "revision"})
+	cmd.ExpectRequiredFlags([]string{"revision"})
 }

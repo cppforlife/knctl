@@ -62,7 +62,7 @@ func NewInstallOptions(ui ui.UI, depsFactory DepsFactory, kubeconfigFlags *Kubec
 	return &InstallOptions{ui: ui, depsFactory: depsFactory, kubeconfigFlags: kubeconfigFlags}
 }
 
-func NewInstallCmd(o *InstallOptions) *cobra.Command {
+func NewInstallCmd(o *InstallOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "install",
 		Short: "Install Knative and Istio",

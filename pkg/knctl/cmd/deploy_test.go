@@ -25,7 +25,7 @@ import (
 
 func TestNewDeployCmd_Ok(t *testing.T) {
 	realCmd := NewDeployOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewDeployCmd(realCmd))
+	cmd := NewTestCmd(t, NewDeployCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
@@ -57,7 +57,7 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 
 func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 	realCmd := NewDeployOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewDeployCmd(realCmd))
+	cmd := NewTestCmd(t, NewDeployCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--service", "test-service",
@@ -88,7 +88,7 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 
 func TestNewDeployCmd_OkMinimum(t *testing.T) {
 	realCmd := NewDeployOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewDeployCmd(realCmd))
+	cmd := NewTestCmd(t, NewDeployCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--service", "test-service",
@@ -106,7 +106,7 @@ func TestNewDeployCmd_OkMinimum(t *testing.T) {
 
 func TestNewDeployCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewDeployOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewDeployCmd(realCmd))
+	cmd := NewTestCmd(t, NewDeployCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"image", "namespace", "service"})
+	cmd.ExpectRequiredFlags([]string{"image", "service"})
 }

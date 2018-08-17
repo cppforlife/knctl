@@ -24,7 +24,7 @@ import (
 
 func TestNewCreateBasicAuthSecretCmd_Ok(t *testing.T) {
 	realCmd := NewCreateBasicAuthSecretOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd))
+	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
@@ -49,7 +49,7 @@ func TestNewCreateBasicAuthSecretCmd_Ok(t *testing.T) {
 
 func TestNewCreateBasicAuthSecretCmd_OkLongFlagNames(t *testing.T) {
 	realCmd := NewCreateBasicAuthSecretOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd))
+	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--secret", "test-secret",
@@ -73,7 +73,7 @@ func TestNewCreateBasicAuthSecretCmd_OkLongFlagNames(t *testing.T) {
 
 func TestNewCreateBasicAuthSecretCmd_OkDockerHub(t *testing.T) {
 	realCmd := NewCreateBasicAuthSecretOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd))
+	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--secret", "test-secret",
@@ -110,7 +110,7 @@ func TestNewCreateBasicAuthSecretCmd_OkDockerHub(t *testing.T) {
 
 func TestNewCreateBasicAuthSecretCmd_OkGCR(t *testing.T) {
 	realCmd := NewCreateBasicAuthSecretOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd))
+	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--secret", "test-secret",
@@ -147,7 +147,7 @@ func TestNewCreateBasicAuthSecretCmd_OkGCR(t *testing.T) {
 
 func TestNewCreateBasicAuthSecretCmd_OkForPulling(t *testing.T) {
 	realCmd := NewCreateBasicAuthSecretOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd))
+	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--secret", "test-secret",
@@ -173,7 +173,7 @@ func TestNewCreateBasicAuthSecretCmd_OkForPulling(t *testing.T) {
 
 func TestNewCreateBasicAuthSecretCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewCreateBasicAuthSecretOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd))
+	cmd := NewTestCmd(t, NewCreateBasicAuthSecretCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"namespace", "password", "secret", "username"})
+	cmd.ExpectRequiredFlags([]string{"password", "secret", "username"})
 }

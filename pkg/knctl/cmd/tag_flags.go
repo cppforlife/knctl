@@ -24,6 +24,6 @@ type TagFlags struct {
 	Tags []string
 }
 
-func (s *TagFlags) Set(cmd *cobra.Command) {
+func (s *TagFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
 	cmd.Flags().StringSliceVarP(&s.Tags, "tag", "t", nil, "Set tag (format: value) (can be specified multiple times)")
 }

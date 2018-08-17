@@ -37,8 +37,8 @@ type BasicAuthSecretCreateFlags struct {
 	ForPulling bool
 }
 
-func (s *BasicAuthSecretCreateFlags) Set(cmd *cobra.Command) {
-	s.GenerateNameFlags.Set(cmd)
+func (s *BasicAuthSecretCreateFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
+	s.GenerateNameFlags.Set(cmd, flagsFactory)
 
 	cmd.Flags().StringVar(&s.Type, "type", "", "Set type (example: docker, ssh)")
 	cmd.Flags().StringVar(&s.URL, "url", "", "Set url (example: https://index.docker.io/v1/, https://github.com)")

@@ -30,9 +30,9 @@ type BuildCreateArgsFlags struct {
 	ctlbuild.BuildSpecOpts
 }
 
-func (s *BuildCreateFlags) Set(cmd *cobra.Command) {
-	s.GenerateNameFlags.Set(cmd)
-	s.BuildCreateArgsFlags.Set(cmd)
+func (s *BuildCreateFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
+	s.GenerateNameFlags.Set(cmd, flagsFactory)
+	s.BuildCreateArgsFlags.Set(cmd, flagsFactory)
 
 	cmd.Flags().StringVarP(&s.Image, "image", "i", "", "Set image URL")
 	cmd.MarkFlagRequired("image")
@@ -42,7 +42,7 @@ func (s *BuildCreateFlags) Validate() error {
 	return s.BuildCreateArgsFlags.Validate()
 }
 
-func (s *BuildCreateArgsFlags) Set(cmd *cobra.Command) {
+func (s *BuildCreateArgsFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
 	cmd.Flags().StringVarP(&s.SourceDirectory, "directory", "d", "", "Set source code directory")
 
 	cmd.Flags().StringVar(&s.GitURL, "git-url", "", "Set Git URL")

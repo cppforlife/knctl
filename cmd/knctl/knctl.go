@@ -37,7 +37,7 @@ func main() {
 	confUI := ui.NewConfUI(ui.NewNoopLogger())
 	defer confUI.Flush()
 
-	command := cmd.NewKnctlCmd(cmd.NewDefaultKnctlOptions(confUI))
+	command := cmd.NewDefaultKnctlCmd(confUI)
 
 	err := command.Execute()
 	if err != nil {

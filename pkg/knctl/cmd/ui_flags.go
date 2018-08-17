@@ -30,7 +30,7 @@ type UIFlags struct {
 	Columns        []string
 }
 
-func (f *UIFlags) Set(cmd *cobra.Command) {
+func (f *UIFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
 	cmd.PersistentFlags().BoolVar(&f.TTY, "tty", false, "Force TTY-like output")
 	cmd.PersistentFlags().BoolVar(&f.NoColor, "no-color", false, "Disable colorized output")
 	cmd.PersistentFlags().BoolVar(&f.JSON, "json", false, "Output as JSON")

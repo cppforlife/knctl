@@ -22,7 +22,7 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/cppforlife/knctl/pkg/knctl/cmd"
+	"github.com/cppforlife/knctl/pkg/knctl/cobrautil"
 	"github.com/spf13/cobra"
 )
 
@@ -63,7 +63,7 @@ func (c *TestCmd) Execute(args []string) {
 
 	c.executeCalled = true
 
-	VisitCommands(c.cmd, func(ci *cobra.Command) {
+	cobrautil.VisitCommands(c.cmd, func(ci *cobra.Command) {
 		ci.RunE = func(_ *cobra.Command, _ []string) error {
 			c.didReachNoopExecution = true
 			return nil

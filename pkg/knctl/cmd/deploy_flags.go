@@ -30,9 +30,9 @@ type DeployFlags struct {
 	RemoveKnctlDeployEnvVar bool
 }
 
-func (s *DeployFlags) Set(cmd *cobra.Command) {
-	s.GenerateNameFlags.Set(cmd)
-	s.BuildCreateArgsFlags.Set(cmd)
+func (s *DeployFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
+	s.GenerateNameFlags.Set(cmd, flagsFactory)
+	s.BuildCreateArgsFlags.Set(cmd, flagsFactory)
 
 	// TODO separate service account for pulling?
 

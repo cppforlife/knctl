@@ -25,8 +25,8 @@ type RouteFlags struct {
 	Name           string
 }
 
-func (s *RouteFlags) Set(cmd *cobra.Command) {
-	s.NamespaceFlags.Set(cmd)
+func (s *RouteFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
+	s.NamespaceFlags.Set(cmd, flagsFactory)
 
 	cmd.Flags().StringVar(&s.Name, "route", "", "Specified route")
 	cmd.MarkFlagRequired("route")

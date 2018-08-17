@@ -24,6 +24,6 @@ type AnnotateFlags struct {
 	Annotations []string
 }
 
-func (s *AnnotateFlags) Set(cmd *cobra.Command) {
+func (s *AnnotateFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
 	cmd.Flags().StringSliceVarP(&s.Annotations, "annotation", "a", nil, "Set annotation (format: key=value) (can be specified multiple times)")
 }

@@ -25,8 +25,8 @@ type BuildFlags struct {
 	Name           string
 }
 
-func (s *BuildFlags) Set(cmd *cobra.Command) {
-	s.NamespaceFlags.Set(cmd)
+func (s *BuildFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
+	s.NamespaceFlags.Set(cmd, flagsFactory)
 
 	cmd.Flags().StringVarP(&s.Name, "build", "b", "", "Specified build")
 	cmd.MarkFlagRequired("build")

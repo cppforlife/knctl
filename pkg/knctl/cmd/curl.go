@@ -38,7 +38,7 @@ func NewCurlOptions(ui ui.UI, depsFactory DepsFactory) *CurlOptions {
 	return &CurlOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewCurlCmd(o *CurlOptions) *cobra.Command {
+func NewCurlCmd(o *CurlOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "curl",
 		Short: "Curl service",
@@ -50,7 +50,7 @@ Requires 'curl' command installed on the system.`,
   knctl curl -s svc1 -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.ServiceFlags.Set(cmd)
+	o.ServiceFlags.Set(cmd, flagsFactory)
 	cmd.Flags().Int32VarP(&o.Port, "port", "p", 80, "Set port")
 	return cmd
 }

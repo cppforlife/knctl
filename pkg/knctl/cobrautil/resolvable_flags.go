@@ -14,20 +14,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package cobrautil
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
-type ServiceAccountFlags struct {
-	NamespaceFlags NamespaceFlags
-	Name           string
+type ResolvableFlag interface {
+	Resolve() error
 }
 
-func (s *ServiceAccountFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
-	s.NamespaceFlags.Set(cmd, flagsFactory)
-
-	cmd.Flags().StringVarP(&s.Name, "service-account", "a", "", "Specified service-account") // TODO better short name?
-	cmd.MarkFlagRequired("service-account")
+func ResolveFlagsForCmd(cmd *cobra.Command) {
+	origRunE := cmd.RunE
+	cmd.RunE = func(cmd2 *cobra.Command, args []string) error {
+		var lastFlagErr error
+		cmd2.Flags().VisitAll(func(flag *pflag.Flag) {
+			if flag.Value == nil {
+				return
+			}
+			if resolvableVal, ok := flag.Value.(ResolvableFlag); ok {
+				err := resolvableVal.Resolve()
+				if err != nil {
+					lastFlagErr = err
+				}
+			}
+		})
+		if lastFlagErr != nil {
+			return lastFlagErr
+		}
+		return origRunE(cmd2, args)
+	}
 }

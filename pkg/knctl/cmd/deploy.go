@@ -37,7 +37,7 @@ func NewDeployOptions(ui ui.UI, depsFactory DepsFactory) *DeployOptions {
 	return &DeployOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewDeployCmd(o *DeployOptions) *cobra.Command {
+func NewDeployCmd(o *DeployOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deploy",
 		Short: "Deploy service",
@@ -61,8 +61,8 @@ func NewDeployCmd(o *DeployOptions) *cobra.Command {
       --env SIMPLE_MSG=123`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.ServiceFlags.Set(cmd)
-	o.DeployFlags.Set(cmd)
+	o.ServiceFlags.Set(cmd, flagsFactory)
+	o.DeployFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

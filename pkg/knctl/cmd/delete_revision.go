@@ -36,7 +36,7 @@ func NewDeleteRevisionOptions(ui ui.UI, depsFactory DepsFactory) *DeleteRevision
 	return &DeleteRevisionOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewDeleteRevisionCmd(o *DeleteRevisionOptions) *cobra.Command {
+func NewDeleteRevisionCmd(o *DeleteRevisionOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "revision",
 		Aliases: revisionAliases,
@@ -46,7 +46,7 @@ func NewDeleteRevisionCmd(o *DeleteRevisionOptions) *cobra.Command {
   knctl delete revision -r rev1 -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.RevisionFlags.Set(cmd)
+	o.RevisionFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

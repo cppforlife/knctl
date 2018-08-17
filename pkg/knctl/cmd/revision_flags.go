@@ -25,8 +25,8 @@ type RevisionFlags struct {
 	Name           string
 }
 
-func (s *RevisionFlags) Set(cmd *cobra.Command) {
-	s.NamespaceFlags.Set(cmd)
+func (s *RevisionFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
+	s.NamespaceFlags.Set(cmd, flagsFactory)
 
 	cmd.Flags().StringVarP(&s.Name, "revision", "r", "", "Specified revision")
 	cmd.MarkFlagRequired("revision")

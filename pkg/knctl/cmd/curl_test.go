@@ -24,7 +24,7 @@ import (
 
 func TestNewCurlCmd_Ok(t *testing.T) {
 	realCmd := NewCurlOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCurlCmd(realCmd))
+	cmd := NewTestCmd(t, NewCurlCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
@@ -38,7 +38,7 @@ func TestNewCurlCmd_Ok(t *testing.T) {
 
 func TestNewCurlCmd_OkLongFlagNames(t *testing.T) {
 	realCmd := NewCurlOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCurlCmd(realCmd))
+	cmd := NewTestCmd(t, NewCurlCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--service", "test-service",
@@ -51,7 +51,7 @@ func TestNewCurlCmd_OkLongFlagNames(t *testing.T) {
 
 func TestNewCurlCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewCurlOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewCurlCmd(realCmd))
+	cmd := NewTestCmd(t, NewCurlCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"namespace", "service"})
+	cmd.ExpectRequiredFlags([]string{"service"})
 }

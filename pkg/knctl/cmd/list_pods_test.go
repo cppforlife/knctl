@@ -24,7 +24,7 @@ import (
 
 func TestNewListPodsCmd_Ok(t *testing.T) {
 	realCmd := NewListPodsOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewListPodsCmd(realCmd))
+	cmd := NewTestCmd(t, NewListPodsCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
@@ -38,7 +38,7 @@ func TestNewListPodsCmd_Ok(t *testing.T) {
 
 func TestNewListPodsCmd_OkLongFlagNames(t *testing.T) {
 	realCmd := NewListPodsOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewListPodsCmd(realCmd))
+	cmd := NewTestCmd(t, NewListPodsCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--service", "test-service",
@@ -51,7 +51,7 @@ func TestNewListPodsCmd_OkLongFlagNames(t *testing.T) {
 
 func TestNewListPodsCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewListPodsOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewListPodsCmd(realCmd))
+	cmd := NewTestCmd(t, NewListPodsCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"namespace", "service"})
+	cmd.ExpectRequiredFlags([]string{"service"})
 }

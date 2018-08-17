@@ -34,7 +34,7 @@ func NewUntagRevisionOptions(ui ui.UI, depsFactory DepsFactory) *UntagRevisionOp
 	return &UntagRevisionOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewUntagRevisionCmd(o *UntagRevisionOptions) *cobra.Command {
+func NewUntagRevisionCmd(o *UntagRevisionOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "revision",
 		Aliases: revisionAliases,
@@ -44,8 +44,8 @@ func NewUntagRevisionCmd(o *UntagRevisionOptions) *cobra.Command {
   knctl untag revision -r rev1 -t stable -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.RevisionFlags.Set(cmd)
-	o.TagFlags.Set(cmd)
+	o.RevisionFlags.Set(cmd, flagsFactory)
+	o.TagFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

@@ -24,7 +24,7 @@ import (
 
 func TestNewTagRevisionCmd_Ok(t *testing.T) {
 	realCmd := NewTagRevisionOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewTagRevisionCmd(realCmd))
+	cmd := NewTestCmd(t, NewTagRevisionCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
@@ -38,7 +38,7 @@ func TestNewTagRevisionCmd_Ok(t *testing.T) {
 
 func TestNewTagRevisionCmd_OkLongFlagNames(t *testing.T) {
 	realCmd := NewTagRevisionOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewTagRevisionCmd(realCmd))
+	cmd := NewTestCmd(t, NewTagRevisionCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--revision", "test-revision",
@@ -51,7 +51,7 @@ func TestNewTagRevisionCmd_OkLongFlagNames(t *testing.T) {
 
 func TestNewTagRevisionCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewTagRevisionOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewTagRevisionCmd(realCmd))
+	cmd := NewTestCmd(t, NewTagRevisionCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"namespace", "revision"})
+	cmd.ExpectRequiredFlags([]string{"revision"})
 }

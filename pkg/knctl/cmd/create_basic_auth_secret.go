@@ -39,7 +39,7 @@ func NewCreateBasicAuthSecretOptions(ui ui.UI, depsFactory DepsFactory) *CreateB
 	return &CreateBasicAuthSecretOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewCreateBasicAuthSecretCmd(o *CreateBasicAuthSecretOptions) *cobra.Command {
+func NewCreateBasicAuthSecretCmd(o *CreateBasicAuthSecretOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "basic-auth-secret",
 		Aliases: []string{"bas"},
@@ -65,8 +65,8 @@ Use 'kubectl delete secret <name> -n <namespace>' to delete secret.`,
   knctl create basic-auth-secret -s secret1 --type docker --url https://registry.domain.com/ --username username --password password -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.SecretFlags.Set(cmd)
-	o.BasicAuthSecretCreateFlags.Set(cmd)
+	o.SecretFlags.Set(cmd, flagsFactory)
+	o.BasicAuthSecretCreateFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

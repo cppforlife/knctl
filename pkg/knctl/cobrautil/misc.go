@@ -1,7 +1,7 @@
 /*
 Copyright 2018 The Knative Authors
 
-Licensed under the Apache License, Version 2.0 (the "License");
+Licensed under the Apache License, Open 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
@@ -14,20 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package cobrautil
 
 import (
-	"log"
-
-	"github.com/spf13/cobra/doc"
-	"github.com/cppforlife/knctl/pkg/knctl/cmd"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	rootCmd := cmd.NewDefaultKnctlCmd(nil)
-
-	err := doc.GenMarkdownTree(rootCmd, "./docs/cmd/")
-	if err != nil {
-		log.Fatal(err)
+func VisitCommands(cmd *cobra.Command, f func(*cobra.Command)) {
+	f(cmd)
+	for _, child := range cmd.Commands() {
+		VisitCommands(child, f)
 	}
 }

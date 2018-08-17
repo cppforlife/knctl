@@ -38,7 +38,7 @@ func NewCreateSSHAuthSecretOptions(ui ui.UI, depsFactory DepsFactory) *CreateSSH
 	return &CreateSSHAuthSecretOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewCreateSSHAuthSecretCmd(o *CreateSSHAuthSecretOptions) *cobra.Command {
+func NewCreateSSHAuthSecretCmd(o *CreateSSHAuthSecretOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "ssh-auth-secret",
 		Aliases: []string{"sas"},
@@ -52,8 +52,8 @@ Use 'kubectl delete secret <name> -n <namespace>' to delete secret.`,
   knctl create ssh-auth-secret -s secret1 --url github.com --private-key ... --known-hosts ... -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.SecretFlags.Set(cmd)
-	o.SSHAuthSecretCreateFlags.Set(cmd)
+	o.SecretFlags.Set(cmd, flagsFactory)
+	o.SSHAuthSecretCreateFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

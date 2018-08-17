@@ -34,7 +34,7 @@ func NewTagRevisionOptions(ui ui.UI, depsFactory DepsFactory) *TagRevisionOption
 	return &TagRevisionOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewTagRevisionCmd(o *TagRevisionOptions) *cobra.Command {
+func NewTagRevisionCmd(o *TagRevisionOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "revision",
 		Aliases: revisionAliases,
@@ -44,8 +44,8 @@ func NewTagRevisionCmd(o *TagRevisionOptions) *cobra.Command {
   knctl tag revision -r rev1 -t stable -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.RevisionFlags.Set(cmd)
-	o.TagFlags.Set(cmd)
+	o.RevisionFlags.Set(cmd, flagsFactory)
+	o.TagFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

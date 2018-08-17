@@ -24,7 +24,7 @@ import (
 
 func TestNewListRoutesCmd_Ok(t *testing.T) {
 	realCmd := NewListRoutesOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewListRoutesCmd(realCmd))
+	cmd := NewTestCmd(t, NewListRoutesCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
@@ -36,7 +36,7 @@ func TestNewListRoutesCmd_Ok(t *testing.T) {
 
 func TestNewListRoutesCmd_OkLongFlagNames(t *testing.T) {
 	realCmd := NewListRoutesOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewListRoutesCmd(realCmd))
+	cmd := NewTestCmd(t, NewListRoutesCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 	})
@@ -45,9 +45,9 @@ func TestNewListRoutesCmd_OkLongFlagNames(t *testing.T) {
 	DeepEqual(t, realCmd.NamespaceFlags, NamespaceFlags{"test-namespace"})
 }
 
-func TestNewListRoutesCmd_RequiredFlags(t *testing.T) {
+func TestNewListRoutesCmd_OkMinimum(t *testing.T) {
 	realCmd := NewListRoutesOptions(nil, NewDepsFactoryImpl())
-	cmd := NewTestCmd(t, NewListRoutesCmd(realCmd))
+	cmd := NewTestCmd(t, NewListRoutesCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"namespace"})
+	cmd.ExpectReachesExecution()
 }

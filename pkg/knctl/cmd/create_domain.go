@@ -35,7 +35,7 @@ func NewCreateDomainOptions(ui ui.UI, depsFactory DepsFactory) *CreateDomainOpti
 	return &CreateDomainOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewCreateDomainCmd(o *CreateDomainOptions) *cobra.Command {
+func NewCreateDomainCmd(o *CreateDomainOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "domain",
 		Aliases: []string{"dom"},

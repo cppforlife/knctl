@@ -41,7 +41,7 @@ func NewListRevisionsOptions(ui ui.UI, depsFactory DepsFactory) *ListRevisionsOp
 	return &ListRevisionsOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewListRevisionsCmd(o *ListRevisionsOptions) *cobra.Command {
+func NewListRevisionsCmd(o *ListRevisionsOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "revisions",
 		Aliases: revisionsAliases,
@@ -52,7 +52,7 @@ func NewListRevisionsCmd(o *ListRevisionsOptions) *cobra.Command {
   knctl list revisions -s svc1 -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.ServiceFlags.Set(cmd)
+	o.ServiceFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

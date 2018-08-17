@@ -38,7 +38,7 @@ func NewListRoutesOptions(ui ui.UI, depsFactory DepsFactory) *ListRoutesOptions 
 	return &ListRoutesOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewListRoutesCmd(o *ListRoutesOptions) *cobra.Command {
+func NewListRoutesCmd(o *ListRoutesOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "routes",
 		Aliases: []string{"route"},
@@ -49,7 +49,7 @@ func NewListRoutesCmd(o *ListRoutesOptions) *cobra.Command {
   knctl list routes -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.NamespaceFlags.Set(cmd)
+	o.NamespaceFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

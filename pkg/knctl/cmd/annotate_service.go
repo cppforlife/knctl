@@ -38,7 +38,7 @@ func NewAnnotateServiceOptions(ui ui.UI, depsFactory DepsFactory) *AnnotateServi
 	return &AnnotateServiceOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewAnnotateServiceCmd(o *AnnotateServiceOptions) *cobra.Command {
+func NewAnnotateServiceCmd(o *AnnotateServiceOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "service",
 		Aliases: serviceAliases,
@@ -48,8 +48,8 @@ func NewAnnotateServiceCmd(o *AnnotateServiceOptions) *cobra.Command {
   knctl annotate service -s srv1 -a key=value -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.ServiceFlags.Set(cmd)
-	o.AnnotateFlags.Set(cmd)
+	o.ServiceFlags.Set(cmd, flagsFactory)
+	o.AnnotateFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 

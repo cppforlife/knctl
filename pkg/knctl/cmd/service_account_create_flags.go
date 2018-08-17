@@ -27,8 +27,8 @@ type ServiceAccountCreateFlags struct {
 	ImagePullSecrets []string
 }
 
-func (s *ServiceAccountCreateFlags) Set(cmd *cobra.Command) {
-	s.GenerateNameFlags.Set(cmd)
+func (s *ServiceAccountCreateFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
+	s.GenerateNameFlags.Set(cmd, flagsFactory)
 
 	cmd.Flags().StringSliceVarP(&s.Secrets, "secret", "s", nil, "Set secret (format: secret-name) (can be specified multiple times)")
 	cmd.Flags().StringSliceVarP(&s.ImagePullSecrets, "image-pull-secret", "p", nil, "Set image pull secret (format: secret-name) (can be specified multiple times)")

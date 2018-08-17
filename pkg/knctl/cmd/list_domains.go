@@ -31,7 +31,7 @@ func NewListDomainsOptions(ui ui.UI, depsFactory DepsFactory) *ListDomainsOption
 	return &ListDomainsOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewListDomainsCmd(o *ListDomainsOptions) *cobra.Command {
+func NewListDomainsCmd(o *ListDomainsOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "domains",
 		Aliases: []string{"dom", "domain"},

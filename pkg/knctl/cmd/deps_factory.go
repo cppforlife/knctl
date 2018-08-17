@@ -32,7 +32,7 @@ type DepsFactory interface {
 	BuildClient() (buildclientset.Interface, error)
 	CoreClient() (kubernetes.Interface, error)
 	RESTConfig() (*rest.Config, error)
-	DefaultNamespace() string
+	DefaultNamespace() (string, error)
 }
 
 type DepsFactoryImpl struct {
@@ -44,10 +44,6 @@ var _ DepsFactory = &DepsFactoryImpl{}
 
 func NewDepsFactoryImpl() *DepsFactoryImpl {
 	return &DepsFactoryImpl{}
-}
-
-func (f *DepsFactoryImpl) DefaultNamespace() string {
-	return f.configNamespace
 }
 
 func (f *DepsFactoryImpl) ServingClient() (servingclientset.Interface, error) {
@@ -96,17 +92,24 @@ func (f *DepsFactoryImpl) RESTConfig() (*rest.Config, error) {
 	return f.config()
 }
 
+func (f *DepsFactoryImpl) DefaultNamespace() (string, error) {
+	name, _, err := f.clientConfig().Namespace()
+	return name, err
+}
+
 func (f *DepsFactoryImpl) ConfigureConfigPath(path string) {
 	f.configPath = path
-	clientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		&clientcmd.ClientConfigLoadingRules{ExplicitPath: path},
+}
+
+func (f *DepsFactoryImpl) clientConfig() clientcmd.ClientConfig {
+	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		&clientcmd.ClientConfigLoadingRules{ExplicitPath: f.configPath},
 		&clientcmd.ConfigOverrides{},
 	)
-	f.configNamespace, _, _ = clientConfig.Namespace()
 }
 
 func (f *DepsFactoryImpl) config() (*rest.Config, error) {
-	config, err := clientcmd.BuildConfigFromFlags("", f.configPath)
+	config, err := f.clientConfig().ClientConfig()
 	if err != nil {
 		return nil, fmt.Errorf("Building Kubernetes config: %s", err)
 	}
