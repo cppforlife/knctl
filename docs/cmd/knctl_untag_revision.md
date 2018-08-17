@@ -22,7 +22,7 @@ knctl untag revision [flags]
 
 ```
   -h, --help               help for revision
-  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)
+  -n, --namespace string   Specified namespace (or default from kubeconfig)
   -r, --revision string    Specified revision
   -t, --tag strings        Set tag (format: value) (can be specified multiple times)
 ```

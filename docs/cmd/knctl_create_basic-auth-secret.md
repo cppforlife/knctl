@@ -41,7 +41,7 @@ knctl create basic-auth-secret [flags]
       --gcr                Preconfigure type and url for gcr.io registry
       --generate-name      Set to generate name
   -h, --help               help for basic-auth-secret
-  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)
+  -n, --namespace string   Specified namespace (or default from kubeconfig)
   -p, --password string    Set password ($KNCTL_BASIC_AUTH_SECRET_PASSWORD)
   -s, --secret string      Specified secret
       --type string        Set type (example: docker, ssh)

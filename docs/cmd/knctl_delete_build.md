@@ -23,7 +23,7 @@ knctl delete build [flags]
 ```
   -b, --build string       Specified build
   -h, --help               help for build
-  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)
+  -n, --namespace string   Specified namespace (or default from kubeconfig)
 ```
 
 ### Options inherited from parent commands

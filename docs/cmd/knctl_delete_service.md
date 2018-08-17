@@ -22,7 +22,7 @@ knctl delete service [flags]
 
 ```
   -h, --help               help for service
-  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE)
+  -n, --namespace string   Specified namespace (or default from kubeconfig)
   -s, --service string     Specified service
 ```
 
