@@ -97,8 +97,11 @@ func (c *TestCmd) ExpectRequiredFlags(flags []string) {
 	if c.didReachNoopExecution {
 		c.t.Fatalf("Expected command to not reach execution")
 	}
-	if c.executeErr.Error() != fmt.Sprintf(`required flag(s) "%s" not set`, strings.Join(flags, `", "`)) {
-		c.t.Fatalf("Expected required flags error, but was '%s'", c.executeErr)
+
+	expectedErrMsg := fmt.Sprintf(`required flag(s) "%s" not set`, strings.Join(flags, `", "`))
+
+	if c.executeErr.Error() != expectedErrMsg {
+		c.t.Fatalf("Expected required flags error ('%s'), but was '%s'", expectedErrMsg, c.executeErr)
 	}
 }
 
