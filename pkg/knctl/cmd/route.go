@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
@@ -28,6 +29,7 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 type RouteOptions struct {
@@ -120,22 +122,18 @@ func (o *RouteOptions) Run() error {
 
 func (o *RouteOptions) createOrUpdate(servingClient servingclientset.Interface, route *v1alpha1.Route) error {
 	if len(route.ResourceVersion) > 0 {
-		var updateErr error
-
-		// TODO better retry functionality
-		for i := 0; i < 5; i++ {
-			_, updateErr = servingClient.ServingV1alpha1().Routes(o.RouteFlags.NamespaceFlags.Name).Update(route)
-			if updateErr == nil {
-				return nil
+		return wait.Poll(time.Second, 10*time.Second, func() (bool, error) {
+			_, err := servingClient.ServingV1alpha1().Routes(o.RouteFlags.NamespaceFlags.Name).Update(route)
+			if err != nil {
+				return false, fmt.Errorf("Updating route: %s", err)
 			}
-		}
-
-		return fmt.Errorf("Updating route: %s", updateErr)
+			return true, nil
+		})
 	}
 
-	_, createErr := servingClient.ServingV1alpha1().Routes(o.RouteFlags.NamespaceFlags.Name).Create(route)
-	if createErr != nil {
-		return fmt.Errorf("Creating route: %s", createErr)
+	_, err := servingClient.ServingV1alpha1().Routes(o.RouteFlags.NamespaceFlags.Name).Create(route)
+	if err != nil {
+		return fmt.Errorf("Creating route: %s", err)
 	}
 
 	return nil

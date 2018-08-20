@@ -20,10 +20,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 type AnnotateServiceOptions struct {
@@ -64,12 +66,14 @@ func (o *AnnotateServiceOptions) Run() error {
 		return err
 	}
 
-	_, err = servingClient.ServingV1alpha1().Services(o.ServiceFlags.NamespaceFlags.Name).Patch(o.ServiceFlags.Name, types.MergePatchType, patchJSON)
-	if err != nil {
-		return fmt.Errorf("Annotating service: %s", err)
-	}
+	return wait.Poll(time.Second, 10*time.Second, func() (bool, error) {
+		_, err := servingClient.ServingV1alpha1().Services(o.ServiceFlags.NamespaceFlags.Name).Patch(o.ServiceFlags.Name, types.MergePatchType, patchJSON)
+		if err != nil {
+			return false, fmt.Errorf("Annotating service: %s", err)
+		}
 
-	return nil
+		return true, nil
+	})
 }
 
 func (o *AnnotateServiceOptions) annotationsAdditionPatchJSON() ([]byte, error) {

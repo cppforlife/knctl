@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/knative/serving/pkg/apis/serving"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
@@ -27,6 +28,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 const (
@@ -130,34 +132,26 @@ func (t Tags) Tag(revision *v1alpha1.Revision, tag string) error {
 		return err
 	}
 
-	var lastErr error
-
-	// TODO better way to avoid race: 'unable to find api field in struct...'
-	for i := 0; i < 5; i++ {
-		_, lastErr = t.servingClient.ServingV1alpha1().Revisions(revision.Namespace).Patch(revision.Name, types.MergePatchType, patchJSON)
-		if lastErr == nil {
-			return nil
+	return wait.Poll(time.Second, 10*time.Second, func() (bool, error) {
+		_, err := t.servingClient.ServingV1alpha1().Revisions(revision.Namespace).Patch(revision.Name, types.MergePatchType, patchJSON)
+		if err != nil {
+			return false, fmt.Errorf("Tagging revision: %s", err)
 		}
-	}
-
-	return fmt.Errorf("Tagging revision: %s", lastErr)
+		return true, nil
+	})
 }
 
 func (t Tags) Untag(revision v1alpha1.Revision, tag string) error {
 	encodedTag := rfc6901Encoder.Replace(t.label(tag))
 	patchJSON := []byte(fmt.Sprintf(`[{"op":"remove", "path":"/metadata/labels/%s"}]`, encodedTag))
 
-	var lastErr error
-
-	// TODO better way to avoid race: 'unable to find api field in struct...'
-	for i := 0; i < 5; i++ {
-		_, lastErr = t.servingClient.ServingV1alpha1().Revisions(revision.Namespace).Patch(revision.Name, types.JSONPatchType, patchJSON)
-		if lastErr == nil {
-			return nil
+	return wait.Poll(time.Second, 10*time.Second, func() (bool, error) {
+		_, err := t.servingClient.ServingV1alpha1().Revisions(revision.Namespace).Patch(revision.Name, types.JSONPatchType, patchJSON)
+		if err != nil {
+			return false, fmt.Errorf("Untagging revision: %s", err)
 		}
-	}
-
-	return fmt.Errorf("Untagging revision: %s", lastErr)
+		return true, nil
+	})
 }
 
 func (t Tags) label(tag string) string {

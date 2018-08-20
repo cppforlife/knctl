@@ -20,11 +20,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 type AnnotateRevisionOptions struct {
@@ -72,12 +74,14 @@ func (o *AnnotateRevisionOptions) Run() error {
 		return err
 	}
 
-	_, err = servingClient.ServingV1alpha1().Revisions(revision.Namespace).Patch(revision.Name, types.MergePatchType, patchJSON)
-	if err != nil {
-		return fmt.Errorf("Annotating revision: %s", err)
-	}
+	return wait.Poll(time.Second, 10*time.Second, func() (bool, error) {
+		_, err := servingClient.ServingV1alpha1().Revisions(revision.Namespace).Patch(revision.Name, types.MergePatchType, patchJSON)
+		if err != nil {
+			return false, fmt.Errorf("Annotating revision: %s", err)
+		}
 
-	return nil
+		return true, nil
+	})
 }
 
 func (o *AnnotateRevisionOptions) annotationsAdditionPatchJSON() ([]byte, error) {
