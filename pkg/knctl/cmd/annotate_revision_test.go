@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewAnnotateRevisionCmd_Ok(t *testing.T) {
-	realCmd := NewAnnotateRevisionOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewAnnotateRevisionOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewAnnotateRevisionCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -37,7 +37,7 @@ func TestNewAnnotateRevisionCmd_Ok(t *testing.T) {
 }
 
 func TestNewAnnotateRevisionCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewAnnotateRevisionOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewAnnotateRevisionOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewAnnotateRevisionCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -50,7 +50,7 @@ func TestNewAnnotateRevisionCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewAnnotateRevisionCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewAnnotateRevisionOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewAnnotateRevisionOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewAnnotateRevisionCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"revision"})

@@ -35,15 +35,15 @@ func (s *NamespaceFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
 }
 
 type NamespaceNameFlag struct {
-	value       *string
-	depsFactory DepsFactory
+	value         *string
+	configFactory ConfigFactory
 }
 
 var _ pflag.Value = &NamespaceNameFlag{}
 var _ cobrautil.ResolvableFlag = &NamespaceNameFlag{}
 
-func NewNamespaceNameFlag(value *string, depsFactory DepsFactory) *NamespaceNameFlag {
-	return &NamespaceNameFlag{value, depsFactory}
+func NewNamespaceNameFlag(value *string, configFactory ConfigFactory) *NamespaceNameFlag {
+	return &NamespaceNameFlag{value, configFactory}
 }
 
 func (s *NamespaceNameFlag) Set(val string) error {
@@ -75,7 +75,7 @@ func (s *NamespaceNameFlag) resolveValue() (string, error) {
 		return envVal, nil
 	}
 
-	configVal, err := s.depsFactory.DefaultNamespace()
+	configVal, err := s.configFactory.DefaultNamespace()
 	if err != nil {
 		return configVal, nil
 	}

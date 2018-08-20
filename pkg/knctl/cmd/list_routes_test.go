@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewListRoutesCmd_Ok(t *testing.T) {
-	realCmd := NewListRoutesOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewListRoutesOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewListRoutesCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -35,7 +35,7 @@ func TestNewListRoutesCmd_Ok(t *testing.T) {
 }
 
 func TestNewListRoutesCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewListRoutesOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewListRoutesOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewListRoutesCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -46,7 +46,7 @@ func TestNewListRoutesCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewListRoutesCmd_OkMinimum(t *testing.T) {
-	realCmd := NewListRoutesOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewListRoutesOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewListRoutesCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectReachesExecution()

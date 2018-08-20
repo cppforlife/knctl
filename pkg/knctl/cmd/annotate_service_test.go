@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewAnnotateServiceCmd_Ok(t *testing.T) {
-	realCmd := NewAnnotateServiceOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewAnnotateServiceOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewAnnotateServiceCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -37,7 +37,7 @@ func TestNewAnnotateServiceCmd_Ok(t *testing.T) {
 }
 
 func TestNewAnnotateServiceCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewAnnotateServiceOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewAnnotateServiceOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewAnnotateServiceCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -50,7 +50,7 @@ func TestNewAnnotateServiceCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewAnnotateServiceCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewAnnotateServiceOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewAnnotateServiceOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewAnnotateServiceCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"service"})

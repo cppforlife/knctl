@@ -17,13 +17,14 @@ limitations under the License.
 package cmd
 
 type FlagsFactory struct {
-	depsFactory DepsFactory
+	configFactory ConfigFactory
+	depsFactory   DepsFactory
 }
 
-func NewFlagsFactory(depsFactory DepsFactory) FlagsFactory {
-	return FlagsFactory{depsFactory}
+func NewFlagsFactory(configFactory ConfigFactory, depsFactory DepsFactory) FlagsFactory {
+	return FlagsFactory{configFactory, depsFactory}
 }
 
 func (f FlagsFactory) NewNamespaceNameFlag(str *string) *NamespaceNameFlag {
-	return NewNamespaceNameFlag(str, f.depsFactory)
+	return NewNamespaceNameFlag(str, f.configFactory)
 }

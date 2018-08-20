@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewDeleteBuildCmd_Ok(t *testing.T) {
-	realCmd := NewDeleteBuildOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewDeleteBuildOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewDeleteBuildCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -37,7 +37,7 @@ func TestNewDeleteBuildCmd_Ok(t *testing.T) {
 }
 
 func TestNewDeleteBuildCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewDeleteBuildOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewDeleteBuildOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewDeleteBuildCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -50,7 +50,7 @@ func TestNewDeleteBuildCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewDeleteBuildCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewDeleteBuildOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewDeleteBuildOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewDeleteBuildCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"build"})

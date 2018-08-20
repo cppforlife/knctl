@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewLogsCmd_Ok(t *testing.T) {
-	realCmd := NewLogsOptions(nil, NewDepsFactoryImpl(), CancelSignals{})
+	realCmd := NewLogsOptions(nil, newDepsFactory(), CancelSignals{})
 	cmd := NewTestCmd(t, NewLogsCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -42,7 +42,7 @@ func TestNewLogsCmd_Ok(t *testing.T) {
 }
 
 func TestNewLogsCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewLogsOptions(nil, NewDepsFactoryImpl(), CancelSignals{})
+	realCmd := NewLogsOptions(nil, newDepsFactory(), CancelSignals{})
 	cmd := NewTestCmd(t, NewLogsCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -60,7 +60,7 @@ func TestNewLogsCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewLogsCmd_OkMinimum(t *testing.T) {
-	realCmd := NewLogsOptions(nil, NewDepsFactoryImpl(), CancelSignals{})
+	realCmd := NewLogsOptions(nil, newDepsFactory(), CancelSignals{})
 	cmd := NewTestCmd(t, NewLogsCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -76,7 +76,7 @@ func TestNewLogsCmd_OkMinimum(t *testing.T) {
 }
 
 func TestNewLogsCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewLogsOptions(nil, NewDepsFactoryImpl(), CancelSignals{})
+	realCmd := NewLogsOptions(nil, newDepsFactory(), CancelSignals{})
 	cmd := NewTestCmd(t, NewLogsCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"service"})

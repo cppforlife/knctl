@@ -27,6 +27,7 @@ import (
 
 type BuildOptions struct {
 	ui            ui.UI
+	configFactory ConfigFactory
 	depsFactory   DepsFactory
 	cancelSignals CancelSignals
 
@@ -34,8 +35,13 @@ type BuildOptions struct {
 	BuildCreateFlags BuildCreateFlags
 }
 
-func NewBuildOptions(ui ui.UI, depsFactory DepsFactory, cancelSignals CancelSignals) *BuildOptions {
-	return &BuildOptions{ui: ui, depsFactory: depsFactory, cancelSignals: cancelSignals}
+func NewBuildOptions(
+	ui ui.UI,
+	configFactory ConfigFactory,
+	depsFactory DepsFactory,
+	cancelSignals CancelSignals,
+) *BuildOptions {
+	return &BuildOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory, cancelSignals: cancelSignals}
 }
 
 func NewBuildCmd(o *BuildOptions, flagsFactory FlagsFactory) *cobra.Command {
@@ -74,7 +80,7 @@ func (o *BuildOptions) Run() error {
 		return err
 	}
 
-	restConfig, err := o.depsFactory.RESTConfig()
+	restConfig, err := o.configFactory.RESTConfig()
 	if err != nil {
 		return err
 	}

@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewDeleteRouteCmd_Ok(t *testing.T) {
-	realCmd := NewDeleteRouteOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewDeleteRouteOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewDeleteRouteCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -37,7 +37,7 @@ func TestNewDeleteRouteCmd_Ok(t *testing.T) {
 }
 
 func TestNewDeleteRouteCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewDeleteRouteOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewDeleteRouteOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewDeleteRouteCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -50,7 +50,7 @@ func TestNewDeleteRouteCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewDeleteRouteCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewDeleteRouteOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewDeleteRouteOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewDeleteRouteCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"route"})

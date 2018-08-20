@@ -22,6 +22,7 @@ import (
 	"strings"
 	"testing"
 
+	. "github.com/cppforlife/knctl/pkg/knctl/cmd"
 	"github.com/cppforlife/knctl/pkg/knctl/cobrautil"
 	"github.com/spf13/cobra"
 )
@@ -120,4 +121,8 @@ func DeepEqual(t *testing.T, actual, expected interface{}) {
 	if !reflect.DeepEqual(actual, expected) {
 		t.Fatalf("Expect obj '%#v' to equal obj '%#v'", actual, expected)
 	}
+}
+
+func newDepsFactory() DepsFactory {
+	return NewDepsFactoryImpl(NewConfigFactoryImpl())
 }

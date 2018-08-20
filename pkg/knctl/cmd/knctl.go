@@ -27,21 +27,23 @@ import (
 )
 
 type KnctlOptions struct {
-	ui          *ui.ConfUI
-	depsFactory DepsFactory
+	ui            *ui.ConfUI
+	configFactory ConfigFactory
+	depsFactory   DepsFactory
 
 	UIFlags         UIFlags
 	KubeconfigFlags KubeconfigFlags
 }
 
-func NewKnctlOptions(ui *ui.ConfUI, depsFactory DepsFactory) *KnctlOptions {
-	return &KnctlOptions{ui: ui, depsFactory: depsFactory}
+func NewKnctlOptions(ui *ui.ConfUI, configFactory ConfigFactory, depsFactory DepsFactory) *KnctlOptions {
+	return &KnctlOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory}
 }
 
 func NewDefaultKnctlCmd(ui *ui.ConfUI) *cobra.Command {
-	depsFactory := NewDepsFactoryImpl()
-	options := NewKnctlOptions(ui, depsFactory)
-	flagsFactory := NewFlagsFactory(depsFactory)
+	configFactory := NewConfigFactoryImpl()
+	depsFactory := NewDepsFactoryImpl(configFactory)
+	options := NewKnctlOptions(ui, configFactory, depsFactory)
+	flagsFactory := NewFlagsFactory(configFactory, depsFactory)
 	return NewKnctlCmd(options, flagsFactory)
 }
 
@@ -55,7 +57,7 @@ CLI docs: https://github.com/cppforlife/knctl#docs.
 Knative docs: https://github.com/knative/docs.`,
 
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			o.depsFactory.ConfigureConfigPath(o.KubeconfigFlags.Path)
+			o.configFactory.ConfigurePath(o.KubeconfigFlags.Path)
 			o.UIFlags.ConfigureUI(o.ui)
 		},
 
@@ -79,11 +81,11 @@ Knative docs: https://github.com/knative/docs.`,
 	cmd.AddCommand(NewVersionCmd(NewVersionOptions(o.ui), flagsFactory))
 	cmd.AddCommand(NewInstallCmd(NewInstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags), flagsFactory))
 	cmd.AddCommand(NewUninstallCmd(NewUninstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags), flagsFactory))
-	cmd.AddCommand(NewDeployCmd(NewDeployOptions(o.ui, o.depsFactory), flagsFactory))
+	cmd.AddCommand(NewDeployCmd(NewDeployOptions(o.ui, o.configFactory, o.depsFactory), flagsFactory))
 	cmd.AddCommand(NewLogsCmd(NewLogsOptions(o.ui, o.depsFactory, CancelSignals{}), flagsFactory))
 	cmd.AddCommand(NewOpenCmd(NewOpenOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(NewCurlCmd(NewCurlOptions(o.ui, o.depsFactory), flagsFactory))
-	cmd.AddCommand(NewBuildCmd(NewBuildOptions(o.ui, o.depsFactory, CancelSignals{}), flagsFactory))
+	cmd.AddCommand(NewBuildCmd(NewBuildOptions(o.ui, o.configFactory, o.depsFactory, CancelSignals{}), flagsFactory))
 	cmd.AddCommand(NewRouteCmd(NewRouteOptions(o.ui, o.depsFactory), flagsFactory))
 
 	createCmd := NewCreateCmd()

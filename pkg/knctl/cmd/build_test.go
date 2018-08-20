@@ -24,7 +24,7 @@ import (
 )
 
 func TestNewBuildCmd_Ok(t *testing.T) {
-	realCmd := NewBuildOptions(nil, NewDepsFactoryImpl(), CancelSignals{})
+	realCmd := NewBuildOptions(nil, NewConfigFactoryImpl(), newDepsFactory(), CancelSignals{})
 	cmd := NewTestCmd(t, NewBuildCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -54,7 +54,7 @@ func TestNewBuildCmd_Ok(t *testing.T) {
 }
 
 func TestNewBuildCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewBuildOptions(nil, NewDepsFactoryImpl(), CancelSignals{})
+	realCmd := NewBuildOptions(nil, NewConfigFactoryImpl(), newDepsFactory(), CancelSignals{})
 	cmd := NewTestCmd(t, NewBuildCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -83,7 +83,7 @@ func TestNewBuildCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewBuildCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewBuildOptions(nil, NewDepsFactoryImpl(), CancelSignals{})
+	realCmd := NewBuildOptions(nil, NewConfigFactoryImpl(), newDepsFactory(), CancelSignals{})
 	cmd := NewTestCmd(t, NewBuildCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"build", "image"})

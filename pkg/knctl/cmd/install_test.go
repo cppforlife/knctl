@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewInstallCmd_Ok(t *testing.T) {
-	realCmd := NewInstallOptions(nil, NewDepsFactoryImpl(), &KubeconfigFlags{})
+	realCmd := NewInstallOptions(nil, newDepsFactory(), &KubeconfigFlags{})
 	cmd := NewTestCmd(t, NewInstallCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -37,7 +37,7 @@ func TestNewInstallCmd_Ok(t *testing.T) {
 }
 
 func TestNewInstallCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewInstallOptions(nil, NewDepsFactoryImpl(), &KubeconfigFlags{})
+	realCmd := NewInstallOptions(nil, newDepsFactory(), &KubeconfigFlags{})
 	cmd := NewTestCmd(t, NewInstallCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--node-ports",
@@ -50,7 +50,7 @@ func TestNewInstallCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewInstallCmd_OkMinimum(t *testing.T) {
-	realCmd := NewInstallOptions(nil, NewDepsFactoryImpl(), &KubeconfigFlags{})
+	realCmd := NewInstallOptions(nil, newDepsFactory(), &KubeconfigFlags{})
 	cmd := NewTestCmd(t, NewInstallCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectReachesExecution()

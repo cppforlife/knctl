@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewUntagRevisionCmd_Ok(t *testing.T) {
-	realCmd := NewUntagRevisionOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewUntagRevisionOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewUntagRevisionCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -37,7 +37,7 @@ func TestNewUntagRevisionCmd_Ok(t *testing.T) {
 }
 
 func TestNewUntagRevisionCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewUntagRevisionOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewUntagRevisionOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewUntagRevisionCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -50,7 +50,7 @@ func TestNewUntagRevisionCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewUntagRevisionCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewUntagRevisionOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewUntagRevisionOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewUntagRevisionCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"revision"})

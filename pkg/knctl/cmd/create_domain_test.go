@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewCreateDomainCmd_Ok(t *testing.T) {
-	realCmd := NewCreateDomainOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewCreateDomainOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewCreateDomainCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -37,7 +37,7 @@ func TestNewCreateDomainCmd_Ok(t *testing.T) {
 }
 
 func TestNewCreateDomainCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewCreateDomainOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewCreateDomainOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewCreateDomainCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--domain", "test-domain",
@@ -50,7 +50,7 @@ func TestNewCreateDomainCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewCreateDomainCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewCreateDomainOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewCreateDomainOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewCreateDomainCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"default", "domain"})

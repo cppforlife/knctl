@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewListDomainsCmd_OkMinimum(t *testing.T) {
-	realCmd := NewListDomainsOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewListDomainsOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewListDomainsCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{})

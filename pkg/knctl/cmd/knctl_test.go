@@ -30,7 +30,7 @@ import (
 
 func TestNewKnctlCmd_Ok(t *testing.T) {
 	noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-	realCmd := NewKnctlOptions(noopUI, NewDepsFactoryImpl())
+	realCmd := NewKnctlOptions(noopUI, NewConfigFactoryImpl(), newDepsFactory())
 	cobraCmd := NewKnctlCmd(realCmd, FlagsFactory{})
 
 	cmd := NewTestCmd(t, cobraCmd)
@@ -46,7 +46,7 @@ func TestNewKnctlCmd_Ok(t *testing.T) {
 
 func TestNewKnctlCmd_OkMinimum(t *testing.T) {
 	noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-	realCmd := NewKnctlOptions(noopUI, NewDepsFactoryImpl())
+	realCmd := NewKnctlOptions(noopUI, NewConfigFactoryImpl(), newDepsFactory())
 	cmd := NewTestCmd(t, NewKnctlCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectReachesExecution()
@@ -56,7 +56,7 @@ func TestNewKnctlCmd_OkMinimum(t *testing.T) {
 
 func TestNewKnctlCmd_OkUIFlags(t *testing.T) {
 	noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-	realCmd := NewKnctlOptions(noopUI, NewDepsFactoryImpl())
+	realCmd := NewKnctlOptions(noopUI, NewConfigFactoryImpl(), newDepsFactory())
 	cmd := NewTestCmd(t, NewKnctlCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--tty",

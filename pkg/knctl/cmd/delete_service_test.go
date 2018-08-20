@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewDeleteServiceCmd_Ok(t *testing.T) {
-	realCmd := NewDeleteServiceOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewDeleteServiceOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewDeleteServiceCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -37,7 +37,7 @@ func TestNewDeleteServiceCmd_Ok(t *testing.T) {
 }
 
 func TestNewDeleteServiceCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewDeleteServiceOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewDeleteServiceOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewDeleteServiceCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -50,7 +50,7 @@ func TestNewDeleteServiceCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewDeleteServiceCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewDeleteServiceOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewDeleteServiceOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewDeleteServiceCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"service"})

@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewCreateServiceAccountCmd_Ok(t *testing.T) {
-	realCmd := NewCreateServiceAccountOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewCreateServiceAccountOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewCreateServiceAccountCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -46,7 +46,7 @@ func TestNewCreateServiceAccountCmd_Ok(t *testing.T) {
 }
 
 func TestNewCreateServiceAccountCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewCreateServiceAccountOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewCreateServiceAccountOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewCreateServiceAccountCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -68,7 +68,7 @@ func TestNewCreateServiceAccountCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewCreateServiceAccountCmd_OkMinimum(t *testing.T) {
-	realCmd := NewCreateServiceAccountOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewCreateServiceAccountOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewCreateServiceAccountCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -83,7 +83,7 @@ func TestNewCreateServiceAccountCmd_OkMinimum(t *testing.T) {
 }
 
 func TestNewCreateServiceAccountCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewCreateServiceAccountOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewCreateServiceAccountOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewCreateServiceAccountCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"service-account"})

@@ -22,32 +22,26 @@ import (
 	buildclientset "github.com/knative/build/pkg/client/clientset/versioned"
 	servingclientset "github.com/knative/serving/pkg/client/clientset/versioned"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 type DepsFactory interface {
-	ConfigureConfigPath(string)
 	ServingClient() (servingclientset.Interface, error)
 	BuildClient() (buildclientset.Interface, error)
 	CoreClient() (kubernetes.Interface, error)
-	RESTConfig() (*rest.Config, error)
-	DefaultNamespace() (string, error)
 }
 
 type DepsFactoryImpl struct {
-	configPath      string
-	configNamespace string
+	configFactory ConfigFactory
 }
 
 var _ DepsFactory = &DepsFactoryImpl{}
 
-func NewDepsFactoryImpl() *DepsFactoryImpl {
-	return &DepsFactoryImpl{}
+func NewDepsFactoryImpl(configFactory ConfigFactory) *DepsFactoryImpl {
+	return &DepsFactoryImpl{configFactory}
 }
 
 func (f *DepsFactoryImpl) ServingClient() (servingclientset.Interface, error) {
-	config, err := f.config()
+	config, err := f.configFactory.RESTConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +55,7 @@ func (f *DepsFactoryImpl) ServingClient() (servingclientset.Interface, error) {
 }
 
 func (f *DepsFactoryImpl) BuildClient() (buildclientset.Interface, error) {
-	config, err := f.config()
+	config, err := f.configFactory.RESTConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +69,7 @@ func (f *DepsFactoryImpl) BuildClient() (buildclientset.Interface, error) {
 }
 
 func (f *DepsFactoryImpl) CoreClient() (kubernetes.Interface, error) {
-	config, err := f.config()
+	config, err := f.configFactory.RESTConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -86,33 +80,4 @@ func (f *DepsFactoryImpl) CoreClient() (kubernetes.Interface, error) {
 	}
 
 	return clientset, nil
-}
-
-func (f *DepsFactoryImpl) RESTConfig() (*rest.Config, error) {
-	return f.config()
-}
-
-func (f *DepsFactoryImpl) DefaultNamespace() (string, error) {
-	name, _, err := f.clientConfig().Namespace()
-	return name, err
-}
-
-func (f *DepsFactoryImpl) ConfigureConfigPath(path string) {
-	f.configPath = path
-}
-
-func (f *DepsFactoryImpl) clientConfig() clientcmd.ClientConfig {
-	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		&clientcmd.ClientConfigLoadingRules{ExplicitPath: f.configPath},
-		&clientcmd.ConfigOverrides{},
-	)
-}
-
-func (f *DepsFactoryImpl) config() (*rest.Config, error) {
-	config, err := f.clientConfig().ClientConfig()
-	if err != nil {
-		return nil, fmt.Errorf("Building Kubernetes config: %s", err)
-	}
-
-	return config, nil
 }

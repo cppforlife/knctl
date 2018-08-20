@@ -26,15 +26,16 @@ import (
 )
 
 type DeployOptions struct {
-	ui          ui.UI
-	depsFactory DepsFactory
+	ui            ui.UI
+	configFactory ConfigFactory
+	depsFactory   DepsFactory
 
 	ServiceFlags ServiceFlags
 	DeployFlags  DeployFlags
 }
 
-func NewDeployOptions(ui ui.UI, depsFactory DepsFactory) *DeployOptions {
-	return &DeployOptions{ui: ui, depsFactory: depsFactory}
+func NewDeployOptions(ui ui.UI, configFactory ConfigFactory, depsFactory DepsFactory) *DeployOptions {
+	return &DeployOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory}
 }
 
 func NewDeployCmd(o *DeployOptions, flagsFactory FlagsFactory) *cobra.Command {
@@ -82,7 +83,7 @@ func (o *DeployOptions) Run() error {
 		return err
 	}
 
-	restConfig, err := o.depsFactory.RESTConfig()
+	restConfig, err := o.configFactory.RESTConfig()
 	if err != nil {
 		return err
 	}

@@ -23,7 +23,7 @@ import (
 )
 
 func TestNewListRevisionsCmd_Ok(t *testing.T) {
-	realCmd := NewListRevisionsOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewListRevisionsOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewListRevisionsCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -37,7 +37,7 @@ func TestNewListRevisionsCmd_Ok(t *testing.T) {
 }
 
 func TestNewListRevisionsCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewListRevisionsOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewListRevisionsOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewListRevisionsCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -50,7 +50,7 @@ func TestNewListRevisionsCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewListRevisionsCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewListRevisionsOptions(nil, NewDepsFactoryImpl())
+	realCmd := NewListRevisionsOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewListRevisionsCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"service"})
