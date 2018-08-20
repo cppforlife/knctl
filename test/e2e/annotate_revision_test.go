@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	uitest "github.com/cppforlife/go-cli-ui/ui/test"
 	"gopkg.in/yaml.v2"
@@ -53,12 +54,18 @@ func TestAnnotateRevision(t *testing.T) {
 			"-e", "TARGET=" + expectedContentRev1,
 		})
 
+		// TODO wait for at least a second to avoid multiple revisions
+		// to have same creation timestamp which causes ordering issues
+		time.Sleep(time.Second)
+
 		knctl.Run([]string{
 			"deploy",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContentRev2,
 		})
+
+		time.Sleep(time.Second)
 
 		knctl.Run([]string{
 			"deploy",

@@ -146,6 +146,7 @@ func (l *Service) CreatedRevisionSinceRevision(lastRevision *v1alpha1.Revision) 
 	var createdRevision *v1alpha1.Revision
 
 	for revision := range revisionsToWatchCh {
+		// TODO comparing based on time causes problems for revisions with same creation timestamp
 		if lastRevision == nil || revision.CreationTimestamp.Time.After(lastRevision.CreationTimestamp.Time) {
 			createdRevision = &revision
 			break
