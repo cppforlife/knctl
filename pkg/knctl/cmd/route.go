@@ -69,18 +69,11 @@ func (o *RouteOptions) Run() error {
 
 	tags := ctlservice.NewTags(servingClient)
 
-	route, err := servingClient.ServingV1alpha1().Routes(o.RouteFlags.NamespaceFlags.Name).Get(o.RouteFlags.Name, metav1.GetOptions{})
-	if err != nil {
-		if !errors.IsNotFound(err) {
-			return fmt.Errorf("Getting route: %s", err)
-		}
-
-		route = &v1alpha1.Route{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      o.RouteFlags.Name, // TODO generate name
-				Namespace: o.RouteFlags.NamespaceFlags.Name,
-			},
-		}
+	route := &v1alpha1.Route{
+		ObjectMeta: o.TrafficFlags.GenerateNameFlags.Apply(metav1.ObjectMeta{
+			Name:      o.RouteFlags.Name,
+			Namespace: o.RouteFlags.NamespaceFlags.Name,
+		}),
 	}
 
 	var targets []v1alpha1.TrafficTarget
@@ -121,20 +114,32 @@ func (o *RouteOptions) Run() error {
 }
 
 func (o *RouteOptions) createOrUpdate(servingClient servingclientset.Interface, route *v1alpha1.Route) error {
-	if len(route.ResourceVersion) > 0 {
-		return wait.Poll(time.Second, 10*time.Second, func() (bool, error) {
-			_, err := servingClient.ServingV1alpha1().Routes(o.RouteFlags.NamespaceFlags.Name).Update(route)
-			if err != nil {
-				return false, fmt.Errorf("Updating route: %s", err)
-			}
-			return true, nil
-		})
-	}
+	_, createErr := servingClient.ServingV1alpha1().Routes(o.RouteFlags.NamespaceFlags.Name).Create(route)
+	if createErr != nil {
+		if errors.IsAlreadyExists(createErr) {
+			return o.update(servingClient, route)
+		}
 
-	_, err := servingClient.ServingV1alpha1().Routes(o.RouteFlags.NamespaceFlags.Name).Create(route)
-	if err != nil {
-		return fmt.Errorf("Creating route: %s", err)
+		return fmt.Errorf("Creating route: %s", createErr)
 	}
 
 	return nil
+}
+
+func (o *RouteOptions) update(servingClient servingclientset.Interface, route *v1alpha1.Route) error {
+	return wait.Poll(time.Second, 10*time.Second, func() (bool, error) {
+		origRoute, err := servingClient.ServingV1alpha1().Routes(o.RouteFlags.NamespaceFlags.Name).Get(o.RouteFlags.Name, metav1.GetOptions{})
+		if err != nil {
+			return true, err
+		}
+
+		origRoute.Spec = route.Spec
+
+		_, err = servingClient.ServingV1alpha1().Routes(o.RouteFlags.NamespaceFlags.Name).Update(origRoute)
+		if err != nil {
+			return false, fmt.Errorf("Updating route: %s", err)
+		}
+
+		return true, nil
+	})
 }

@@ -24,6 +24,7 @@ knctl route [flags]
 ### Options
 
 ```
+      --generate-name        Set to generate name
   -h, --help                 help for route
   -n, --namespace string     Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
   -p, --percentage strings   Set percentage (format: revision=percentage, example: latest=100%) (can be specified multiple times)
