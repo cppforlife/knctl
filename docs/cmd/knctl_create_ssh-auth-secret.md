@@ -28,7 +28,7 @@ knctl create ssh-auth-secret [flags]
       --github                    Preconfigure type and url for Github.com Git access
   -h, --help                      help for ssh-auth-secret
       --known-hosts string        Set known hosts
-  -n, --namespace string          Specified namespace (or default from kubeconfig)
+  -n, --namespace string          Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
       --private-key string        Set private key in PEM format ($KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY)
       --private-key-path string   Set private key in PEM format from file path
   -s, --secret string             Specified secret

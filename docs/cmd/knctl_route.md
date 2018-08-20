@@ -25,7 +25,7 @@ knctl route [flags]
 
 ```
   -h, --help                 help for route
-  -n, --namespace string     Specified namespace (or default from kubeconfig)
+  -n, --namespace string     Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
   -p, --percentage strings   Set percentage (format: revision=percentage, example: latest=100%) (can be specified multiple times)
       --route string         Specified route
 ```

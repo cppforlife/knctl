@@ -22,7 +22,7 @@ knctl list revisions [flags]
 
 ```
   -h, --help               help for revisions
-  -n, --namespace string   Specified namespace (or default from kubeconfig)
+  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
   -s, --service string     Specified service
 ```
 

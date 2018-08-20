@@ -43,7 +43,7 @@ knctl deploy [flags]
       --git-url string           Set Git URL
   -h, --help                     help for deploy
   -i, --image string             Set image URL
-  -n, --namespace string         Specified namespace (or default from kubeconfig)
+  -n, --namespace string         Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
   -s, --service string           Specified service
       --service-account string   Set service account name for building
       --template string          Set template name

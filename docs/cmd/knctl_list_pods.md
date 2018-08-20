@@ -14,7 +14,7 @@ knctl list pods [flags]
 
 ```
   -h, --help               help for pods
-  -n, --namespace string   Specified namespace (or default from kubeconfig)
+  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
   -s, --service string     Specified service
 ```
 

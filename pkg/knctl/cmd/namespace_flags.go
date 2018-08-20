@@ -31,7 +31,7 @@ type NamespaceFlags struct {
 
 func (s *NamespaceFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
 	name := flagsFactory.NewNamespaceNameFlag(&s.Name)
-	cmd.Flags().VarP(name, "namespace", "n", "Specified namespace (or default from kubeconfig)")
+	cmd.Flags().VarP(name, "namespace", "n", "Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)")
 }
 
 type NamespaceNameFlag struct {

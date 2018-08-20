@@ -22,7 +22,7 @@ knctl delete revision [flags]
 
 ```
   -h, --help               help for revision
-  -n, --namespace string   Specified namespace (or default from kubeconfig)
+  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
   -r, --revision string    Specified revision
 ```
 

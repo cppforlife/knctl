@@ -23,7 +23,7 @@ knctl annotate revision [flags]
 ```
   -a, --annotation strings   Set annotation (format: key=value) (can be specified multiple times)
   -h, --help                 help for revision
-  -n, --namespace string     Specified namespace (or default from kubeconfig)
+  -n, --namespace string     Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
   -r, --revision string      Specified revision
 ```
 
