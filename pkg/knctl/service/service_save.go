@@ -18,32 +18,19 @@ package service
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 func (s *Service) CreateOrUpdate() (*v1alpha1.Service, error) {
 	createdService, createErr := s.servingClient.ServingV1alpha1().Services(s.service.Namespace).Create(&s.service)
 	if createErr != nil {
 		if errors.IsAlreadyExists(createErr) {
-			origService, err := s.servingClient.ServingV1alpha1().Services(s.service.Namespace).Get(s.service.Name, metav1.GetOptions{})
-			if err != nil {
-				return nil, fmt.Errorf("Creating service: %s", createErr)
-			}
-
-			// TODO currently replaces everything
-			s.service.ResourceVersion = origService.ResourceVersion
-
-			updatedService, updateErr := s.servingClient.ServingV1alpha1().Services(s.service.Namespace).Update(&s.service)
-			if updateErr != nil {
-				return nil, fmt.Errorf("Updating service: %s", updateErr)
-			}
-
-			s.service = *updatedService
-
-			return updatedService, nil
+			return s.update()
 		}
 
 		return nil, fmt.Errorf("Creating service: %s", createErr)
@@ -52,4 +39,33 @@ func (s *Service) CreateOrUpdate() (*v1alpha1.Service, error) {
 	s.service = *createdService
 
 	return createdService, nil
+}
+
+func (s *Service) update() (*v1alpha1.Service, error) {
+	var updatedService *v1alpha1.Service
+
+	updateErr := wait.Poll(time.Second, 10*time.Second, func() (bool, error) {
+		origService, err := s.servingClient.ServingV1alpha1().Services(s.service.Namespace).Get(s.service.Name, metav1.GetOptions{})
+		if err != nil {
+			return false, fmt.Errorf("Creating service: %s", err)
+		}
+
+		origService.Spec = s.service.Spec
+
+		service, err := s.servingClient.ServingV1alpha1().Services(s.service.Namespace).Update(origService)
+		if err != nil {
+			return false, fmt.Errorf("Updating service: %s", err)
+		}
+
+		updatedService = service
+
+		return true, nil
+	})
+	if updateErr != nil {
+		return nil, updateErr
+	}
+
+	s.service = *updatedService
+
+	return updatedService, nil
 }
