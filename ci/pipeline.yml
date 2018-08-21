@@ -43,6 +43,8 @@ jobs:
 
 - name: e2e-tests
   plan:
+  - get: e2e-tests-interval
+    trigger: true
   - get: knctl
   - task: test
     config:
@@ -122,3 +124,8 @@ resources:
   source:
     uri: https://github.com/cppforlife/knctl
     branch: master
+
+- name: e2e-tests-interval
+  type: time
+  source:
+    interval: 30m
