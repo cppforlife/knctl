@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	Version = "0.0.5"
+	Version = "0.0.6-dev.1"
 )
 
 type VersionOptions struct {
