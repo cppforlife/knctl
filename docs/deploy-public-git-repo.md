@@ -39,3 +39,5 @@ $ knctl deploy \
     --image index.docker.io/<your-username>/<your-repo> \
     --env SIMPLE_MSG=123
 ```
+
+See how to [deploy from private Git repo](./deploy-private-git-repo.md).

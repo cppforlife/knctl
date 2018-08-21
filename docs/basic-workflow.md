@@ -68,3 +68,8 @@ hello-00001  0%                   Reserve        3m
 
 2 revisions
 ```
+
+See how to:
+
+- [deploy from public Git repo](./deploy-public-git-repo.md)
+- [deploy from local source directory](./deploy-source-directory.md)
