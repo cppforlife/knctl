@@ -22,6 +22,7 @@ import (
 
 	"github.com/knative/build/pkg/apis/build/v1alpha1"
 	buildclientset "github.com/knative/build/pkg/client/clientset/versioned"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -67,7 +68,12 @@ func (w BuildWaiter) WaitForCompletion(cancelCh chan struct{}) (*v1alpha1.Build,
 
 		cond := build.Status.GetCondition(v1alpha1.BuildSucceeded)
 		if cond != nil {
-			return build, nil
+			switch cond.Status {
+			case corev1.ConditionTrue, corev1.ConditionFalse:
+				return build, nil
+			default:
+				// continue waiting
+			}
 		}
 
 		select {
