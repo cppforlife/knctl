@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cppforlife/knctl/pkg/knctl/util"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 func (s *Service) CreateOrUpdate() (*v1alpha1.Service, error) {
@@ -44,7 +44,7 @@ func (s *Service) CreateOrUpdate() (*v1alpha1.Service, error) {
 func (s *Service) update() (*v1alpha1.Service, error) {
 	var updatedService *v1alpha1.Service
 
-	updateErr := wait.Poll(time.Second, 10*time.Second, func() (bool, error) {
+	updateErr := util.Retry(time.Second, 10*time.Second, func() (bool, error) {
 		origService, err := s.servingClient.ServingV1alpha1().Services(s.service.Namespace).Get(s.service.Name, metav1.GetOptions{})
 		if err != nil {
 			return false, fmt.Errorf("Creating service: %s", err)

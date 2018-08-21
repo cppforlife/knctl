@@ -24,12 +24,12 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
+	"github.com/cppforlife/knctl/pkg/knctl/util"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	servingclientset "github.com/knative/serving/pkg/client/clientset/versioned"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 type RouteOptions struct {
@@ -127,7 +127,7 @@ func (o *RouteOptions) createOrUpdate(servingClient servingclientset.Interface, 
 }
 
 func (o *RouteOptions) update(servingClient servingclientset.Interface, route *v1alpha1.Route) error {
-	return wait.Poll(time.Second, 10*time.Second, func() (bool, error) {
+	return util.Retry(time.Second, 10*time.Second, func() (bool, error) {
 		origRoute, err := servingClient.ServingV1alpha1().Routes(o.RouteFlags.NamespaceFlags.Name).Get(o.RouteFlags.Name, metav1.GetOptions{})
 		if err != nil {
 			return true, err

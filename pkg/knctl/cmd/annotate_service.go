@@ -23,9 +23,9 @@ import (
 	"time"
 
 	"github.com/cppforlife/go-cli-ui/ui"
+	"github.com/cppforlife/knctl/pkg/knctl/util"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 type AnnotateServiceOptions struct {
@@ -66,7 +66,7 @@ func (o *AnnotateServiceOptions) Run() error {
 		return err
 	}
 
-	return wait.Poll(time.Second, 10*time.Second, func() (bool, error) {
+	return util.Retry(time.Second, 10*time.Second, func() (bool, error) {
 		_, err := servingClient.ServingV1alpha1().Services(o.ServiceFlags.NamespaceFlags.Name).Patch(o.ServiceFlags.Name, types.MergePatchType, patchJSON)
 		if err != nil {
 			return false, fmt.Errorf("Annotating service: %s", err)

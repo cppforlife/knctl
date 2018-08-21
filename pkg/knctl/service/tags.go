@@ -22,13 +22,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cppforlife/knctl/pkg/knctl/util"
 	"github.com/knative/serving/pkg/apis/serving"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	servingclientset "github.com/knative/serving/pkg/client/clientset/versioned"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 const (
@@ -132,7 +132,7 @@ func (t Tags) Tag(revision *v1alpha1.Revision, tag string) error {
 		return err
 	}
 
-	return wait.Poll(time.Second, 30*time.Second, func() (bool, error) {
+	return util.Retry(time.Second, 30*time.Second, func() (bool, error) {
 		_, err := t.servingClient.ServingV1alpha1().Revisions(revision.Namespace).Patch(revision.Name, types.MergePatchType, patchJSON)
 		if err != nil {
 			return false, fmt.Errorf("Tagging revision: %s", err)
@@ -145,7 +145,7 @@ func (t Tags) Untag(revision v1alpha1.Revision, tag string) error {
 	encodedTag := rfc6901Encoder.Replace(t.label(tag))
 	patchJSON := []byte(fmt.Sprintf(`[{"op":"remove", "path":"/metadata/labels/%s"}]`, encodedTag))
 
-	return wait.Poll(time.Second, 30*time.Second, func() (bool, error) {
+	return util.Retry(time.Second, 30*time.Second, func() (bool, error) {
 		_, err := t.servingClient.ServingV1alpha1().Revisions(revision.Namespace).Patch(revision.Name, types.JSONPatchType, patchJSON)
 		if err != nil {
 			return false, fmt.Errorf("Untagging revision: %s", err)
