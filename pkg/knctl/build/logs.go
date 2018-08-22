@@ -45,9 +45,6 @@ func (l Logs) Tail(ui ui.UI, cancelCh chan struct{}) error {
 	case v1alpha1.ClusterBuildProvider:
 		return NewClusterBuilderLogs(l.waiter, l.podsGetterClient).Tail(ui, cancelCh)
 
-	case v1alpha1.GoogleBuildProvider:
-		return nil
-
 	default:
 		ui.PrintLinef("Cannot follow logs unknown builder '%s'...\n", build.Status.Builder)
 		return nil
