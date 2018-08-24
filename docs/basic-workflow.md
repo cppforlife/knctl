@@ -36,6 +36,19 @@ hello  hello.default.example.com  hello.default.svc.cluster.local  1d
 1 services
 ```
 
+Check that at least one Pod is in `Running` state
+
+```bash
+$ knctl list pods --service hello
+
+Pods for service 'hello'
+
+Revision     Name                                    Phase    Restarts  Age
+hello-00001  hello-00001-deployment-c9cc8b88c-8hw4x  Running  0         10s
+
+1 pods
+```
+
 Curl the deployed service and see that it responds
 
 ```bash
