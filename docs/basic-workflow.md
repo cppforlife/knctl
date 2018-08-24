@@ -30,8 +30,8 @@ $ knctl list services
 
 Services in namespace 'default'
 
-Name   Domain                     Internal Domain                  Age
-hello  hello.default.example.com  hello.default.svc.cluster.local  1d
+Name   Domain                     Annotations  Age
+hello  hello.default.example.com  -            1d
 
 1 services
 ```
