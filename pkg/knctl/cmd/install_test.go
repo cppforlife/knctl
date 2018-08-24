@@ -29,11 +29,13 @@ func TestNewInstallCmd_Ok(t *testing.T) {
 	cmd.Execute([]string{
 		"-p",
 		"-m",
+		"--version-check",
 	})
 	cmd.ExpectReachesExecution()
 
 	DeepEqual(t, realCmd.NodePorts, true)
 	DeepEqual(t, realCmd.ExcludeMonitoring, true)
+	DeepEqual(t, realCmd.VersionCheck, true)
 }
 
 func TestNewInstallCmd_OkLongFlagNames(t *testing.T) {
@@ -42,11 +44,13 @@ func TestNewInstallCmd_OkLongFlagNames(t *testing.T) {
 	cmd.Execute([]string{
 		"--node-ports",
 		"--exclude-monitoring",
+		"--version-check=false",
 	})
 	cmd.ExpectReachesExecution()
 
 	DeepEqual(t, realCmd.NodePorts, true)
 	DeepEqual(t, realCmd.ExcludeMonitoring, true)
+	DeepEqual(t, realCmd.VersionCheck, false)
 }
 
 func TestNewInstallCmd_OkMinimum(t *testing.T) {
@@ -57,6 +61,7 @@ func TestNewInstallCmd_OkMinimum(t *testing.T) {
 
 	DeepEqual(t, realCmd.NodePorts, false)
 	DeepEqual(t, realCmd.ExcludeMonitoring, false)
+	DeepEqual(t, realCmd.VersionCheck, true)
 }
 
 func TestNewInstallCmd_CheckInstallationAssets(t *testing.T) {

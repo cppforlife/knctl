@@ -23,6 +23,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -54,6 +55,7 @@ type InstallOptions struct {
 
 	NodePorts         bool
 	ExcludeMonitoring bool
+	VersionCheck      bool
 
 	kubeconfigFlags *KubeconfigFlags
 }
@@ -73,18 +75,25 @@ Requires 'kubectl' command installed on a the system.`,
 	}
 	cmd.Flags().BoolVarP(&o.NodePorts, "node-ports", "p", false, "Use service type NodePorts instead of type LoadBalancer")
 	cmd.Flags().BoolVarP(&o.ExcludeMonitoring, "exclude-monitoring", "m", false, "Exclude installation of monitoring components")
+	cmd.Flags().BoolVar(&o.VersionCheck, "version-check", true, "Check minimum Kubernetes API server version")
 	return cmd
 }
 
 func (o *InstallOptions) Run() error {
 	// TODO remove kubectl dependency
 	// TODO install latest dev version
-	// TODO check kube versions is 1.10+
 	// TODO grant cluster-admin permissions to the current user for Istio
 
 	coreClient, err := o.depsFactory.CoreClient()
 	if err != nil {
 		return err
+	}
+
+	if o.VersionCheck {
+		err = o.ensureMinimumServerVersion(coreClient)
+		if err != nil {
+			return fmt.Errorf("%s (skip via --version-check=false)", err)
+		}
 	}
 
 	istio := NewIstio()
@@ -109,6 +118,30 @@ func (o *InstallOptions) Run() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (o *InstallOptions) ensureMinimumServerVersion(coreClient kubernetes.Interface) error {
+	version, err := coreClient.Discovery().ServerVersion()
+	if err != nil {
+		return err
+	}
+
+	majorI, err := strconv.Atoi(version.Major)
+	if err != nil {
+		return fmt.Errorf("Converting major version '%s' to int: %s", version.Major, err)
+	}
+
+	// GKE shows minor as "10+"
+	minorI, err := strconv.Atoi(strings.TrimRight(version.Minor, "-+"))
+	if err != nil {
+		return fmt.Errorf("Converting minor version '%s' to int: %s", version.Minor, err)
+	}
+
+	if majorI == 1 && minorI < 10 {
+		return fmt.Errorf("Expected Kubernetes API server version to be >=1.10")
 	}
 
 	return nil
