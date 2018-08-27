@@ -62,9 +62,9 @@ func (o *UninstallOptions) Run() error {
 	istio := NewIstio()
 
 	components := []UninstallationComponent{
-		{"Istio", NamespaceRemoval{istio.SystemNamespaceName(), coreClient}, o.ui, o.kubeconfigFlags},
-		{"Knative Serving", NamespaceRemoval{"knative-serving", coreClient}, o.ui, o.kubeconfigFlags},
 		{"Knative Build", NamespaceRemoval{"knative-build", coreClient}, o.ui, o.kubeconfigFlags},
+		{"Knative Serving", NamespaceRemoval{"knative-serving", coreClient}, o.ui, o.kubeconfigFlags},
+		{"Istio", NamespaceRemoval{istio.SystemNamespaceName(), coreClient}, o.ui, o.kubeconfigFlags},
 	}
 
 	for _, c := range components {
