@@ -21,6 +21,10 @@ export KNCTL_KUBECONFIG=
 export KNCTL_BASIC_AUTH_SECRET_PASSWORD=
 export KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY=
 
+rm -rf docs/cmd
+
+mkdir -p docs/cmd
+
 go run ./hack/generate-docs.go
 
 echo "Success"
