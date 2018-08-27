@@ -22,9 +22,9 @@ import (
 	. "github.com/cppforlife/knctl/pkg/knctl/cmd"
 )
 
-func TestNewRouteCmd_Ok(t *testing.T) {
-	realCmd := NewRouteOptions(nil, newDepsFactory())
-	cmd := NewTestCmd(t, NewRouteCmd(realCmd, FlagsFactory{}))
+func TestNewCreateRouteCmd_Ok(t *testing.T) {
+	realCmd := NewCreateRouteOptions(nil, newDepsFactory())
+	cmd := NewTestCmd(t, NewCreateRouteCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
@@ -41,9 +41,9 @@ func TestNewRouteCmd_Ok(t *testing.T) {
 		TrafficFlags{Percentages: []string{"srv1:rev1=50%", "srv1:rev2=50%"}})
 }
 
-func TestNewRouteCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewRouteOptions(nil, newDepsFactory())
-	cmd := NewTestCmd(t, NewRouteCmd(realCmd, FlagsFactory{}))
+func TestNewCreateRouteCmd_OkLongFlagNames(t *testing.T) {
+	realCmd := NewCreateRouteOptions(nil, newDepsFactory())
+	cmd := NewTestCmd(t, NewCreateRouteCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--route", "test-route",
@@ -59,9 +59,9 @@ func TestNewRouteCmd_OkLongFlagNames(t *testing.T) {
 		TrafficFlags{Percentages: []string{"srv1:rev1=50%", "srv1:rev2=50%"}})
 }
 
-func TestNewRouteCmd_OkMinimum(t *testing.T) {
-	realCmd := NewRouteOptions(nil, newDepsFactory())
-	cmd := NewTestCmd(t, NewRouteCmd(realCmd, FlagsFactory{}))
+func TestNewCreateRouteCmd_OkMinimum(t *testing.T) {
+	realCmd := NewCreateRouteOptions(nil, newDepsFactory())
+	cmd := NewTestCmd(t, NewCreateRouteCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
@@ -75,9 +75,9 @@ func TestNewRouteCmd_OkMinimum(t *testing.T) {
 	DeepEqual(t, realCmd.TrafficFlags, TrafficFlags{Percentages: nil})
 }
 
-func TestNewRouteCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewRouteOptions(nil, newDepsFactory())
-	cmd := NewTestCmd(t, NewRouteCmd(realCmd, FlagsFactory{}))
+func TestNewCreateRouteCmd_RequiredFlags(t *testing.T) {
+	realCmd := NewCreateRouteOptions(nil, newDepsFactory())
+	cmd := NewTestCmd(t, NewCreateRouteCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"route"})
 }

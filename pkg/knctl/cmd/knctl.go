@@ -100,14 +100,14 @@ Knative docs: https://github.com/knative/docs.`,
 	revisionCmd.AddCommand(NewAnnotateRevisionCmd(NewAnnotateRevisionOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(revisionCmd)
 
-	routeCmd := NewRoute2Cmd()
-	routeCmd.AddCommand(NewRouteCmd(NewRouteOptions(o.ui, o.depsFactory), flagsFactory))
+	routeCmd := NewRouteCmd()
+	routeCmd.AddCommand(NewCreateRouteCmd(NewCreateRouteOptions(o.ui, o.depsFactory), flagsFactory))
 	routeCmd.AddCommand(NewListRoutesCmd(NewListRoutesOptions(o.ui, o.depsFactory), flagsFactory))
 	routeCmd.AddCommand(NewDeleteRouteCmd(NewDeleteRouteOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(routeCmd)
 
-	buildCmd := NewBuild2Cmd()
-	buildCmd.AddCommand(NewBuildCmd(NewBuildOptions(o.ui, o.configFactory, o.depsFactory, CancelSignals{}), flagsFactory))
+	buildCmd := NewBuildCmd()
+	buildCmd.AddCommand(NewCreateBuildCmd(NewCreateBuildOptions(o.ui, o.configFactory, o.depsFactory, CancelSignals{}), flagsFactory))
 	buildCmd.AddCommand(NewListBuildsCmd(NewListBuildsOptions(o.ui, o.depsFactory), flagsFactory))
 	buildCmd.AddCommand(NewDeleteBuildCmd(NewDeleteBuildOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(buildCmd)

@@ -23,9 +23,9 @@ import (
 	. "github.com/cppforlife/knctl/pkg/knctl/cmd"
 )
 
-func TestNewBuildCmd_Ok(t *testing.T) {
-	realCmd := NewBuildOptions(nil, NewConfigFactoryImpl(), newDepsFactory(), CancelSignals{})
-	cmd := NewTestCmd(t, NewBuildCmd(realCmd, FlagsFactory{}))
+func TestNewCreateBuildCmd_Ok(t *testing.T) {
+	realCmd := NewCreateBuildOptions(nil, NewConfigFactoryImpl(), newDepsFactory(), CancelSignals{})
+	cmd := NewTestCmd(t, NewCreateBuildCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
@@ -53,9 +53,9 @@ func TestNewBuildCmd_Ok(t *testing.T) {
 	})
 }
 
-func TestNewBuildCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewBuildOptions(nil, NewConfigFactoryImpl(), newDepsFactory(), CancelSignals{})
-	cmd := NewTestCmd(t, NewBuildCmd(realCmd, FlagsFactory{}))
+func TestNewCreateBuildCmd_OkLongFlagNames(t *testing.T) {
+	realCmd := NewCreateBuildOptions(nil, NewConfigFactoryImpl(), newDepsFactory(), CancelSignals{})
+	cmd := NewTestCmd(t, NewCreateBuildCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--build", "test-build",
@@ -82,9 +82,9 @@ func TestNewBuildCmd_OkLongFlagNames(t *testing.T) {
 	})
 }
 
-func TestNewBuildCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewBuildOptions(nil, NewConfigFactoryImpl(), newDepsFactory(), CancelSignals{})
-	cmd := NewTestCmd(t, NewBuildCmd(realCmd, FlagsFactory{}))
+func TestNewCreateBuildCmd_RequiredFlags(t *testing.T) {
+	realCmd := NewCreateBuildOptions(nil, NewConfigFactoryImpl(), newDepsFactory(), CancelSignals{})
+	cmd := NewTestCmd(t, NewCreateBuildCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"build", "image"})
 }

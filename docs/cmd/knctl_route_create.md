@@ -1,10 +1,10 @@
 ## knctl route create
 
-Configure route
+Create or update route
 
 ### Synopsis
 
-Configure route
+Create or update route
 
 ```
 knctl route create [flags]
