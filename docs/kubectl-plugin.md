@@ -28,7 +28,7 @@ $ chmod +x /usr/local/bin/kubectl-kn
 `kubectl` will find any binary named `kubectl-*` on your `PATH` and consider it as a plugin
 
 ```bash
-$ kubectl plugin list
+$ ./kubectl plugin list
 
 /usr/local/bin/kubectl-kn
 ```
@@ -36,7 +36,7 @@ $ kubectl plugin list
 List Knative services
 
 ```bash
-$ kubectl kn service list
+$ ./kubectl kn service list
 
 Services in namespace 'default'
 
