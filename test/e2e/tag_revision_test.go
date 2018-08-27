@@ -38,7 +38,7 @@ func TestDefaultRevisionTags(t *testing.T) {
 	)
 
 	cleanUp := func() {
-		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"service", "delete", "-s", serviceName}, RunOpts{AllowError: true})
 	}
 
 	logger.Section("Delete previous service with the same name if exists", cleanUp)
@@ -55,7 +55,7 @@ func TestDefaultRevisionTags(t *testing.T) {
 	})
 
 	expectNumberOfRevisions := func(expectedRows int) []map[string]string {
-		out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
+		out := knctl.Run([]string{"revision", "list", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		if len(resp.Tables[0].Rows) != expectedRows {
@@ -161,9 +161,9 @@ func TestDefaultRevisionTags(t *testing.T) {
 	})
 
 	logger.Section("Deleting service", func() {
-		knctl.Run([]string{"delete", "service", "-s", serviceName})
+		knctl.Run([]string{"service", "delete", "-s", serviceName})
 
-		out := knctl.Run([]string{"list", "services", "--json"})
+		out := knctl.Run([]string{"service", "list", "--json"})
 		if strings.Contains(out, serviceName) {
 			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
 		}
@@ -183,11 +183,11 @@ func TestTagRevisions(t *testing.T) {
 	)
 
 	logger.Section("Delete previous service with the same name if exists", func() {
-		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"service", "delete", "-s", serviceName}, RunOpts{AllowError: true})
 	})
 
 	defer func() {
-		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"service", "delete", "-s", serviceName}, RunOpts{AllowError: true})
 	}()
 
 	logger.Section("Deploy two revisions", func() {
@@ -209,7 +209,7 @@ func TestTagRevisions(t *testing.T) {
 	})
 
 	expectNumberOfRevisions := func(expectedRows int) []map[string]string {
-		out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
+		out := knctl.Run([]string{"revision", "list", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		if len(resp.Tables[0].Rows) != expectedRows {
@@ -227,7 +227,7 @@ func TestTagRevisions(t *testing.T) {
 
 	logger.Section("Check that revision can be tagged", func() {
 		firstRow := expectNumberOfRevisions(2)[0]
-		knctl.Run([]string{"tag", "revision", "-t", "tag1", "-t", "tag2", "-r", firstRow["name"], "--json"})
+		knctl.Run([]string{"revision", "tag", "-t", "tag1", "-t", "tag2", "-r", firstRow["name"], "--json"})
 
 		tags := extractTags(expectNumberOfRevisions(2)[0])
 		if !reflect.DeepEqual(tags, []string{"latest", "tag1", "tag2"}) {
@@ -237,7 +237,7 @@ func TestTagRevisions(t *testing.T) {
 
 	logger.Section("Check that revision can be re-tagged", func() {
 		lastRow := expectNumberOfRevisions(2)[1]
-		knctl.Run([]string{"tag", "revision", "-t", "tag2", "-r", lastRow["name"], "--json"})
+		knctl.Run([]string{"revision", "tag", "-t", "tag2", "-r", lastRow["name"], "--json"})
 
 		tags := extractTags(expectNumberOfRevisions(2)[0])
 		if !reflect.DeepEqual(tags, []string{"latest", "tag1"}) {
@@ -252,7 +252,7 @@ func TestTagRevisions(t *testing.T) {
 
 	logger.Section("Check that revision can be untagged", func() {
 		firstRow := expectNumberOfRevisions(2)[0]
-		knctl.Run([]string{"untag", "revision", "-t", "latest", "-r", firstRow["name"], "--json"})
+		knctl.Run([]string{"revision", "untag", "-t", "latest", "-r", firstRow["name"], "--json"})
 
 		tags := extractTags(expectNumberOfRevisions(2)[0])
 		if !reflect.DeepEqual(tags, []string{"tag1"}) {
@@ -261,9 +261,9 @@ func TestTagRevisions(t *testing.T) {
 	})
 
 	logger.Section("Deleting service", func() {
-		knctl.Run([]string{"delete", "service", "-s", serviceName})
+		knctl.Run([]string{"service", "delete", "-s", serviceName})
 
-		out := knctl.Run([]string{"list", "services", "--json"})
+		out := knctl.Run([]string{"service", "list", "--json"})
 		if strings.Contains(out, serviceName) {
 			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
 		}

@@ -37,7 +37,7 @@ func TestBuildSuccess(t *testing.T) {
 	)
 
 	cleanUp := func() {
-		knctl.RunWithOpts([]string{"delete", "build", "-b", buildName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"build", "delete", "-b", buildName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "secret", buildDockerSecretName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "serviceaccount", buildServiceAccountName}, RunOpts{AllowError: true})
 	}
@@ -47,20 +47,21 @@ func TestBuildSuccess(t *testing.T) {
 
 	logger.Section("Add service account with Docker push secret", func() {
 		knctl.RunWithOpts([]string{
-			"create",
 			"basic-auth-secret",
+			"create",
 			"-s", buildDockerSecretName,
 			"--docker-hub",
 			"-u", env.BuildDockerUsername,
 			"-p", env.BuildDockerPassword,
 		}, RunOpts{Redact: true})
 
-		knctl.Run([]string{"create", "service-account", "-a", buildServiceAccountName, "-s", buildDockerSecretName})
+		knctl.Run([]string{"service-account", "create", "-a", buildServiceAccountName, "-s", buildDockerSecretName})
 	})
 
 	logger.Section("Run build and see log output", func() {
 		out := knctl.Run([]string{
 			"build",
+			"create",
 			"-b", buildName,
 			"--git-url", env.BuildGitURL,
 			"--git-revision", env.BuildGitRevision,
@@ -79,7 +80,7 @@ func TestBuildSuccess(t *testing.T) {
 	})
 
 	logger.Section("Checking if build was added", func() {
-		out := knctl.Run([]string{"list", "builds", "--json"})
+		out := knctl.Run([]string{"build", "list", "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		var foundService bool
@@ -100,9 +101,9 @@ func TestBuildSuccess(t *testing.T) {
 	})
 
 	logger.Section("Deleting build", func() {
-		knctl.Run([]string{"delete", "build", "-b", buildName})
+		knctl.Run([]string{"build", "delete", "-b", buildName})
 
-		out := knctl.Run([]string{"list", "builds", "--json"})
+		out := knctl.Run([]string{"build", "list", "--json"})
 		if strings.Contains(out, buildName) {
 			t.Fatalf("Expected to not see build in the list of builds, but was: %s", out)
 		}
@@ -123,7 +124,7 @@ func TestBuildFailed(t *testing.T) {
 	)
 
 	cleanUp := func() {
-		knctl.RunWithOpts([]string{"delete", "build", "-b", buildName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"build", "delete", "-b", buildName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "secret", buildDockerSecretName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "serviceaccount", buildServiceAccountName}, RunOpts{AllowError: true})
 	}
@@ -133,20 +134,21 @@ func TestBuildFailed(t *testing.T) {
 
 	logger.Section("Add service account with Docker push secret", func() {
 		knctl.RunWithOpts([]string{
-			"create",
 			"basic-auth-secret",
+			"create",
 			"-s", buildDockerSecretName,
 			"--docker-hub",
 			"-u", env.BuildDockerUsername,
 			"-p", env.BuildDockerPassword,
 		}, RunOpts{Redact: true})
 
-		knctl.Run([]string{"create", "service-account", "-a", buildServiceAccountName, "-s", buildDockerSecretName})
+		knctl.Run([]string{"service-account", "create", "-a", buildServiceAccountName, "-s", buildDockerSecretName})
 	})
 
 	logger.Section("Run build and see it fail", func() {
 		out, err := knctl.RunWithOpts([]string{
 			"build",
+			"create",
 			"-b", buildName,
 			"--git-url", "invalid-git-url",
 			"--git-revision", "invalid-git-revision",
@@ -166,11 +168,11 @@ func TestBuildFailed(t *testing.T) {
 	})
 
 	defer func() {
-		knctl.RunWithOpts([]string{"delete", "build", "-b", buildName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"build", "delete", "-b", buildName}, RunOpts{AllowError: true})
 	}()
 
 	logger.Section("Checking if build was added", func() {
-		out := knctl.Run([]string{"list", "builds", "--json"})
+		out := knctl.Run([]string{"build", "list", "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		var foundService bool
@@ -191,9 +193,9 @@ func TestBuildFailed(t *testing.T) {
 	})
 
 	logger.Section("Deleting build", func() {
-		knctl.Run([]string{"delete", "build", "-b", buildName})
+		knctl.Run([]string{"build", "delete", "-b", buildName})
 
-		out := knctl.Run([]string{"list", "builds", "--json"})
+		out := knctl.Run([]string{"build", "list", "--json"})
 		if strings.Contains(out, buildName) {
 			t.Fatalf("Expected to not see build in the list of builds, but was: %s", out)
 		}

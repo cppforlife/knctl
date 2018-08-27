@@ -39,11 +39,11 @@ func TestAnnotateRevision(t *testing.T) {
 	)
 
 	logger.Section("Delete previous service with the same name if exists", func() {
-		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"service", "delete", "-s", serviceName}, RunOpts{AllowError: true})
 	})
 
 	defer func() {
-		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"service", "delete", "-s", serviceName}, RunOpts{AllowError: true})
 	}()
 
 	logger.Section("Deploy 3 revisions", func() {
@@ -79,7 +79,7 @@ func TestAnnotateRevision(t *testing.T) {
 		var success bool
 
 		for i := 0; i < 30; i++ {
-			out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
+			out := knctl.Run([]string{"revision", "list", "-s", serviceName, "--json"})
 			resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 			if len(resp.Tables[0].Rows) == 3 {
@@ -100,7 +100,7 @@ func TestAnnotateRevision(t *testing.T) {
 	)
 
 	logger.Section("Checking that there are no annotations", func() {
-		out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
+		out := knctl.Run([]string{"revision", "list", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		if len(resp.Tables[0].Rows) != 3 {
@@ -122,18 +122,18 @@ func TestAnnotateRevision(t *testing.T) {
 	})
 
 	logger.Section("Annotating revisions", func() {
-		out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
+		out := knctl.Run([]string{"revision", "list", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		for _, row := range resp.Tables[0].Rows {
 			ann1 := fmt.Sprintf("%s=%s", annotationKey, annotationValue)
 			ann2 := fmt.Sprintf("%s=%s", annotationCustomNameKey, row["name"])
-			knctl.Run([]string{"annotate", "revision", "-r", row["name"], "-a", ann1, "-a", ann2})
+			knctl.Run([]string{"revision", "annotate", "-r", row["name"], "-a", ann1, "-a", ann2})
 		}
 	})
 
 	logger.Section("Checking that there are annotations", func() {
-		out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
+		out := knctl.Run([]string{"revision", "list", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		for _, row := range resp.Tables[0].Rows {
@@ -154,9 +154,9 @@ func TestAnnotateRevision(t *testing.T) {
 	})
 
 	logger.Section("Deleting service", func() {
-		knctl.Run([]string{"delete", "service", "-s", serviceName})
+		knctl.Run([]string{"service", "delete", "-s", serviceName})
 
-		out := knctl.Run([]string{"list", "services", "--json"})
+		out := knctl.Run([]string{"service", "list", "--json"})
 		if strings.Contains(out, serviceName) {
 			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
 		}

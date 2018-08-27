@@ -38,7 +38,7 @@ func TestDeployBuildPublicGitPrivateImage(t *testing.T) {
 	)
 
 	cleanUp := func() {
-		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"service", "delete", "-s", serviceName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "secret", pushPullDockerSecretName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "secret", pullDockerSecretName}, RunOpts{AllowError: true})
 		kubectl.RunWithOpts([]string{"delete", "serviceaccount", buildServiceAccountName}, RunOpts{AllowError: true})
@@ -49,8 +49,8 @@ func TestDeployBuildPublicGitPrivateImage(t *testing.T) {
 
 	logger.Section("Add service account with Docker push secret", func() {
 		knctl.RunWithOpts([]string{
-			"create",
 			"basic-auth-secret",
+			"create",
 			"-s", pushPullDockerSecretName,
 			"--docker-hub",
 			"-u", env.BuildDockerUsername,
@@ -58,8 +58,8 @@ func TestDeployBuildPublicGitPrivateImage(t *testing.T) {
 		}, RunOpts{Redact: true})
 
 		knctl.RunWithOpts([]string{
-			"create",
 			"basic-auth-secret",
+			"create",
 			"-s", pullDockerSecretName,
 			"--docker-hub",
 			"-u", env.BuildDockerUsername,
@@ -68,8 +68,8 @@ func TestDeployBuildPublicGitPrivateImage(t *testing.T) {
 		}, RunOpts{Redact: true})
 
 		knctl.Run([]string{
-			"create",
 			"service-account",
+			"create",
 			"-a", buildServiceAccountName,
 			"-s", pushPullDockerSecretName,
 			"-s", pullDockerSecretName,
@@ -109,9 +109,9 @@ func TestDeployBuildPublicGitPrivateImage(t *testing.T) {
 	})
 
 	logger.Section("Deleting service", func() {
-		knctl.Run([]string{"delete", "service", "-s", serviceName})
+		knctl.Run([]string{"service", "delete", "-s", serviceName})
 
-		out := knctl.Run([]string{"list", "services", "--json"})
+		out := knctl.Run([]string{"service", "list", "--json"})
 		if strings.Contains(out, serviceName) {
 			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
 		}

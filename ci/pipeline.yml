@@ -105,7 +105,7 @@ jobs:
           ln -s $PWD/knctl /usr/local/bin/knctl
 
           export KNCTL_NAMESPACE=$(date +%s%N | sha256sum | cut -f1 -d' ' | head -c 32)
-          knctl create namespace
+          knctl namespace create
 
           function finish {
             kubectl delete ns $KNCTL_NAMESPACE

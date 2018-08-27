@@ -48,7 +48,7 @@ func TestLogsFollow(t *testing.T) {
 	})
 
 	cleanUp := func() {
-		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"service", "delete", "-s", serviceName}, RunOpts{AllowError: true})
 	}
 
 	logger.Section("Delete previous service with the same name if exists", cleanUp)
@@ -109,7 +109,7 @@ func TestLogsFollow(t *testing.T) {
 	})
 
 	logger.Section("Check logs of service to make sure it includes logs from 4 revisions", func() {
-		out := knctl.Run([]string{"list", "revisions", "-s", serviceName, "--json"})
+		out := knctl.Run([]string{"revision", "list", "-s", serviceName, "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		if len(resp.Tables[0].Rows) != 4 {
@@ -172,9 +172,9 @@ func TestLogsFollow(t *testing.T) {
 	<-doneCh
 
 	logger.Section("Deleting service", func() {
-		knctl.Run([]string{"delete", "service", "-s", serviceName})
+		knctl.Run([]string{"service", "delete", "-s", serviceName})
 
-		out := knctl.Run([]string{"list", "services", "--json"})
+		out := knctl.Run([]string{"service", "list", "--json"})
 		if strings.Contains(out, serviceName) {
 			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
 		}

@@ -33,7 +33,7 @@ func TestDomains(t *testing.T) {
 	}
 
 	logger.Section("Checking if at least one domain is available by default", func() {
-		out, _ := knctl.RunWithOpts([]string{"list", "domains", "--json"}, RunOpts{NoNamespace: true})
+		out, _ := knctl.RunWithOpts([]string{"domain", "list", "--json"}, RunOpts{NoNamespace: true})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		var foundDefaultDomain bool
@@ -62,9 +62,9 @@ func TestDomains(t *testing.T) {
 	}
 
 	logger.Section("Change default domain", func() {
-		knctl.RunWithOpts([]string{"create", "domain", "-d", newDomain, "--default"}, RunOpts{NoNamespace: true})
+		knctl.RunWithOpts([]string{"domain", "create", "-d", newDomain, "--default"}, RunOpts{NoNamespace: true})
 
-		out, _ := knctl.RunWithOpts([]string{"list", "domains", "--json"}, RunOpts{NoNamespace: true})
+		out, _ := knctl.RunWithOpts([]string{"domain", "list", "--json"}, RunOpts{NoNamespace: true})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		if len(resp.Tables[0].Rows) == 0 {

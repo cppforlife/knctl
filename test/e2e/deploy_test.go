@@ -35,7 +35,7 @@ func TestBasicDeploy(t *testing.T) {
 	)
 
 	cleanUp := func() {
-		knctl.RunWithOpts([]string{"delete", "service", "-s", serviceName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"service", "delete", "-s", serviceName}, RunOpts{AllowError: true})
 	}
 
 	logger.Section("Delete previous service with the same name if exists", cleanUp)
@@ -52,7 +52,7 @@ func TestBasicDeploy(t *testing.T) {
 	})
 
 	logger.Section("Checking if service was added", func() {
-		out := knctl.Run([]string{"list", "services", "--json"})
+		out := knctl.Run([]string{"service", "list", "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		var foundService bool
@@ -88,9 +88,9 @@ func TestBasicDeploy(t *testing.T) {
 	})
 
 	logger.Section("Deleting service", func() {
-		knctl.Run([]string{"delete", "service", "-s", serviceName})
+		knctl.Run([]string{"service", "delete", "-s", serviceName})
 
-		out := knctl.Run([]string{"list", "services", "--json"})
+		out := knctl.Run([]string{"service", "list", "--json"})
 		if strings.Contains(out, serviceName) {
 			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
 		}

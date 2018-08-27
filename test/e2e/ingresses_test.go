@@ -28,7 +28,7 @@ func TestIngresses(t *testing.T) {
 	knctl := Knctl{t, env.Namespace, logger}
 
 	logger.Section("Checking if at least one ingress available", func() {
-		out, _ := knctl.RunWithOpts([]string{"list", "ingresses", "--json"}, RunOpts{NoNamespace: true})
+		out, _ := knctl.RunWithOpts([]string{"ingress", "list", "--json"}, RunOpts{NoNamespace: true})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		if len(resp.Tables[0].Rows) == 0 {

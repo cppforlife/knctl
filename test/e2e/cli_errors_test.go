@@ -29,7 +29,7 @@ func TestCLIErrorsForFlagsBeforeExtraArgs(t *testing.T) {
 	var stderr bytes.Buffer
 
 	_, err := knctl.RunWithOpts(
-		[]string{"build", "test-arg"},
+		[]string{"build", "create", "test-arg"},
 		RunOpts{StderrWriter: &stderr, NoNamespace: true, AllowError: true},
 	)
 
@@ -51,7 +51,18 @@ func TestCLIErrorsForCommandGroups(t *testing.T) {
 
 	// For commands with children commands it's friendlier ux
 	// to ignore extra arguments and show available subcommands
-	cmdsWithSubcmds := []string{"list", "create", "delete", "tag", "untag", "annotate"}
+	cmdsWithSubcmds := []string{
+		"service",
+		"revision",
+		"route",
+		"build",
+		"domain",
+		"ingress",
+		"pod",
+		"service-account",
+		"basic-auth-secret",
+		"ssh-auth-secret",
+	}
 
 	for _, cmd := range cmdsWithSubcmds {
 		var stderr bytes.Buffer
