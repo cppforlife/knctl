@@ -38,13 +38,13 @@ func NewListServicesOptions(ui ui.UI, depsFactory DepsFactory) *ListServicesOpti
 
 func NewListServicesCmd(o *ListServicesOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "services",
-		Aliases: servicesAliases,
+		Use:     "list",
+		Aliases: listAliases,
 		Short:   "List services",
 		Long:    "List all services in a namespace",
 		Example: `
   # List all services in namespace 'ns1'
-  knctl list services -n ns1`,
+  knctl service list -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.NamespaceFlags.Set(cmd, flagsFactory)

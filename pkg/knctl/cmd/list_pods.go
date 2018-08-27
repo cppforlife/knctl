@@ -39,10 +39,11 @@ func NewListPodsOptions(ui ui.UI, depsFactory DepsFactory) *ListPodsOptions {
 
 func NewListPodsCmd(o *ListPodsOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "pods",
-		Short: "List pods",
-		Long:  "List all pods for a service",
-		RunE:  func(_ *cobra.Command, _ []string) error { return o.Run() },
+		Use:     "list",
+		Aliases: listAliases,
+		Short:   "List pods",
+		Long:    "List all pods for a service",
+		RunE:    func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.ServiceFlags.Set(cmd, flagsFactory)
 	return cmd

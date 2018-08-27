@@ -1,7 +1,7 @@
 ## Ingresses
 
 ```bash
-$ knctl list ingresses
+$ knctl ingress list
 
 Ingresses
 

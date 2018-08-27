@@ -37,12 +37,12 @@ func NewDeleteServiceOptions(ui ui.UI, depsFactory DepsFactory) *DeleteServiceOp
 
 func NewDeleteServiceCmd(o *DeleteServiceOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "service",
-		Aliases: serviceAliases,
+		Use:     "delete",
+		Aliases: deleteAliases,
 		Short:   "Delete service",
 		Example: `
   # Delete service 'svc1' in namespace 'ns1'
-  knctl delete service -s svc1 -n ns1`,
+  knctl service delete -s svc1 -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.ServiceFlags.Set(cmd, flagsFactory)

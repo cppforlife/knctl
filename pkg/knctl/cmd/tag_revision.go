@@ -36,12 +36,11 @@ func NewTagRevisionOptions(ui ui.UI, depsFactory DepsFactory) *TagRevisionOption
 
 func NewTagRevisionCmd(o *TagRevisionOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "revision",
-		Aliases: revisionAliases,
-		Short:   "Tag revision",
+		Use:   "tag",
+		Short: "Tag revision",
 		Example: `
   # Tag revision 'rev1' in namespace 'ns1' as 'stable'
-  knctl tag revision -r rev1 -t stable -n ns1`,
+  knctl revision tag -r rev1 -t stable -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.RevisionFlags.Set(cmd, flagsFactory)

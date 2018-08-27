@@ -5,7 +5,7 @@ See [Basic Workflow](./basic-workflow.md) for introduction.
 Create new namespace
 
 ```bash
-$ knctl create namespace -n standalone-build
+$ knctl namespace create -n standalone-build
 
 $ export KNCTL_NAMESPACE=standalone-build
 ```
@@ -13,19 +13,19 @@ $ export KNCTL_NAMESPACE=standalone-build
 Create Docker Hub secret for pushing images
 
 ```bash
-$ knctl create basic-auth-secret -s docker-reg1 --docker-hub -u <your-username> -p <your-password>
+$ knctl basic-auth-secret create -s docker-reg1 --docker-hub -u <your-username> -p <your-password>
 ```
 
 Create service account that references above credential
 
 ```bash
-$ knctl create service-account -a serv-acct1 -s docker-reg1
+$ knctl service-account create -a serv-acct1 -s docker-reg1
 ```
 
 Deploy service that builds image from a Git repo, and then deploys it
 
 ```bash
-$ knctl build \
+$ knctl build create \
     --build build1 \
     --git-url https://github.com/cppforlife/simple-app \
     --git-revision master \

@@ -17,9 +17,6 @@ limitations under the License.
 package cmd
 
 var (
-	serviceAliases  = []string{"s", "svc", "service"}
-	servicesAliases = append([]string{"svcs"}, serviceAliases...)
-
-	revisionAliases  = []string{"r", "rev", "revision"}
-	revisionsAliases = append([]string{"rs", "revs"}, revisionAliases...)
+	listAliases   = []string{"l", "ls"}
+	deleteAliases = []string{"del"}
 )

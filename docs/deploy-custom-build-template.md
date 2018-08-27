@@ -5,7 +5,7 @@ See [Basic Workflow](./basic-workflow.md) for introduction.
 Create new namespace
 
 ```bash
-$ knctl create namespace -n deploy-with-buildpack
+$ knctl namespace create -n deploy-with-buildpack
 
 $ export KNCTL_NAMESPACE=deploy-with-buildpack
 ```
@@ -21,19 +21,19 @@ $ kubectl -n deploy-with-buildpack apply -f https://raw.githubusercontent.com/kn
 Create Docker Hub secret for pushing images
 
 ```bash
-$ knctl create basic-auth-secret -s docker-reg1 --docker-hub -u <your-username> -p <your-password>
+$ knctl basic-auth-secret create -s docker-reg1 --docker-hub -u <your-username> -p <your-password>
 ```
 
 If necessary, create Docker Hub secret for pulling images
 
 ```bash
-$ knctl create basic-auth-secret -s docker-reg2 --docker-hub -u <your-username> -p <your-password> --for-pulling
+$ knctl basic-auth-secret create -s docker-reg2 --docker-hub -u <your-username> -p <your-password> --for-pulling
 ```
 
 Create service account that references above credentials
 
 ```bash
-$ knctl create service-account -a serv-acct1 -s git1 -s docker-reg1 [-s docker-reg2]
+$ knctl service-account create -a serv-acct1 -s git1 -s docker-reg1 [-s docker-reg2]
 ```
 
 Deploy service that builds image from a Git repo, and then deploys it

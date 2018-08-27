@@ -1,34 +1,19 @@
 ## knctl route
 
-Configure route
+Route (create, delete, list)
 
 ### Synopsis
 
-Configure route
+Route (create, delete, list)
 
 ```
 knctl route [flags]
 ```
 
-### Examples
-
-```
-
-  # Set traffic percentages for service 'svc1' in namespace 'ns1'
-  knctl route --route rt1 -p svc1:latest=20% -p svc1:previous=80% -n ns1
-
-  # Roll back traffic for previous revision of service 'svc1' in namespace 'ns1'
-  knctl route --route rt1 -p svc1:previous=100% -n ns1
-```
-
 ### Options
 
 ```
-      --generate-name        Set to generate name
-  -h, --help                 help for route
-  -n, --namespace string     Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
-  -p, --percentage strings   Set percentage (format: revision=percentage, example: latest=100%) (can be specified multiple times)
-      --route string         Specified route
+  -h, --help   help for route
 ```
 
 ### Options inherited from parent commands
@@ -44,5 +29,8 @@ knctl route [flags]
 
 ### SEE ALSO
 
-* [knctl](knctl.md)	 - knctl controls Knative resources (annotate, build, create, curl, delete, deploy, install, list, logs, open, route, tag, uninstall, untag, version)
+* [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, domain, ingress, install, logs, namespace, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
+* [knctl route create](knctl_route_create.md)	 - Configure route
+* [knctl route delete](knctl_route_delete.md)	 - Delete route
+* [knctl route list](knctl_route_list.md)	 - List routes
 

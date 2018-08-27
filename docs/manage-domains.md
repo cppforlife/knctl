@@ -5,7 +5,7 @@ See [Basic Workflow](./basic-workflow.md) for introduction.
 List available domains
 
 ```bash
-$ knctl list domains
+$ knctl domain list
 
 Domains
 
@@ -20,7 +20,7 @@ Succeeded
 Change default domain
 
 ```bash
-$ knctl create domain --domain my-domain.test --default
+$ knctl domain create --domain my-domain.test --default
 ```
 
 Deploy sample service with new default domain

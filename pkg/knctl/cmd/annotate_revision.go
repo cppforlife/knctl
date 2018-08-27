@@ -43,12 +43,11 @@ func NewAnnotateRevisionOptions(ui ui.UI, depsFactory DepsFactory) *AnnotateRevi
 
 func NewAnnotateRevisionCmd(o *AnnotateRevisionOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "revision",
-		Aliases: revisionAliases,
-		Short:   "Annotate revision",
+		Use:   "annotate",
+		Short: "Annotate revision",
 		Example: `
   # Annotate revision 'rev1' in namespace 'ns1' with key and value
-  knctl annotate revision -r rev1 -a key=value -n ns1`,
+  knctl revision annotate -r rev1 -a key=value -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.RevisionFlags.Set(cmd, flagsFactory)

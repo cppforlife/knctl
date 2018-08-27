@@ -35,8 +35,8 @@ func NewListIngressesOptions(ui ui.UI, depsFactory DepsFactory) *ListIngressesOp
 
 func NewListIngressesCmd(o *ListIngressesOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "ingresses",
-		Aliases: []string{"i", "is", "ing", "ings", "ingress"},
+		Use:     "list",
+		Aliases: listAliases,
 		Short:   "List ingresses",
 		Long:    "List all ingresses labeled as `knative: ingressgateway` in Istio's namespace",
 		RunE:    func(_ *cobra.Command, _ []string) error { return o.Run() },

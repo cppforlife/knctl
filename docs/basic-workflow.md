@@ -26,7 +26,7 @@ $ knctl deploy --service hello --image gcr.io/knative-samples/helloworld-go --en
 List deployed services
 
 ```bash
-$ knctl list services
+$ knctl service list
 
 Services in namespace 'default'
 
@@ -39,7 +39,7 @@ hello  hello.default.example.com  -            1d
 Check that at least one Pod is in `Running` state
 
 ```bash
-$ knctl list pods --service hello
+$ knctl pod list --service hello
 
 Pods for service 'hello'
 
@@ -82,7 +82,7 @@ Hello World: new-value!
 List multiple revisions of the deployed service
 
 ```bash
-$ knctl --service hello list revisions
+$ knctl revision list --service hello
 
 Revisions for service 'hello'
 

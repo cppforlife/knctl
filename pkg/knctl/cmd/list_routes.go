@@ -40,13 +40,13 @@ func NewListRoutesOptions(ui ui.UI, depsFactory DepsFactory) *ListRoutesOptions 
 
 func NewListRoutesCmd(o *ListRoutesOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "routes",
-		Aliases: []string{"route"},
+		Use:     "list",
+		Aliases: listAliases,
 		Short:   "List routes",
 		Long:    "List all routes in a namespace",
 		Example: `
   # List all routes in namespace 'ns1'
-  knctl list routes -n ns1`,
+  knctl route list -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.NamespaceFlags.Set(cmd, flagsFactory)

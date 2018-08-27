@@ -37,11 +37,12 @@ func NewDeleteBuildOptions(ui ui.UI, depsFactory DepsFactory) *DeleteBuildOption
 
 func NewDeleteBuildCmd(o *DeleteBuildOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "build",
-		Short: "Delete build",
+		Use:     "delete",
+		Aliases: deleteAliases,
+		Short:   "Delete build",
 		Example: `
   # Delete build 'build1' in namespace 'ns1'
-  knctl delete build -b build1 -n ns1`,
+  knctl build delete -b build1 -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.BuildFlags.Set(cmd, flagsFactory)

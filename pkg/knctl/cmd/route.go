@@ -46,14 +46,14 @@ func NewRouteOptions(ui ui.UI, depsFactory DepsFactory) *RouteOptions {
 
 func NewRouteCmd(o *RouteOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "route",
+		Use:   "create",
 		Short: "Configure route",
 		Example: `
   # Set traffic percentages for service 'svc1' in namespace 'ns1'
-  knctl route --route rt1 -p svc1:latest=20% -p svc1:previous=80% -n ns1
+  knctl route create --route rt1 -p svc1:latest=20% -p svc1:previous=80% -n ns1
 
   # Roll back traffic for previous revision of service 'svc1' in namespace 'ns1'
-  knctl route --route rt1 -p svc1:previous=100% -n ns1`,
+  knctl route create --route rt1 -p svc1:previous=100% -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.RouteFlags.Set(cmd, flagsFactory)

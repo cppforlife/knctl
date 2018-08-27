@@ -33,8 +33,8 @@ func NewListDomainsOptions(ui ui.UI, depsFactory DepsFactory) *ListDomainsOption
 
 func NewListDomainsCmd(o *ListDomainsOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "domains",
-		Aliases: []string{"dom", "domain"},
+		Use:     "list",
+		Aliases: listAliases,
 		Short:   "List domains",
 		Long:    "List all domains",
 		RunE:    func(_ *cobra.Command, _ []string) error { return o.Run() },

@@ -41,28 +41,27 @@ func NewCreateBasicAuthSecretOptions(ui ui.UI, depsFactory DepsFactory) *CreateB
 
 func NewCreateBasicAuthSecretCmd(o *CreateBasicAuthSecretOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "basic-auth-secret",
-		Aliases: []string{"bas"},
-		Short:   "Create basic auth secret",
+		Use:   "create",
+		Short: "Create basic auth secret",
 		Long: `Create basic auth secret.
 
 Use 'kubectl get secret -n <namespace>' to list secrets.
 Use 'kubectl delete secret <name> -n <namespace>' to delete secret.`,
 		Example: `
   # Create SSH basic auth secret 'secret1' in namespace 'ns1'
-  knctl create basic-auth-secret -s secret1 --type ssh --url github.com --username username --password password -n ns1
+  knctl basic-auth-secret create -s secret1 --type ssh --url github.com --username username --password password -n ns1
 
   # Create Docker registry basic auth secret 'secret1' in namespace 'ns1'
-  knctl create basic-auth-secret -s secret1 --docker-hub --username username --password password -n ns1
+  knctl basic-auth-secret create -s secret1 --docker-hub --username username --password password -n ns1
 
   # Create Docker registry basic auth secret 'secret1' for pulling images in namespace 'ns1'
-  knctl create basic-auth-secret -s secret1 --docker-hub --username username --password password --for-pulling -n ns1
+  knctl basic-auth-secret create -s secret1 --docker-hub --username username --password password --for-pulling -n ns1
 
   # Create GCR.io registry basic auth secret 'secret1' in namespace 'ns1'
-  knctl create basic-auth-secret -s secret1 --gcr --username username --password password -n ns1
+  knctl basic-auth-secret create -s secret1 --gcr --username username --password password -n ns1
 
   # Create generic Docker registry basic auth secret 'secret1' in namespace 'ns1'
-  knctl create basic-auth-secret -s secret1 --type docker --url https://registry.domain.com/ --username username --password password -n ns1`,
+  knctl basic-auth-secret create -s secret1 --type docker --url https://registry.domain.com/ --username username --password password -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.SecretFlags.Set(cmd, flagsFactory)

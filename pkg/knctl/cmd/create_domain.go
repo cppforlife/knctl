@@ -37,12 +37,11 @@ func NewCreateDomainOptions(ui ui.UI, depsFactory DepsFactory) *CreateDomainOpti
 
 func NewCreateDomainCmd(o *CreateDomainOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "domain",
-		Aliases: []string{"dom"},
-		Short:   "Create domain",
+		Use:   "create",
+		Short: "Create domain",
 		Example: `
   # Create domain 'example.com' and set it as default
-  knctl create domain -d example.com --default`,
+  knctl domain create -d example.com --default`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 

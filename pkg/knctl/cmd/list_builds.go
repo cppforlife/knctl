@@ -40,13 +40,13 @@ func NewListBuildsOptions(ui ui.UI, depsFactory DepsFactory) *ListBuildsOptions 
 
 func NewListBuildsCmd(o *ListBuildsOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "builds",
-		Aliases: []string{"bs", "build"},
+		Use:     "list",
+		Aliases: listAliases,
 		Short:   "List builds",
 		Long:    "List all builds in a namespace",
 		Example: `
   # List all builds in namespace 'ns1'
-  knctl list builds -n ns1`,
+  knctl build list -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.NamespaceFlags.Set(cmd, flagsFactory)

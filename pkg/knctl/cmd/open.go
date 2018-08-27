@@ -44,8 +44,8 @@ func NewOpenCmd(o *OpenOptions, flagsFactory FlagsFactory) *cobra.Command {
 
 Requires 'open' command installed on the system.`,
 		Example: `
-# Open web browser pointing at service 'svc1' in namespace 'ns1'
-knctl open -s svc1 -n ns1`,
+  # Open web browser pointing at service 'svc1' in namespace 'ns1'
+  knctl service open -s svc1 -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.ServiceFlags.Set(cmd, flagsFactory)

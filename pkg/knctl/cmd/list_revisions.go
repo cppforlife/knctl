@@ -43,13 +43,13 @@ func NewListRevisionsOptions(ui ui.UI, depsFactory DepsFactory) *ListRevisionsOp
 
 func NewListRevisionsCmd(o *ListRevisionsOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "revisions",
-		Aliases: revisionsAliases,
+		Use:     "list",
+		Aliases: listAliases,
 		Short:   "List revisions",
 		Long:    "List all revisions for a service",
 		Example: `
   # List all revisions for service 'svc1' in namespace 'ns1' 
-  knctl list revisions -s svc1 -n ns1`,
+  knctl revision list -s svc1 -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.ServiceFlags.Set(cmd, flagsFactory)

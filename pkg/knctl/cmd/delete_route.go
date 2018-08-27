@@ -37,11 +37,12 @@ func NewDeleteRouteOptions(ui ui.UI, depsFactory DepsFactory) *DeleteRouteOption
 
 func NewDeleteRouteCmd(o *DeleteRouteOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "route",
-		Short: "Delete route",
+		Use:     "delete",
+		Aliases: deleteAliases,
+		Short:   "Delete route",
 		Example: `
   # Delete route 'route1' in namespace 'ns1'
-  knctl delete route --route route1 -n ns1`,
+  knctl route delete --route route1 -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.RouteFlags.Set(cmd, flagsFactory)

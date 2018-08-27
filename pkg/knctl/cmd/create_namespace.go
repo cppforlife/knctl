@@ -40,15 +40,14 @@ func NewCreateNamespaceOptions(ui ui.UI, depsFactory DepsFactory) *CreateNamespa
 
 func NewCreateNamespaceCmd(o *CreateNamespaceOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "namespace",
-		Aliases: []string{"ns"},
-		Short:   "Create namespace",
+		Use:   "create",
+		Short: "Create namespace",
 		Long: `Create namespace.
 
 Use 'kubectl delete ns <name>' to delete namespace.`,
 		Example: `
   # Create namespace 'ns1'
-  knctl create namespace -n ns1`,
+  knctl namespace create -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.NamespaceFlags.Set(cmd, flagsFactory)
