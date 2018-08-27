@@ -25,12 +25,14 @@ import (
 
 type ConfigFactory interface {
 	ConfigurePathResolver(func() (string, error))
+	ConfigureContextResolver(func() (string, error))
 	RESTConfig() (*rest.Config, error)
 	DefaultNamespace() (string, error)
 }
 
 type ConfigFactoryImpl struct {
-	pathResolverFunc func() (string, error)
+	pathResolverFunc    func() (string, error)
+	contextResolverFunc func() (string, error)
 }
 
 var _ ConfigFactory = &ConfigFactoryImpl{}
@@ -41,6 +43,10 @@ func NewConfigFactoryImpl() *ConfigFactoryImpl {
 
 func (f *ConfigFactoryImpl) ConfigurePathResolver(resolverFunc func() (string, error)) {
 	f.pathResolverFunc = resolverFunc
+}
+
+func (f *ConfigFactoryImpl) ConfigureContextResolver(resolverFunc func() (string, error)) {
+	f.contextResolverFunc = resolverFunc
 }
 
 func (f *ConfigFactoryImpl) RESTConfig() (*rest.Config, error) {
@@ -73,8 +79,13 @@ func (f *ConfigFactoryImpl) clientConfig() (clientcmd.ClientConfig, error) {
 		return nil, fmt.Errorf("Resolving config path: %s", err)
 	}
 
+	context, err := f.contextResolverFunc()
+	if err != nil {
+		return nil, fmt.Errorf("Resolving config context: %s", err)
+	}
+
 	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		&clientcmd.ClientConfigLoadingRules{ExplicitPath: path},
-		&clientcmd.ConfigOverrides{},
+		&clientcmd.ConfigOverrides{CurrentContext: context},
 	), nil
 }

@@ -73,9 +73,8 @@ Knative docs: https://github.com/knative/docs.`,
 	o.UIFlags.Set(cmd, flagsFactory)
 	o.KubeconfigFlags.Set(cmd, flagsFactory)
 
-	o.configFactory.ConfigurePathResolver(func() (string, error) {
-		return o.KubeconfigFlags.Path.Value()
-	})
+	o.configFactory.ConfigurePathResolver(o.KubeconfigFlags.Path.Value)
+	o.configFactory.ConfigureContextResolver(o.KubeconfigFlags.Context.Value)
 
 	cmd.AddCommand(NewVersionCmd(NewVersionOptions(o.ui), flagsFactory))
 	cmd.AddCommand(NewInstallCmd(NewInstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags), flagsFactory))

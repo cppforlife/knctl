@@ -16,13 +16,14 @@ knctl [flags]
 ### Options
 
 ```
-      --column strings      Filter to show only given columns
-  -h, --help                help for knctl
-      --json                Output as JSON
-      --kubeconfig string   Path to the kubeconfig file ($KNCTL_KUBECONFIG or $KUBECONFIG)
-      --no-color            Disable colorized output
-      --non-interactive     Don't ask for user input
-      --tty                 Force TTY-like output
+      --column strings              Filter to show only given columns
+  -h, --help                        help for knctl
+      --json                        Output as JSON
+      --kubeconfig string           Path to the kubeconfig file ($KNCTL_KUBECONFIG or $KUBECONFIG)
+      --kubeconfig-context string   Kubeconfig context override ($KNCTL_KUBECONFIG_CONTEXT)
+      --no-color                    Disable colorized output
+      --non-interactive             Don't ask for user input
+      --tty                         Force TTY-like output
 ```
 
 ### SEE ALSO

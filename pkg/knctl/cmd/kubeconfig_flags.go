@@ -26,12 +26,16 @@ import (
 )
 
 type KubeconfigFlags struct {
-	Path *KubeconfigPathFlag
+	Path    *KubeconfigPathFlag
+	Context *KubeconfigContextFlag
 }
 
 func (f *KubeconfigFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
 	f.Path = NewKubeconfigPathFlag()
 	cmd.PersistentFlags().Var(f.Path, "kubeconfig", "Path to the kubeconfig file ($KNCTL_KUBECONFIG or $KUBECONFIG)")
+
+	f.Context = NewKubeconfigContextFlag()
+	cmd.PersistentFlags().Var(f.Context, "kubeconfig-context", "Kubeconfig context override ($KNCTL_KUBECONFIG_CONTEXT)")
 }
 
 type KubeconfigPathFlag struct {
@@ -91,4 +95,42 @@ func (*KubeconfigPathFlag) homeDir() string {
 		return h
 	}
 	return os.Getenv("USERPROFILE") // windows
+}
+
+type KubeconfigContextFlag struct {
+	value string
+}
+
+var _ pflag.Value = &KubeconfigContextFlag{}
+var _ cobrautil.ResolvableFlag = &KubeconfigPathFlag{}
+
+func NewKubeconfigContextFlag() *KubeconfigContextFlag {
+	return &KubeconfigContextFlag{}
+}
+
+func (s *KubeconfigContextFlag) Set(val string) error {
+	s.value = val
+	return nil
+}
+
+func (s *KubeconfigContextFlag) Type() string   { return "string" }
+func (s *KubeconfigContextFlag) String() string { return "" } // default for usage
+
+func (s *KubeconfigContextFlag) Value() (string, error) {
+	err := s.Resolve()
+	if err != nil {
+		return "", err
+	}
+
+	return s.value, nil
+}
+
+func (s *KubeconfigContextFlag) Resolve() error {
+	if len(s.value) > 0 {
+		return nil
+	}
+
+	s.value = os.Getenv("KNCTL_KUBECONFIG_CONTEXT")
+
+	return nil
 }
