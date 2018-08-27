@@ -89,9 +89,14 @@ type UninstallationComponent struct {
 func (c UninstallationComponent) Uninstall() error {
 	c.ui.PrintLinef("Uninstalling %s", c.Name)
 
-	opts := []string{"--kubeconfig", c.kubeconfigFlags.Path, "delete", "namespace", c.nsRemoval.Namespace}
+	kubeconfigPath, err := c.kubeconfigFlags.Path.Value()
+	if err != nil {
+		return err
+	}
 
-	_, err := exec.Command("kubectl", opts...).Output()
+	opts := []string{"--kubeconfig", kubeconfigPath, "delete", "namespace", c.nsRemoval.Namespace}
+
+	_, err = exec.Command("kubectl", opts...).Output()
 	if err != nil {
 		return fmt.Errorf("Uninstalling %s: %s", c.Name, err)
 	}

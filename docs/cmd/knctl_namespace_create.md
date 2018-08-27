@@ -33,7 +33,7 @@ knctl namespace create [flags]
 ```
       --column strings      Filter to show only given columns
       --json                Output as JSON
-      --kubeconfig string   Path to the kubeconfig file ($KNCTL_KUBECONFIG) (default "/Users/pivotal/.kube/config")
+      --kubeconfig string   Path to the kubeconfig file ($KNCTL_KUBECONFIG or $KUBECONFIG)
       --no-color            Disable colorized output
       --non-interactive     Don't ask for user input
       --tty                 Force TTY-like output

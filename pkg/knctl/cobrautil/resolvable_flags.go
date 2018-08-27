@@ -25,24 +25,18 @@ type ResolvableFlag interface {
 	Resolve() error
 }
 
-func ResolveFlagsForCmd(cmd *cobra.Command) {
-	origRunE := cmd.RunE
-	cmd.RunE = func(cmd2 *cobra.Command, args []string) error {
-		var lastFlagErr error
-		cmd2.Flags().VisitAll(func(flag *pflag.Flag) {
-			if flag.Value == nil {
-				return
-			}
-			if resolvableVal, ok := flag.Value.(ResolvableFlag); ok {
-				err := resolvableVal.Resolve()
-				if err != nil {
-					lastFlagErr = err
-				}
-			}
-		})
-		if lastFlagErr != nil {
-			return lastFlagErr
+func ResolveFlagsForCmd(cmd *cobra.Command, args []string) error {
+	var lastFlagErr error
+	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
+		if flag.Value == nil {
+			return
 		}
-		return origRunE(cmd2, args)
-	}
+		if resolvableVal, ok := flag.Value.(ResolvableFlag); ok {
+			err := resolvableVal.Resolve()
+			if err != nil {
+				lastFlagErr = err
+			}
+		}
+	})
+	return lastFlagErr
 }

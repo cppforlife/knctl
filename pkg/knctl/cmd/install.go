@@ -160,12 +160,17 @@ type InstallationComponent struct {
 func (c InstallationComponent) Install() error {
 	c.ui.PrintLinef("Installing %s from '%s'", c.Name, c.source.Source())
 
+	kubeconfigPath, err := c.kubeconfigFlags.Path.Value()
+	if err != nil {
+		return err
+	}
+
 	content, err := c.source.Content()
 	if err != nil {
 		return err
 	}
 
-	opts := []string{"--kubeconfig", c.kubeconfigFlags.Path, "apply", "-f", "-"}
+	opts := []string{"--kubeconfig", kubeconfigPath, "apply", "-f", "-"}
 
 	cmd := exec.Command("kubectl", opts...)
 	cmd.Stdin = strings.NewReader(content)

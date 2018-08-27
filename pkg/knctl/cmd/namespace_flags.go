@@ -55,6 +55,10 @@ func (s *NamespaceNameFlag) Type() string   { return "string" }
 func (s *NamespaceNameFlag) String() string { return "" } // default for usage
 
 func (s *NamespaceNameFlag) Resolve() error {
+	if s.value != nil && len(*s.value) > 0 {
+		return nil
+	}
+
 	value, err := s.resolveValue()
 	if err != nil {
 		return err
@@ -66,10 +70,6 @@ func (s *NamespaceNameFlag) Resolve() error {
 }
 
 func (s *NamespaceNameFlag) resolveValue() (string, error) {
-	if s.value != nil && len(*s.value) > 0 {
-		return *s.value, nil
-	}
-
 	envVal := os.Getenv("KNCTL_NAMESPACE")
 	if len(envVal) > 0 {
 		return envVal, nil
@@ -77,7 +77,7 @@ func (s *NamespaceNameFlag) resolveValue() (string, error) {
 
 	configVal, err := s.configFactory.DefaultNamespace()
 	if err != nil {
-		return configVal, nil
+		return "", err
 	}
 
 	if len(configVal) > 0 {

@@ -56,11 +56,6 @@ func NewKnctlCmd(o *KnctlOptions, flagsFactory FlagsFactory) *cobra.Command {
 CLI docs: https://github.com/cppforlife/knctl#docs.
 Knative docs: https://github.com/knative/docs.`,
 
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			o.configFactory.ConfigurePath(o.KubeconfigFlags.Path)
-			o.UIFlags.ConfigureUI(o.ui)
-		},
-
 		RunE: ShowHelp,
 
 		// Affects children as well
@@ -77,6 +72,10 @@ Knative docs: https://github.com/knative/docs.`,
 
 	o.UIFlags.Set(cmd, flagsFactory)
 	o.KubeconfigFlags.Set(cmd, flagsFactory)
+
+	o.configFactory.ConfigurePathResolver(func() (string, error) {
+		return o.KubeconfigFlags.Path.Value()
+	})
 
 	cmd.AddCommand(NewVersionCmd(NewVersionOptions(o.ui), flagsFactory))
 	cmd.AddCommand(NewInstallCmd(NewInstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags), flagsFactory))
@@ -141,9 +140,16 @@ Knative docs: https://github.com/knative/docs.`,
 	sshAuthSecretCmd.AddCommand(NewCreateSSHAuthSecretCmd(NewCreateSSHAuthSecretOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(sshAuthSecretCmd)
 
+	// Last one runs first
 	cobrautil.VisitCommands(cmd, reconfigureCmdWithSubcmd)
 	cobrautil.VisitCommands(cmd, reconfigureLeafCmd)
-	cobrautil.VisitCommands(cmd, cobrautil.ResolveFlagsForCmd)
+
+	cobrautil.VisitCommands(cmd, cobrautil.WrapRunEForCmd(func(*cobra.Command, []string) error {
+		o.UIFlags.ConfigureUI(o.ui)
+		return nil
+	}))
+
+	cobrautil.VisitCommands(cmd, cobrautil.WrapRunEForCmd(cobrautil.ResolveFlagsForCmd))
 
 	return cmd
 }

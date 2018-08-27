@@ -26,3 +26,16 @@ func VisitCommands(cmd *cobra.Command, f func(*cobra.Command)) {
 		VisitCommands(child, f)
 	}
 }
+
+func WrapRunEForCmd(additionalRunE func(*cobra.Command, []string) error) func(cmd *cobra.Command) {
+	return func(cmd *cobra.Command) {
+		origRunE := cmd.RunE
+		cmd.RunE = func(cmd2 *cobra.Command, args []string) error {
+			err := additionalRunE(cmd2, args)
+			if err != nil {
+				return err
+			}
+			return origRunE(cmd2, args)
+		}
+	}
+}
