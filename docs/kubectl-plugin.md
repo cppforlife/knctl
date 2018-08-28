@@ -7,7 +7,7 @@ To try it out, build new `kubectl` locally from master
 ```bash
 $ git clone https://github.com/kubernetes/kubernetes ~/workspace/kubernetes/src/k8s.io/kubernetes
 
-$ export GOPATH=~/workspace/kubernetes/src
+$ export GOPATH=~/workspace/kubernetes/
 
 $ go build k8s.io/kubernetes/cmd/kubectl
 
