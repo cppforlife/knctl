@@ -25,6 +25,9 @@ func NewIngressCmd() *cobra.Command {
 		Use:     "ingress",
 		Aliases: []string{"ing"},
 		Short:   "Ingress",
+		Annotations: map[string]string{
+			routeMgmtGroup.Key: routeMgmtGroup.Value,
+		},
 	}
 	return cmd
 }

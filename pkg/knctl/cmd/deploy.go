@@ -60,6 +60,9 @@ func NewDeployCmd(o *DeployOptions, flagsFactory FlagsFactory) *cobra.Command {
       --template buildpack --template-env GOPACKAGENAME=main \
       --service-account serv-acct1 --image index.docker.io/your-account/your-repo \
       --env SIMPLE_MSG=123`,
+		Annotations: map[string]string{
+			basicGroup.Key: basicGroup.Value,
+		},
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.ServiceFlags.Set(cmd, flagsFactory)

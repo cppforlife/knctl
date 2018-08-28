@@ -39,7 +39,10 @@ func NewVersionCmd(o *VersionOptions, flagsFactory FlagsFactory) *cobra.Command 
 	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "Print client version",
-		RunE:  func(_ *cobra.Command, _ []string) error { return o.Run() },
+		Annotations: map[string]string{
+			systemGroup.Key: systemGroup.Value,
+		},
+		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	return cmd
 }

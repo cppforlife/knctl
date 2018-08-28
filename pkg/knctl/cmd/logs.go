@@ -53,6 +53,9 @@ func NewLogsCmd(o *LogsOptions, flagsFactory FlagsFactory) *cobra.Command {
 
   # Follow logs for service 'svc1' in namespace 'ns1' 
   knctl logs -f -s svc1 -n ns1`,
+		Annotations: map[string]string{
+			basicGroup.Key: basicGroup.Value,
+		},
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.ServiceFlags.Set(cmd, flagsFactory)

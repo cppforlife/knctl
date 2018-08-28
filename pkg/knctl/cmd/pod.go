@@ -24,6 +24,9 @@ func NewPodCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "pod",
 		Short: "Pod",
+		Annotations: map[string]string{
+			basicGroup.Key: basicGroup.Value,
+		},
 	}
 	return cmd
 }

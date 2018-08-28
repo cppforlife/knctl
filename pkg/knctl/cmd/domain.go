@@ -24,6 +24,9 @@ func NewDomainCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "domain",
 		Short: "Domain",
+		Annotations: map[string]string{
+			routeMgmtGroup.Key: routeMgmtGroup.Value,
+		},
 	}
 	return cmd
 }

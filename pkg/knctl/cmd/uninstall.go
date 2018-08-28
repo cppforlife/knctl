@@ -48,6 +48,9 @@ func NewUninstallCmd(o *UninstallOptions, flagsFactory FlagsFactory) *cobra.Comm
 		Long: `Uninstall Knative and Istio. 
 
 Requires 'kubectl' command installed on a the system.`,
+		Annotations: map[string]string{
+			systemGroup.Key: systemGroup.Value,
+		},
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	return cmd

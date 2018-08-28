@@ -48,6 +48,9 @@ Requires 'curl' command installed on the system.`,
 		Example: `
   # Curl service 'svc1' in namespace 'ns1'
   knctl curl -s svc1 -n ns1`,
+		Annotations: map[string]string{
+			basicGroup.Key: basicGroup.Value,
+		},
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.ServiceFlags.Set(cmd, flagsFactory)

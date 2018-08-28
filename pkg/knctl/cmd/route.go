@@ -25,6 +25,9 @@ func NewRouteCmd() *cobra.Command {
 		Use:     "route",
 		Aliases: []string{"r", "rs", "routes"},
 		Short:   "Route",
+		Annotations: map[string]string{
+			routeMgmtGroup.Key: routeMgmtGroup.Value,
+		},
 	}
 	return cmd
 }

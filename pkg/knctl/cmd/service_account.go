@@ -25,6 +25,9 @@ func NewServiceAccountCmd() *cobra.Command {
 		Use:     "service-account",
 		Aliases: []string{"sa"},
 		Short:   "Service account",
+		Annotations: map[string]string{
+			secretMgmtGroup.Key: secretMgmtGroup.Value,
+		},
 	}
 	return cmd
 }

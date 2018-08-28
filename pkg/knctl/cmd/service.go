@@ -25,6 +25,9 @@ func NewServiceCmd() *cobra.Command {
 		Use:     "service",
 		Aliases: []string{"s", "svc", "svc", "services"},
 		Short:   "Service",
+		Annotations: map[string]string{
+			basicGroup.Key: basicGroup.Value,
+		},
 	}
 	return cmd
 }

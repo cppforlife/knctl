@@ -70,6 +70,16 @@ Knative docs: https://github.com/knative/docs.`,
 
 	cmd.SetOutput(uiBlockWriter{o.ui}) // setting output for cmd.Help()
 
+	cmd.SetUsageTemplate(cobrautil.HelpSectionsUsageTemplate([]cobrautil.HelpSection{
+		basicGroup,
+		buildMgmtGroup,
+		secretMgmtGroup,
+		routeMgmtGroup,
+		otherGroup,
+		systemGroup,
+		restOfCommandsGroup,
+	}))
+
 	o.UIFlags.Set(cmd, flagsFactory)
 	o.KubeconfigFlags.Set(cmd, flagsFactory)
 

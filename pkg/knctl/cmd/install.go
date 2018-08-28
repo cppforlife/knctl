@@ -71,6 +71,9 @@ func NewInstallCmd(o *InstallOptions, flagsFactory FlagsFactory) *cobra.Command 
 		Long: `Install Knative and Istio.
 
 Requires 'kubectl' command installed on a the system.`,
+		Annotations: map[string]string{
+			systemGroup.Key: systemGroup.Value,
+		},
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	cmd.Flags().BoolVarP(&o.NodePorts, "node-ports", "p", false, "Use service type NodePorts instead of type LoadBalancer")
