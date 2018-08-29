@@ -38,26 +38,26 @@ Usage:
 Basic Commands:
   curl              Curl service
   deploy            Deploy service
-  logs              Print logs
-  pod               Pod (list)
-  revision          Revision (annotate, delete, list, tag, untag)
-  service           Service (annotate, delete, list, open)
+  logs              Print service logs
+  pod               Pod management (list)
+  revision          Revision management (annotate, delete, list, tag, untag)
+  service           Service management (annotate, delete, list, open)
 
 Build Management Commands:
-  build             Build (create, delete, list)
+  build             Build management (create, delete, list)
 
 Secret Management Commands:
-  basic-auth-secret Basic auth secret (create)
-  service-account   Service account (create)
-  ssh-auth-secret   SSH auth secret (create)
+  basic-auth-secret Basic auth secret management (create)
+  service-account   Service account management (create)
+  ssh-auth-secret   SSH auth secret management (create)
 
 Route Management Commands:
-  domain            Domain (create, list)
-  ingress           Ingress (list)
-  route             Route (create, delete, list)
+  domain            Domain management (create, list)
+  ingress           Ingress management (list)
+  route             Route management (create, delete, list)
 
 Other Commands:
-  namespace         Namespace (create)
+  namespace         Namespace management (create)
 
 System Commands:
   install           Install Knative and Istio
@@ -93,7 +93,7 @@ func TestHelpCmdWithChildren(t *testing.T) {
 
 	out, _ := knctl.RunWithOpts([]string{"service", "-h"}, RunOpts{NoNamespace: true})
 
-	const expectedOutput = `Service (annotate, delete, list, open)
+	const expectedOutput = `Service management (annotate, delete, list, open)
 
 Usage:
   knctl service [flags]
