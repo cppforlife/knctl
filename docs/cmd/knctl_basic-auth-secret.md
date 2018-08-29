@@ -1,10 +1,10 @@
 ## knctl basic-auth-secret
 
-Basic auth secret (create)
+Basic auth secret management (create)
 
 ### Synopsis
 
-Basic auth secret (create)
+Basic auth secret management (create)
 
 ```
 knctl basic-auth-secret [flags]

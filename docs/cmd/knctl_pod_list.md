@@ -32,5 +32,5 @@ knctl pod list [flags]
 
 ### SEE ALSO
 
-* [knctl pod](knctl_pod.md)	 - Pod (list)
+* [knctl pod](knctl_pod.md)	 - Pod management (list)
 

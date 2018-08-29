@@ -24,7 +24,7 @@ func NewServiceCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "service",
 		Aliases: []string{"s", "svc", "svc", "services"},
-		Short:   "Service",
+		Short:   "Service management",
 		Annotations: map[string]string{
 			basicGroup.Key: basicGroup.Value,
 		},

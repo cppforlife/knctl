@@ -24,7 +24,7 @@ func NewSSHAuthSecretCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "ssh-auth-secret",
 		Aliases: []string{"sas"},
-		Short:   "SSH auth secret",
+		Short:   "SSH auth secret management",
 		Annotations: map[string]string{
 			secretMgmtGroup.Key: secretMgmtGroup.Value,
 		},

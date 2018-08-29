@@ -1,10 +1,10 @@
 ## knctl ingress
 
-Ingress (list)
+Ingress management (list)
 
 ### Synopsis
 
-Ingress (list)
+Ingress management (list)
 
 ```
 knctl ingress [flags]

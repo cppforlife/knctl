@@ -50,5 +50,5 @@ knctl ssh-auth-secret create [flags]
 
 ### SEE ALSO
 
-* [knctl ssh-auth-secret](knctl_ssh-auth-secret.md)	 - SSH auth secret (create)
+* [knctl ssh-auth-secret](knctl_ssh-auth-secret.md)	 - SSH auth secret management (create)
 

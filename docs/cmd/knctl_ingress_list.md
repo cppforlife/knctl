@@ -30,5 +30,5 @@ knctl ingress list [flags]
 
 ### SEE ALSO
 
-* [knctl ingress](knctl_ingress.md)	 - Ingress (list)
+* [knctl ingress](knctl_ingress.md)	 - Ingress management (list)
 

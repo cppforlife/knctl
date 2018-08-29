@@ -39,5 +39,5 @@ knctl build list [flags]
 
 ### SEE ALSO
 
-* [knctl build](knctl_build.md)	 - Build (create, delete, list)
+* [knctl build](knctl_build.md)	 - Build management (create, delete, list)
 

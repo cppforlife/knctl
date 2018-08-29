@@ -1,10 +1,10 @@
 ## knctl logs
 
-Print logs
+Print service logs
 
 ### Synopsis
 
-Print logs of all active pods for a service
+Print service logs of all active pods for a service
 
 ```
 knctl logs [flags]

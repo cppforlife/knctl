@@ -24,7 +24,7 @@ func NewRevisionCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "revision",
 		Aliases: []string{"r", "rs", "rev", "revs", "revisions"},
-		Short:   "Revision",
+		Short:   "Revision management",
 		Annotations: map[string]string{
 			basicGroup.Key: basicGroup.Value,
 		},

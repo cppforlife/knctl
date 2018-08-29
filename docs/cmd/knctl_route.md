@@ -1,10 +1,10 @@
 ## knctl route
 
-Route (create, delete, list)
+Route management (create, delete, list)
 
 ### Synopsis
 
-Route (create, delete, list)
+Route management (create, delete, list)
 
 ```
 knctl route [flags]

@@ -1,10 +1,10 @@
 ## knctl build
 
-Build (create, delete, list)
+Build management (create, delete, list)
 
 ### Synopsis
 
-Build (create, delete, list)
+Build management (create, delete, list)
 
 ```
 knctl build [flags]

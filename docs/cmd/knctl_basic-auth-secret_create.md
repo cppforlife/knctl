@@ -63,5 +63,5 @@ knctl basic-auth-secret create [flags]
 
 ### SEE ALSO
 
-* [knctl basic-auth-secret](knctl_basic-auth-secret.md)	 - Basic auth secret (create)
+* [knctl basic-auth-secret](knctl_basic-auth-secret.md)	 - Basic auth secret management (create)
 

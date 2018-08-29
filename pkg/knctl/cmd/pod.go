@@ -23,7 +23,7 @@ import (
 func NewPodCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "pod",
-		Short: "Pod",
+		Short: "Pod management",
 		Annotations: map[string]string{
 			basicGroup.Key: basicGroup.Value,
 		},

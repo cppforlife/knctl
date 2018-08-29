@@ -24,7 +24,7 @@ func NewBuildCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "build",
 		Aliases: []string{"b", "bs", "builds"},
-		Short:   "Build",
+		Short:   "Build management",
 		Annotations: map[string]string{
 			buildMgmtGroup.Key: buildMgmtGroup.Value,
 		},

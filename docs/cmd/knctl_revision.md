@@ -1,10 +1,10 @@
 ## knctl revision
 
-Revision (annotate, delete, list, tag, untag)
+Revision management (annotate, delete, list, tag, untag)
 
 ### Synopsis
 
-Revision (annotate, delete, list, tag, untag)
+Revision management (annotate, delete, list, tag, untag)
 
 ```
 knctl revision [flags]

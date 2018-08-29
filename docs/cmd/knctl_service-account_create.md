@@ -46,5 +46,5 @@ knctl service-account create [flags]
 
 ### SEE ALSO
 
-* [knctl service-account](knctl_service-account.md)	 - Service account (create)
+* [knctl service-account](knctl_service-account.md)	 - Service account management (create)
 

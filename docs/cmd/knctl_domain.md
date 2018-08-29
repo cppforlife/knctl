@@ -1,10 +1,10 @@
 ## knctl domain
 
-Domain (create, list)
+Domain management (create, list)
 
 ### Synopsis
 
-Domain (create, list)
+Domain management (create, list)
 
 ```
 knctl domain [flags]

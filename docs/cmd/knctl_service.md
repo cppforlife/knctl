@@ -1,10 +1,10 @@
 ## knctl service
 
-Service (annotate, delete, list, open)
+Service management (annotate, delete, list, open)
 
 ### Synopsis
 
-Service (annotate, delete, list, open)
+Service management (annotate, delete, list, open)
 
 ```
 knctl service [flags]

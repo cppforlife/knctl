@@ -23,7 +23,7 @@ import (
 func NewDomainCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "domain",
-		Short: "Domain",
+		Short: "Domain management",
 		Annotations: map[string]string{
 			routeMgmtGroup.Key: routeMgmtGroup.Value,
 		},

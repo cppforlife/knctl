@@ -30,5 +30,5 @@ knctl domain list [flags]
 
 ### SEE ALSO
 
-* [knctl domain](knctl_domain.md)	 - Domain (create, list)
+* [knctl domain](knctl_domain.md)	 - Domain management (create, list)
 

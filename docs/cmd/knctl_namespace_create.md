@@ -42,5 +42,5 @@ knctl namespace create [flags]
 
 ### SEE ALSO
 
-* [knctl namespace](knctl_namespace.md)	 - Namespace (create)
+* [knctl namespace](knctl_namespace.md)	 - Namespace management (create)
 

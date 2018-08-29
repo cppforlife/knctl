@@ -1,10 +1,10 @@
 ## knctl service-account
 
-Service account (create)
+Service account management (create)
 
 ### Synopsis
 
-Service account (create)
+Service account management (create)
 
 ```
 knctl service-account [flags]

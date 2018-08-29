@@ -1,10 +1,10 @@
 ## knctl pod
 
-Pod (list)
+Pod management (list)
 
 ### Synopsis
 
-Pod (list)
+Pod management (list)
 
 ```
 knctl pod [flags]

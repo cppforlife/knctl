@@ -24,7 +24,7 @@ func NewBasicAuthSecretCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "basic-auth-secret",
 		Aliases: []string{"bas"},
-		Short:   "Basic auth secret",
+		Short:   "Basic auth secret management",
 		Annotations: map[string]string{
 			secretMgmtGroup.Key: secretMgmtGroup.Value,
 		},

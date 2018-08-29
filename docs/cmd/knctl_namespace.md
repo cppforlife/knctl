@@ -1,10 +1,10 @@
 ## knctl namespace
 
-Namespace (create)
+Namespace management (create)
 
 ### Synopsis
 
-Namespace (create)
+Namespace management (create)
 
 ```
 knctl namespace [flags]

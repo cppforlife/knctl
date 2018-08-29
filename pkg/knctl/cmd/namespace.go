@@ -24,7 +24,7 @@ func NewNamespaceCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "namespace",
 		Aliases: []string{"ns"},
-		Short:   "Namespace",
+		Short:   "Namespace management",
 		Annotations: map[string]string{
 			otherGroup.Key: otherGroup.Value,
 		},

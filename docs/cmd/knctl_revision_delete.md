@@ -40,5 +40,5 @@ knctl revision delete [flags]
 
 ### SEE ALSO
 
-* [knctl revision](knctl_revision.md)	 - Revision (annotate, delete, list, tag, untag)
+* [knctl revision](knctl_revision.md)	 - Revision management (annotate, delete, list, tag, untag)
 

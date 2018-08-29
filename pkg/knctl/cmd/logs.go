@@ -45,8 +45,8 @@ func NewLogsOptions(ui ui.UI, depsFactory DepsFactory, cancelSignals CancelSigna
 func NewLogsCmd(o *LogsOptions, flagsFactory FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "logs",
-		Short: "Print logs",
-		Long:  "Print logs of all active pods for a service",
+		Short: "Print service logs",
+		Long:  "Print service logs of all active pods for a service",
 		Example: `
   # Fetch last 10 log lines for service 'svc1' in namespace 'ns1' 
   knctl logs -s svc1 -n ns1

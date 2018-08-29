@@ -1,10 +1,10 @@
 ## knctl ssh-auth-secret
 
-SSH auth secret (create)
+SSH auth secret management (create)
 
 ### Synopsis
 
-SSH auth secret (create)
+SSH auth secret management (create)
 
 ```
 knctl ssh-auth-secret [flags]
