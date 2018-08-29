@@ -25,6 +25,7 @@ knctl service open [flags]
 ```
   -h, --help               help for open
   -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
+  -p, --port int32         Set port (default 80)
   -s, --service string     Specified service
 ```
 

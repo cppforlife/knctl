@@ -30,8 +30,8 @@ type CurlOptions struct {
 	ui          ui.UI
 	depsFactory DepsFactory
 
-	ServiceFlags ServiceFlags
-	Port         int32
+	ServiceFlags  ServiceFlags
+	CurlPortFlags CurlPortFlags
 }
 
 func NewCurlOptions(ui ui.UI, depsFactory DepsFactory) *CurlOptions {
@@ -54,7 +54,7 @@ Requires 'curl' command installed on the system.`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.ServiceFlags.Set(cmd, flagsFactory)
-	cmd.Flags().Int32VarP(&o.Port, "port", "p", 80, "Set port")
+	o.CurlPortFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 
@@ -69,13 +69,8 @@ func (o *CurlOptions) Run() error {
 		return err
 	}
 
-	schema := "http"
-	if o.Port == 443 {
-		schema = "https"
-	}
-
 	cmdName := "curl"
-	cmdArgs := []string{"-H", "Host: " + serviceDomain, schema + "://" + ingressAddress}
+	cmdArgs := []string{"-H", "Host: " + serviceDomain, o.CurlPortFlags.RequestSchema() + "://" + ingressAddress}
 
 	o.ui.PrintLinef("Running: %s '%s'", cmdName, strings.Join(cmdArgs, "' '"))
 
@@ -113,5 +108,5 @@ func (o *CurlOptions) preferredIngressAddress() (string, error) {
 		return "", err
 	}
 
-	return IngressServices{coreClient}.PreferredAddress(o.Port)
+	return IngressServices{coreClient}.PreferredAddress(o.CurlPortFlags.Port)
 }

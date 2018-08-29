@@ -29,14 +29,31 @@ func TestNewCurlCmd_Ok(t *testing.T) {
 	cmd.Execute([]string{
 		"-n", "test-namespace",
 		"-s", "test-service",
+		"-p", "1234",
 	})
 	cmd.ExpectReachesExecution()
 
 	DeepEqual(t, realCmd.ServiceFlags,
 		ServiceFlags{NamespaceFlags{"test-namespace"}, "test-service"})
+	DeepEqual(t, realCmd.CurlPortFlags, CurlPortFlags{Port: int32(1234)})
 }
 
 func TestNewCurlCmd_OkLongFlagNames(t *testing.T) {
+	realCmd := NewCurlOptions(nil, newDepsFactory())
+	cmd := NewTestCmd(t, NewCurlCmd(realCmd, FlagsFactory{}))
+	cmd.Execute([]string{
+		"--namespace", "test-namespace",
+		"--service", "test-service",
+		"--port", "1234",
+	})
+	cmd.ExpectReachesExecution()
+
+	DeepEqual(t, realCmd.ServiceFlags,
+		ServiceFlags{NamespaceFlags{"test-namespace"}, "test-service"})
+	DeepEqual(t, realCmd.CurlPortFlags, CurlPortFlags{Port: int32(1234)})
+}
+
+func TestNewCurlCmd_OkMinimum(t *testing.T) {
 	realCmd := NewCurlOptions(nil, newDepsFactory())
 	cmd := NewTestCmd(t, NewCurlCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
@@ -47,6 +64,7 @@ func TestNewCurlCmd_OkLongFlagNames(t *testing.T) {
 
 	DeepEqual(t, realCmd.ServiceFlags,
 		ServiceFlags{NamespaceFlags{"test-namespace"}, "test-service"})
+	DeepEqual(t, realCmd.CurlPortFlags, CurlPortFlags{Port: int32(80)})
 }
 
 func TestNewCurlCmd_RequiredFlags(t *testing.T) {
