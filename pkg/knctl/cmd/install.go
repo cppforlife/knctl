@@ -107,8 +107,8 @@ func (o *InstallOptions) Run() error {
 	}
 
 	components := []InstallationComponent{
-		{"Istio", YAMLSource{InstallIstioAsset, o.NodePorts}, NamespaceReadiness{istio.SystemNamespaceName(), coreClient}, o.ui, o.kubeconfigFlags},
-		{"Knative", YAMLSource{knativeAsset, o.NodePorts}, NamespaceReadiness{"knative-serving", coreClient}, o.ui, o.kubeconfigFlags},
+		{"Istio", YAMLSource{InstallIstioAsset, o.NodePorts}, NamespaceReadiness{istio.SystemNamespaceName(), coreClient}, o.ui, o.kubeconfigFlags, 1},
+		{"Knative", YAMLSource{knativeAsset, o.NodePorts}, NamespaceReadiness{"knative-serving", coreClient}, o.ui, o.kubeconfigFlags, 0},
 	}
 
 	for _, c := range components {
@@ -158,6 +158,7 @@ type InstallationComponent struct {
 	ui          ui.UI
 
 	kubeconfigFlags *KubeconfigFlags
+	retryCount      int
 }
 
 func (c InstallationComponent) Install() error {
@@ -173,19 +174,25 @@ func (c InstallationComponent) Install() error {
 		return err
 	}
 
-	opts := []string{"--kubeconfig", kubeconfigPath, "apply", "-f", "-"}
+	var lastErr error
 
+	for i := 0; i < c.retryCount+1; i++ {
+		lastErr = c.runKubectl(content, []string{"--kubeconfig", kubeconfigPath, "apply", "-f", "-"})
+		if lastErr == nil {
+			return nil
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	return fmt.Errorf("Installing %s: %s", c.Name, lastErr)
+}
+
+func (c InstallationComponent) runKubectl(content string, opts []string) error {
 	cmd := exec.Command("kubectl", opts...)
 	cmd.Stdin = strings.NewReader(content)
 	cmd.Stdout = uiLinesWriter{c.ui}
 	cmd.Stderr = uiLinesWriter{c.ui}
-
-	err = cmd.Run()
-	if err != nil {
-		return fmt.Errorf("Installing %s: %s", c.Name, err)
-	}
-
-	return nil
+	return cmd.Run()
 }
 
 func (c InstallationComponent) Monitor() error {
