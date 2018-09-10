@@ -17,6 +17,8 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+
 	ctlbuild "github.com/cppforlife/knctl/pkg/knctl/build"
 	"github.com/spf13/cobra"
 )
@@ -35,7 +37,6 @@ func (s *BuildCreateFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
 	s.BuildCreateArgsFlags.Set(cmd, flagsFactory)
 
 	cmd.Flags().StringVarP(&s.Image, "image", "i", "", "Set image URL")
-	cmd.MarkFlagRequired("image")
 }
 
 func (s *BuildCreateFlags) Validate() error {
@@ -60,5 +61,8 @@ func (s *BuildCreateArgsFlags) IsProvided() bool {
 }
 
 func (s *BuildCreateArgsFlags) Validate() error {
-	return nil // TODO better error messages?
+	if len(s.Image) == 0 {
+		return fmt.Errorf("Expected --image to be non-empty")
+	}
+	return nil
 }

@@ -30,8 +30,9 @@ type DeployOptions struct {
 	configFactory ConfigFactory
 	depsFactory   DepsFactory
 
-	ServiceFlags ServiceFlags
-	DeployFlags  DeployFlags
+	ServiceFlags  ServiceFlags
+	DeployFlags   DeployFlags
+	RegistryFlags RegistryFlags
 }
 
 func NewDeployOptions(ui ui.UI, configFactory ConfigFactory, depsFactory DepsFactory) *DeployOptions {
@@ -67,6 +68,7 @@ func NewDeployCmd(o *DeployOptions, flagsFactory FlagsFactory) *cobra.Command {
 	}
 	o.ServiceFlags.Set(cmd, flagsFactory)
 	o.DeployFlags.Set(cmd, flagsFactory)
+	o.RegistryFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 
@@ -87,6 +89,18 @@ func (o *DeployOptions) Run() error {
 	}
 
 	restConfig, err := o.configFactory.RESTConfig()
+	if err != nil {
+		return err
+	}
+
+	regConf := NewRegistryConfiguration(o.RegistryFlags, coreClient)
+
+	err = regConf.ApplyToService(o.ServiceFlags, &o.DeployFlags)
+	if err != nil {
+		return err
+	}
+
+	err = o.DeployFlags.Validate()
 	if err != nil {
 		return err
 	}

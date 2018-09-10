@@ -33,6 +33,7 @@ type CreateBuildOptions struct {
 
 	BuildFlags       BuildFlags
 	BuildCreateFlags BuildCreateFlags
+	RegistryFlags    RegistryFlags
 }
 
 func NewCreateBuildOptions(
@@ -66,6 +67,7 @@ func NewCreateBuildCmd(o *CreateBuildOptions, flagsFactory FlagsFactory) *cobra.
 	}
 	o.BuildFlags.Set(cmd, flagsFactory)
 	o.BuildCreateFlags.Set(cmd, flagsFactory)
+	o.RegistryFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 
@@ -81,6 +83,18 @@ func (o *CreateBuildOptions) Run() error {
 	}
 
 	restConfig, err := o.configFactory.RESTConfig()
+	if err != nil {
+		return err
+	}
+
+	regConf := NewRegistryConfiguration(o.RegistryFlags, coreClient)
+
+	err = regConf.ApplyToBuild(o.BuildFlags, &o.BuildCreateFlags)
+	if err != nil {
+		return err
+	}
+
+	err = o.BuildCreateFlags.Validate()
 	if err != nil {
 		return err
 	}

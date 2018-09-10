@@ -36,6 +36,8 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 		"-i", "test-image",
 		"-e", "key1=val1",
 		"-e", "key2=val2",
+		"-c",
+		"--cluster-registry-namespace", "test-cr-ns",
 	})
 	cmd.ExpectReachesExecution()
 
@@ -52,6 +54,11 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 		},
 		Image: "test-image",
 		Env:   []string{"key1=val1", "key2=val2"},
+	})
+
+	DeepEqual(t, realCmd.RegistryFlags, RegistryFlags{
+		ClusterRegistry:          true,
+		ClusterRegistryNamespace: "test-cr-ns",
 	})
 }
 
@@ -67,6 +74,8 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 		"--image", "test-image",
 		"--env", "key1=val1",
 		"--env", "key2=val2",
+		"--cluster-registry",
+		"--cluster-registry-namespace", "test-cr-ns",
 	})
 	cmd.ExpectReachesExecution()
 
@@ -83,6 +92,11 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 		},
 		Image: "test-image",
 		Env:   []string{"key1=val1", "key2=val2"},
+	})
+
+	DeepEqual(t, realCmd.RegistryFlags, RegistryFlags{
+		ClusterRegistry:          true,
+		ClusterRegistryNamespace: "test-cr-ns",
 	})
 }
 
@@ -102,11 +116,35 @@ func TestNewDeployCmd_OkMinimum(t *testing.T) {
 	DeepEqual(t, realCmd.DeployFlags, DeployFlags{
 		Image: "test-image",
 	})
+
+	DeepEqual(t, realCmd.RegistryFlags, RegistryFlags{})
+}
+
+func TestNewDeployCmd_OkMinimumWithClusterRegistry(t *testing.T) {
+	realCmd := NewDeployOptions(nil, NewConfigFactoryImpl(), newDepsFactory())
+	cmd := NewTestCmd(t, NewDeployCmd(realCmd, FlagsFactory{}))
+	cmd.Execute([]string{
+		"--namespace", "test-namespace",
+		"--service", "test-service",
+		"--cluster-registry",
+	})
+	cmd.ExpectReachesExecution()
+
+	DeepEqual(t, realCmd.ServiceFlags,
+		ServiceFlags{NamespaceFlags{"test-namespace"}, "test-service"})
+
+	DeepEqual(t, realCmd.DeployFlags, DeployFlags{
+		Image: "test-image",
+	})
+
+	DeepEqual(t, realCmd.RegistryFlags, RegistryFlags{
+		ClusterRegistry: true,
+	})
 }
 
 func TestNewDeployCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewDeployOptions(nil, NewConfigFactoryImpl(), newDepsFactory())
 	cmd := NewTestCmd(t, NewDeployCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"image", "service"})
+	cmd.ExpectRequiredFlags([]string{"service"})
 }

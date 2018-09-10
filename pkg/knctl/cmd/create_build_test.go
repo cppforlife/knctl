@@ -34,6 +34,8 @@ func TestNewCreateBuildCmd_Ok(t *testing.T) {
 		"--git-revision", "test-git-revision",
 		"--service-account", "test-service-account",
 		"-i", "test-image",
+		"-c",
+		"--cluster-registry-namespace", "test-cr-ns",
 	})
 	cmd.ExpectReachesExecution()
 
@@ -50,6 +52,11 @@ func TestNewCreateBuildCmd_Ok(t *testing.T) {
 				Image:              "test-image",
 			},
 		},
+	})
+
+	DeepEqual(t, realCmd.RegistryFlags, RegistryFlags{
+		ClusterRegistry:          true,
+		ClusterRegistryNamespace: "test-cr-ns",
 	})
 }
 
@@ -63,6 +70,8 @@ func TestNewCreateBuildCmd_OkLongFlagNames(t *testing.T) {
 		"--git-revision", "test-git-revision",
 		"--service-account", "test-service-account",
 		"--image", "test-image",
+		"--cluster-registry",
+		"--cluster-registry-namespace", "test-cr-ns",
 	})
 	cmd.ExpectReachesExecution()
 
@@ -80,11 +89,47 @@ func TestNewCreateBuildCmd_OkLongFlagNames(t *testing.T) {
 			},
 		},
 	})
+
+	DeepEqual(t, realCmd.RegistryFlags, RegistryFlags{
+		ClusterRegistry:          true,
+		ClusterRegistryNamespace: "test-cr-ns",
+	})
+}
+
+func TestNewCreateBuildCmd_OkMinimumWithClusterRegistr(t *testing.T) {
+	realCmd := NewCreateBuildOptions(nil, NewConfigFactoryImpl(), newDepsFactory(), CancelSignals{})
+	cmd := NewTestCmd(t, NewCreateBuildCmd(realCmd, FlagsFactory{}))
+	cmd.Execute([]string{
+		"--namespace", "test-namespace",
+		"--build", "test-build",
+		"--git-url", "test-git-url",
+		"--git-revision", "test-git-revision",
+		"--cluster-registry",
+	})
+	cmd.ExpectReachesExecution()
+
+	DeepEqual(t, realCmd.BuildFlags,
+		BuildFlags{NamespaceFlags{"test-namespace"}, "test-build"})
+
+	DeepEqual(t, realCmd.BuildCreateFlags, BuildCreateFlags{
+		GenerateNameFlags{},
+		BuildCreateArgsFlags{
+			ctlbuild.BuildSpecOpts{
+				GitURL:      "test-git-url",
+				GitRevision: "test-git-revision",
+				Image:       "test-image",
+			},
+		},
+	})
+
+	DeepEqual(t, realCmd.RegistryFlags, RegistryFlags{
+		ClusterRegistry: true,
+	})
 }
 
 func TestNewCreateBuildCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewCreateBuildOptions(nil, NewConfigFactoryImpl(), newDepsFactory(), CancelSignals{})
 	cmd := NewTestCmd(t, NewCreateBuildCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"build", "image"})
+	cmd.ExpectRequiredFlags([]string{"build"})
 }

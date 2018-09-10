@@ -36,13 +36,17 @@ type BuildSpecOpts struct {
 	GitURL      string
 	GitRevision string
 
-	ServiceAccountName string
-
 	Template     string
 	TemplateArgs []string
 	TemplateEnv  []string
 
-	Image string
+	ServiceAccountName string
+	Image              string
+
+	// Necessary to add custom CA certificates
+	Env          []corev1.EnvVar // kaniko sets custom $SSL_CERT_DIR
+	Volumes      []corev1.Volume
+	VolumeMounts []corev1.VolumeMount
 }
 
 func (s BuildSpec) Build(opts BuildSpecOpts) (v1alpha1.BuildSpec, error) {
@@ -63,6 +67,7 @@ func (s BuildSpec) Build(opts BuildSpecOpts) (v1alpha1.BuildSpec, error) {
 		Source:             source,
 		Template:           template,
 		Steps:              steps,
+		Volumes:            opts.Volumes,
 	}
 
 	return spec, nil
@@ -131,6 +136,8 @@ func (s BuildSpec) nonTemplateSteps(opts BuildSpecOpts) []corev1.Container {
 				"--dockerfile=/workspace/Dockerfile",
 				"--destination=" + opts.Image,
 			},
+			Env:          opts.Env,
+			VolumeMounts: opts.VolumeMounts,
 		},
 	}
 }
