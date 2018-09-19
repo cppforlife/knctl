@@ -40,7 +40,7 @@ knctl [flags]
 * [knctl pod](knctl_pod.md)	 - Pod management (list)
 * [knctl revision](knctl_revision.md)	 - Revision management (annotate, delete, list, tag, untag)
 * [knctl route](knctl_route.md)	 - Route management (create, delete, list)
-* [knctl service](knctl_service.md)	 - Service management (annotate, delete, list, open)
+* [knctl service](knctl_service.md)	 - Service management (annotate, delete, list, open, show)
 * [knctl service-account](knctl_service-account.md)	 - Service account management (create)
 * [knctl ssh-auth-secret](knctl_ssh-auth-secret.md)	 - SSH auth secret management (create)
 * [knctl uninstall](knctl_uninstall.md)	 - Uninstall Knative and Istio

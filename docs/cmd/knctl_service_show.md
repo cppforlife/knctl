@@ -1,28 +1,29 @@
-## knctl service list
+## knctl service show
 
-List services
+Show service
 
 ### Synopsis
 
-List all services in a namespace
+Show service details in a namespace
 
 ```
-knctl service list [flags]
+knctl service show [flags]
 ```
 
 ### Examples
 
 ```
 
-  # List all services in namespace 'ns1'
-  knctl service list -n ns1
+  # Show details for service 'srv1' in namespace 'ns1'
+  knctl service show -s srv1 -n ns1
 ```
 
 ### Options
 
 ```
-  -h, --help               help for list
+  -h, --help               help for show
   -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
+  -s, --service string     Specified service
 ```
 
 ### Options inherited from parent commands

@@ -95,6 +95,7 @@ Knative docs: https://github.com/knative/docs.`,
 
 	serviceCmd := NewServiceCmd()
 	serviceCmd.AddCommand(NewListServicesCmd(NewListServicesOptions(o.ui, o.depsFactory), flagsFactory))
+	serviceCmd.AddCommand(NewShowServiceCmd(NewShowServiceOptions(o.ui, o.depsFactory), flagsFactory))
 	serviceCmd.AddCommand(NewDeleteServiceCmd(NewDeleteServiceOptions(o.ui, o.depsFactory), flagsFactory))
 	serviceCmd.AddCommand(NewAnnotateServiceCmd(NewAnnotateServiceOptions(o.ui, o.depsFactory), flagsFactory))
 	serviceCmd.AddCommand(NewOpenCmd(NewOpenOptions(o.ui, o.depsFactory), flagsFactory))

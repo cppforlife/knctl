@@ -1,10 +1,10 @@
 ## knctl service
 
-Service management (annotate, delete, list, open)
+Service management (annotate, delete, list, open, show)
 
 ### Synopsis
 
-Service management (annotate, delete, list, open)
+Service management (annotate, delete, list, open, show)
 
 ```
 knctl service [flags]
@@ -35,4 +35,5 @@ knctl service [flags]
 * [knctl service delete](knctl_service_delete.md)	 - Delete service
 * [knctl service list](knctl_service_list.md)	 - List services
 * [knctl service open](knctl_service_open.md)	 - Open web browser pointing at a service domain
+* [knctl service show](knctl_service_show.md)	 - Show service
 

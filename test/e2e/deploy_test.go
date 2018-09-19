@@ -68,6 +68,15 @@ func TestBasicDeploy(t *testing.T) {
 		}
 	})
 
+	logger.Section("Checking if service name details can be seen", func() {
+		out := knctl.Run([]string{"service", "show", "-s", serviceName, "--json"})
+		resp := uitest.JSONUIFromBytes(t, []byte(out))
+
+		if resp.Tables[0].Rows[0]["name"] != serviceName {
+			t.Fatalf("Expected to see sample service name in its details, but did not: '%s'", out)
+		}
+	})
+
 	logger.Section("Checking if service is reachable and presents content", func() {
 		curl.WaitForContent(serviceName, expectedContent)
 	})
