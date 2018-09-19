@@ -68,6 +68,15 @@ func TestRevisions(t *testing.T) {
 		}
 	})
 
+	logger.Section("Checking if revision details can be seen", func() {
+		out := knctl.Run([]string{"revision", "show", "-r", serviceName + ":latest", "--json"})
+		resp := uitest.JSONUIFromBytes(t, []byte(out))
+
+		if !strings.Contains(resp.Tables[0].Rows[0]["name"], serviceName) {
+			t.Fatalf("Expected to see sample revision name in its details, but did not: '%s'", out)
+		}
+	})
+
 	logger.Section("Checking if service is reachable and presents content from revision 1", func() {
 		curl.WaitForContent(serviceName, expectedContentRev1)
 	})

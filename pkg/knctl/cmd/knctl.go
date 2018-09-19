@@ -103,6 +103,7 @@ Knative docs: https://github.com/knative/docs.`,
 
 	revisionCmd := NewRevisionCmd()
 	revisionCmd.AddCommand(NewListRevisionsCmd(NewListRevisionsOptions(o.ui, o.depsFactory), flagsFactory))
+	revisionCmd.AddCommand(NewShowRevisionCmd(NewShowRevisionOptions(o.ui, o.depsFactory), flagsFactory))
 	revisionCmd.AddCommand(NewDeleteRevisionCmd(NewDeleteRevisionOptions(o.ui, o.depsFactory), flagsFactory))
 	revisionCmd.AddCommand(NewTagRevisionCmd(NewTagRevisionOptions(o.ui, o.depsFactory), flagsFactory))
 	revisionCmd.AddCommand(NewUntagRevisionCmd(NewUntagRevisionOptions(o.ui, o.depsFactory), flagsFactory))
