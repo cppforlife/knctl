@@ -51,42 +51,13 @@ func NewService(
 }
 
 func (l *Service) CreatedBuildSinceRevision(lastRevision *v1alpha1.Revision) (ctlbuild.Build, error) {
+	createdRevision, err := l.CreatedRevisionSinceRevision(lastRevision)
+	if err != nil {
+		return ctlbuild.Build{}, err
+	}
+
 	cancelResWatchCh := make(chan struct{})
-	revisionsToWatchCh := make(chan v1alpha1.Revision)
 	buildsToWatchCh := make(chan buildv1alpha1.Build)
-
-	// Watch revisions in this service
-	go func() {
-		revisionWatcher := NewRevisionWatcher(
-			l.servingClient.ServingV1alpha1().Revisions(l.service.Namespace),
-			metav1.ListOptions{
-				LabelSelector: labels.Set(map[string]string{
-					serving.ConfigurationLabelKey: l.service.Name,
-				}).String(),
-			},
-		)
-
-		err := revisionWatcher.Watch(revisionsToWatchCh, cancelResWatchCh)
-		if err != nil {
-			// TODO error?
-			fmt.Printf("Revision watching error: %s\n", err)
-		}
-
-		close(revisionsToWatchCh)
-	}()
-
-	var createdRevision *v1alpha1.Revision
-
-	for revision := range revisionsToWatchCh {
-		if lastRevision == nil || revision.CreationTimestamp.Time.After(lastRevision.CreationTimestamp.Time) {
-			createdRevision = &revision
-			break
-		}
-	}
-
-	if createdRevision == nil {
-		return ctlbuild.Build{}, fmt.Errorf("Expected to find created revision")
-	}
 
 	// TODO build is not not necessarily in same namespace as service
 	buildsClient := l.buildClient.BuildV1alpha1().Builds(l.service.Namespace)
@@ -152,6 +123,8 @@ func (l *Service) CreatedRevisionSinceRevision(lastRevision *v1alpha1.Revision) 
 			break
 		}
 	}
+
+	close(cancelResWatchCh)
 
 	if createdRevision == nil {
 		return nil, fmt.Errorf("Expected to find created revision")
