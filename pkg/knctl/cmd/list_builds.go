@@ -71,20 +71,18 @@ func (o *ListBuildsOptions) Run() error {
 
 		Header: []uitable.Header{
 			uitable.NewHeader("Name"),
-			uitable.NewHeader("Builder"),
 			uitable.NewHeader("Succeeded"),
 			uitable.NewHeader("Age"),
 		},
 
 		SortBy: []uitable.ColumnSort{
-			{Column: 3, Asc: false}, // Show latest first
+			{Column: 2, Asc: false}, // Show latest first
 		},
 	}
 
 	for _, build := range builds.Items {
 		table.Rows = append(table.Rows, []uitable.Value{
 			uitable.NewValueString(build.Name),
-			uitable.NewValueString(string(build.Status.Builder)),
 			o.succeededValue(build),
 			NewValueAge(build.CreationTimestamp.Time),
 		})
