@@ -40,8 +40,8 @@ Basic Commands:
   deploy            Deploy service
   logs              Print service logs
   pod               Pod management (list)
-  revision          Revision management (annotate, delete, list, tag, untag)
-  service           Service management (annotate, delete, list, open)
+  revision          Revision management (annotate, delete, list, show, tag, untag)
+  service           Service management (annotate, delete, list, open, show)
 
 Build Management Commands:
   build             Build management (create, delete, list)
@@ -93,7 +93,7 @@ func TestHelpCmdWithChildren(t *testing.T) {
 
 	out, _ := knctl.RunWithOpts([]string{"service", "-h"}, RunOpts{NoNamespace: true})
 
-	const expectedOutput = `Service management (annotate, delete, list, open)
+	const expectedOutput = `Service management (annotate, delete, list, open, show)
 
 Usage:
   knctl service [flags]
@@ -107,6 +107,7 @@ Available Commands:
   delete      Delete service
   list        List services
   open        Open web browser pointing at a service domain
+  show        Show service
 
 Flags:
   -h, --help   help for service

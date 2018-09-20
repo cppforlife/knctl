@@ -48,7 +48,7 @@ func NewDeployCmd(o *DeployOptions, flagsFactory FlagsFactory) *cobra.Command {
 
   # Deploy service 'srv1' from Git repo and one environment variable in namespace 'ns1'
   knctl deploy -s srv1 --image gcr.io/your-account/your-image \
-  		--git-url https://github.com/cppforlife/simple-app --git-revision master --env TARGET=123 -n ns1
+      --git-url https://github.com/cppforlife/simple-app --git-revision master --env TARGET=123 -n ns1
 
   # Deploy service 'srv1' from local source code in namespace 'ns1'
   # ( https://github.com/cppforlife/knctl/blob/master/docs/deploy-source-directory.md )
