@@ -34,12 +34,14 @@ type ShowBuildOptions struct {
 	ui            ui.UI
 	configFactory ConfigFactory
 	depsFactory   DepsFactory
+	cancelSignals CancelSignals
 
 	BuildFlags BuildFlags
+	Logs       bool
 }
 
-func NewShowBuildOptions(ui ui.UI, configFactory ConfigFactory, depsFactory DepsFactory) *ShowBuildOptions {
-	return &ShowBuildOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory}
+func NewShowBuildOptions(ui ui.UI, configFactory ConfigFactory, depsFactory DepsFactory, cancelSignals CancelSignals) *ShowBuildOptions {
+	return &ShowBuildOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory, cancelSignals: cancelSignals}
 }
 
 func NewShowBuildCmd(o *ShowBuildOptions, flagsFactory FlagsFactory) *cobra.Command {
@@ -53,6 +55,7 @@ func NewShowBuildCmd(o *ShowBuildOptions, flagsFactory FlagsFactory) *cobra.Comm
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.BuildFlags.Set(cmd, flagsFactory)
+	cmd.Flags().BoolVar(&o.Logs, "logs", true, "Show logs")
 	return cmd
 }
 
@@ -121,7 +124,11 @@ func (o *ShowBuildOptions) Run() error {
 
 	o.ui.PrintTable(table)
 
-	return o.showLogs(build, buildClient)
+	if o.Logs {
+		return o.showLogs(build, buildClient)
+	}
+
+	return nil
 }
 
 func (o *ShowBuildOptions) showLogs(build *v1alpha1.Build, buildClient buildclientset.Interface) error {
@@ -137,5 +144,8 @@ func (o *ShowBuildOptions) showLogs(build *v1alpha1.Build, buildClient buildclie
 
 	buildObjFactory := ctlbuild.NewFactory(buildClient, coreClient, restConfig)
 
-	return buildObjFactory.New(build).TailLogs(o.ui, make(chan struct{}))
+	cancelCh := make(chan struct{})
+	o.cancelSignals.Watch(func() { close(cancelCh) })
+
+	return buildObjFactory.New(build).TailLogs(o.ui, cancelCh)
 }
