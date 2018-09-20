@@ -29,22 +29,33 @@ type PodTerminalStatusWatcher struct {
 	PodsClient typedcorev1.PodInterface
 }
 
+func (l PodTerminalStatusWatcher) IsDone() (bool, corev1.PodPhase, error) {
+	pod, err := l.PodsClient.Get(l.Pod.Name, metav1.GetOptions{})
+	if err != nil {
+		return false, "", err
+	}
+
+	done := pod.Status.Phase == corev1.PodSucceeded || pod.Status.Phase == corev1.PodFailed
+
+	return done, pod.Status.Phase, nil
+}
+
 func (l PodTerminalStatusWatcher) Wait(cancelCh chan struct{}) (corev1.PodPhase, error) {
 	for {
 		// TODO infinite retry
 
-		pod, err := l.PodsClient.Get(l.Pod.Name, metav1.GetOptions{})
+		done, phase, err := l.IsDone()
 		if err != nil {
 			return "", err
 		}
 
-		if pod.Status.Phase == corev1.PodSucceeded || pod.Status.Phase == corev1.PodFailed {
-			return pod.Status.Phase, nil
+		if done {
+			return phase, nil
 		}
 
 		select {
 		case <-cancelCh:
-			return pod.Status.Phase, nil
+			return phase, nil
 		default:
 			time.Sleep(1 * time.Second)
 		}

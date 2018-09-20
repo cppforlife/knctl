@@ -54,23 +54,27 @@ func (l ClusterBuilderLogs) Tail(ui ui.UI, cancelCh chan struct{}) error { // TO
 		return fmt.Errorf("Getting assigned building pod: %s", err)
 	}
 
+	statusWatcher := PodTerminalStatusWatcher{*pod, podsClient}
 	cancelPodTailCh := make(chan struct{})
 
-	// Wait for pod to reach one of its terminal states
-	// to make sure we've collected all of the logs;
-	// log stream does not end on its own when pod phase is 'Failed'.
-	go func() {
-		_, err := PodTerminalStatusWatcher{*pod, podsClient}.Wait(cancelPodTailCh)
-		if err != nil {
-			ui.BeginLinef("Pod status waiting error: %s\n", err)
-		}
+	done, _, _ := statusWatcher.IsDone()
+	if !done {
+		// Wait for pod to reach one of its terminal states
+		// to make sure we've collected all of the logs;
+		// log stream does not end on its own when pod phase is 'Failed'.
+		go func() {
+			_, err := statusWatcher.Wait(cancelPodTailCh)
+			if err != nil {
+				ui.BeginLinef("Pod status waiting error: %s\n", err)
+			}
 
-		// TODO logs may get truncated since we are terminating
-		// tailing without waiting for all logs to drain
-		close(cancelPodTailCh)
-	}()
+			// TODO logs may get truncated since we are terminating
+			// tailing without waiting for all logs to drain
+			close(cancelPodTailCh)
+		}()
+	}
 
-	err = logs.NewPodLog(*pod, podsClient, "build", logs.PodLogOpts{Follow: true}).TailAll(ui, cancelPodTailCh)
+	err = logs.NewPodLog(*pod, podsClient, "build", logs.PodLogOpts{Follow: !done}).TailAll(ui, cancelPodTailCh)
 	if err != nil {
 		ui.BeginLinef("Pod logs tailing error: %s\n", err)
 	}

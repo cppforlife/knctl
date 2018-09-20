@@ -21,6 +21,9 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
+	ctlbuild "github.com/cppforlife/knctl/pkg/knctl/build"
+	"github.com/knative/build/pkg/apis/build/v1alpha1"
+	buildclientset "github.com/knative/build/pkg/client/clientset/versioned"
 	"github.com/mitchellh/go-wordwrap"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
@@ -28,14 +31,15 @@ import (
 )
 
 type ShowBuildOptions struct {
-	ui          ui.UI
-	depsFactory DepsFactory
+	ui            ui.UI
+	configFactory ConfigFactory
+	depsFactory   DepsFactory
 
 	BuildFlags BuildFlags
 }
 
-func NewShowBuildOptions(ui ui.UI, depsFactory DepsFactory) *ShowBuildOptions {
-	return &ShowBuildOptions{ui: ui, depsFactory: depsFactory}
+func NewShowBuildOptions(ui ui.UI, configFactory ConfigFactory, depsFactory DepsFactory) *ShowBuildOptions {
+	return &ShowBuildOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory}
 }
 
 func NewShowBuildCmd(o *ShowBuildOptions, flagsFactory FlagsFactory) *cobra.Command {
@@ -117,5 +121,21 @@ func (o *ShowBuildOptions) Run() error {
 
 	o.ui.PrintTable(table)
 
-	return nil
+	return o.showLogs(build, buildClient)
+}
+
+func (o *ShowBuildOptions) showLogs(build *v1alpha1.Build, buildClient buildclientset.Interface) error {
+	coreClient, err := o.depsFactory.CoreClient()
+	if err != nil {
+		return err
+	}
+
+	restConfig, err := o.configFactory.RESTConfig()
+	if err != nil {
+		return err
+	}
+
+	buildObjFactory := ctlbuild.NewFactory(buildClient, coreClient, restConfig)
+
+	return buildObjFactory.New(build).TailLogs(o.ui, make(chan struct{}))
 }

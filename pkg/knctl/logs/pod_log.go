@@ -48,11 +48,24 @@ func NewPodLog(
 
 // TailAll will tail all logs from all containers in a single Pod
 func (l PodLog) TailAll(ui ui.UI, cancelCh chan struct{}) error {
-	var wg sync.WaitGroup
+	// Container will not emit any new logs since this is a terminal position
+	podInTerminalState := l.pod.Status.Phase == corev1.PodSucceeded || l.pod.Status.Phase == corev1.PodFailed
 
 	var conts []corev1.Container
-	conts = append(conts, l.pod.Spec.InitContainers...)
-	conts = append(conts, l.pod.Spec.Containers...)
+
+	for _, cont := range l.pod.Spec.InitContainers {
+		if !(podInTerminalState && l.isWaitingContainer(cont, l.pod.Status.InitContainerStatuses)) {
+			conts = append(conts, cont)
+		}
+	}
+
+	for _, cont := range l.pod.Spec.Containers {
+		if !(podInTerminalState && l.isWaitingContainer(cont, l.pod.Status.ContainerStatuses)) {
+			conts = append(conts, cont)
+		}
+	}
+
+	var wg sync.WaitGroup
 
 	for _, cont := range conts {
 		cont := cont
@@ -67,4 +80,13 @@ func (l PodLog) TailAll(ui ui.UI, cancelCh chan struct{}) error {
 	wg.Wait()
 
 	return nil
+}
+
+func (l PodLog) isWaitingContainer(cont corev1.Container, statuses []corev1.ContainerStatus) bool {
+	for _, contStatus := range statuses {
+		if cont.Name == contStatus.Name {
+			return contStatus.State.Waiting != nil
+		}
+	}
+	return false
 }
