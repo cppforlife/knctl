@@ -44,7 +44,7 @@ Basic Commands:
   service           Service management (annotate, delete, list, open, show)
 
 Build Management Commands:
-  build             Build management (create, delete, list)
+  build             Build management (create, delete, list, show)
 
 Secret Management Commands:
   basic-auth-secret Basic auth secret management (create)

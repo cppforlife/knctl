@@ -119,6 +119,7 @@ Knative docs: https://github.com/knative/docs.`,
 	buildCmd := NewBuildCmd()
 	buildCmd.AddCommand(NewCreateBuildCmd(NewCreateBuildOptions(o.ui, o.configFactory, o.depsFactory, CancelSignals{}), flagsFactory))
 	buildCmd.AddCommand(NewListBuildsCmd(NewListBuildsOptions(o.ui, o.depsFactory), flagsFactory))
+	buildCmd.AddCommand(NewShowBuildCmd(NewShowBuildOptions(o.ui, o.depsFactory), flagsFactory))
 	buildCmd.AddCommand(NewDeleteBuildCmd(NewDeleteBuildOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(buildCmd)
 

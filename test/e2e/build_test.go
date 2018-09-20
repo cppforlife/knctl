@@ -100,6 +100,15 @@ func TestBuildSuccess(t *testing.T) {
 		}
 	})
 
+	logger.Section("Checking if build details can be seen", func() {
+		out := knctl.Run([]string{"build", "show", "-b", buildName, "--json"})
+		resp := uitest.JSONUIFromBytes(t, []byte(out))
+
+		if resp.Tables[0].Rows[0]["name"] != buildName {
+			t.Fatalf("Expected to see sample build name in its details, but did not: '%s'", out)
+		}
+	})
+
 	logger.Section("Deleting build", func() {
 		knctl.Run([]string{"build", "delete", "-b", buildName})
 

@@ -83,7 +83,7 @@ func (o *ListBuildsOptions) Run() error {
 	for _, build := range builds.Items {
 		table.Rows = append(table.Rows, []uitable.Value{
 			uitable.NewValueString(build.Name),
-			o.succeededValue(build),
+			NewBuildSucceededValue(build),
 			NewValueAge(build.CreationTimestamp.Time),
 		})
 	}
@@ -93,7 +93,7 @@ func (o *ListBuildsOptions) Run() error {
 	return nil
 }
 
-func (*ListBuildsOptions) succeededValue(build v1alpha1.Build) ValueUnknownBool {
+func NewBuildSucceededValue(build v1alpha1.Build) ValueUnknownBool {
 	cond := build.Status.GetCondition(v1alpha1.BuildSucceeded)
 	if cond != nil {
 		switch cond.Status {
