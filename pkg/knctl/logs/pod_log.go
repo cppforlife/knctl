@@ -33,17 +33,17 @@ type PodLog struct {
 	pod        corev1.Pod
 	podsClient typedcorev1.PodInterface
 
-	tag  string
-	opts PodLogOpts
+	tagFunc func(corev1.Container) string
+	opts    PodLogOpts
 }
 
 func NewPodLog(
 	pod corev1.Pod,
 	podsClient typedcorev1.PodInterface,
-	tag string,
+	tagFunc func(corev1.Container) string,
 	opts PodLogOpts,
 ) PodLog {
-	return PodLog{pod, podsClient, tag, opts}
+	return PodLog{pod, podsClient, tagFunc, opts}
 }
 
 // TailAll will tail all logs from all containers in a single Pod
@@ -72,7 +72,7 @@ func (l PodLog) TailAll(ui ui.UI, cancelCh chan struct{}) error {
 		wg.Add(1)
 
 		go func() {
-			NewPodContainerLog(l.pod, cont.Name, l.podsClient, l.tag, l.opts).Tail(ui, cancelCh) // TODO err?
+			NewPodContainerLog(l.pod, cont.Name, l.podsClient, l.tagFunc(cont), l.opts).Tail(ui, cancelCh) // TODO err?
 			wg.Done()
 		}()
 	}

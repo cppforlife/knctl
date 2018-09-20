@@ -21,6 +21,7 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/cppforlife/knctl/pkg/knctl/logs"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
@@ -74,7 +75,9 @@ func (l ClusterBuilderLogs) Tail(ui ui.UI, cancelCh chan struct{}) error { // TO
 		}()
 	}
 
-	err = logs.NewPodLog(*pod, podsClient, "build", logs.PodLogOpts{Follow: !done}).TailAll(ui, cancelPodTailCh)
+	tagFunc := func(cont corev1.Container) string { return cont.Name }
+
+	err = logs.NewPodLog(*pod, podsClient, tagFunc, logs.PodLogOpts{Follow: !done}).TailAll(ui, cancelPodTailCh)
 	if err != nil {
 		ui.BeginLinef("Pod logs tailing error: %s\n", err)
 	}
