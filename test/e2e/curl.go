@@ -31,7 +31,7 @@ func (c Curl) WaitForContent(serviceName, expectedContent string) {
 	var curledSuccessfully bool
 	var out string
 
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 300; i++ {
 		out, _ = c.knctl.RunWithOpts([]string{"curl", "-n", "default", "-s", serviceName}, RunOpts{AllowError: true})
 		if strings.Contains(out, expectedContent) {
 			curledSuccessfully = true
