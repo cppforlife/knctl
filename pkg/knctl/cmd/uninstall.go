@@ -18,14 +18,13 @@ package cmd
 
 import (
 	"fmt"
-	"os/exec"
 	"time"
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/spf13/cobra"
-	"k8s.io/client-go/kubernetes"
-
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 type UninstallOptions struct {
@@ -33,12 +32,10 @@ type UninstallOptions struct {
 	depsFactory DepsFactory
 
 	ExcludeMonitoring bool
-
-	kubeconfigFlags *KubeconfigFlags
 }
 
-func NewUninstallOptions(ui ui.UI, depsFactory DepsFactory, kubeconfigFlags *KubeconfigFlags) *UninstallOptions {
-	return &UninstallOptions{ui: ui, depsFactory: depsFactory, kubeconfigFlags: kubeconfigFlags}
+func NewUninstallOptions(ui ui.UI, depsFactory DepsFactory) *UninstallOptions {
+	return &UninstallOptions{ui: ui, depsFactory: depsFactory}
 }
 
 func NewUninstallCmd(o *UninstallOptions, flagsFactory FlagsFactory) *cobra.Command {
@@ -65,9 +62,9 @@ func (o *UninstallOptions) Run() error {
 	istio := NewIstio()
 
 	components := []UninstallationComponent{
-		{"Knative Build", NamespaceRemoval{"knative-build", coreClient}, o.ui, o.kubeconfigFlags},
-		{"Knative Serving", NamespaceRemoval{"knative-serving", coreClient}, o.ui, o.kubeconfigFlags},
-		{"Istio", NamespaceRemoval{istio.SystemNamespaceName(), coreClient}, o.ui, o.kubeconfigFlags},
+		{"Knative Build", NamespaceRemoval{"knative-build", coreClient}, o.ui},
+		{"Knative Serving", NamespaceRemoval{"knative-serving", coreClient}, o.ui},
+		{"Istio", NamespaceRemoval{istio.SystemNamespaceName(), coreClient}, o.ui},
 	}
 
 	for _, c := range components {
@@ -85,23 +82,14 @@ type UninstallationComponent struct {
 
 	nsRemoval NamespaceRemoval
 	ui        ui.UI
-
-	kubeconfigFlags *KubeconfigFlags
 }
 
 func (c UninstallationComponent) Uninstall() error {
 	c.ui.PrintLinef("Uninstalling %s", c.Name)
 
-	kubeconfigPath, err := c.kubeconfigFlags.Path.Value()
+	err := c.nsRemoval.Remove()
 	if err != nil {
 		return err
-	}
-
-	opts := []string{"--kubeconfig", kubeconfigPath, "delete", "namespace", c.nsRemoval.Namespace}
-
-	_, err = exec.Command("kubectl", opts...).Output()
-	if err != nil {
-		return fmt.Errorf("Uninstalling %s: %s", c.Name, err)
 	}
 
 	return c.Monitor()
@@ -115,6 +103,16 @@ func (c UninstallationComponent) Monitor() error {
 type NamespaceRemoval struct {
 	Namespace  string
 	coreClient kubernetes.Interface
+}
+
+func (n NamespaceRemoval) Remove() error {
+	err := n.coreClient.CoreV1().Namespaces().Delete(n.Namespace, &metav1.DeleteOptions{})
+	if err != nil {
+		if !errors.IsNotFound(err) {
+			return err
+		}
+	}
+	return nil
 }
 
 func (n NamespaceRemoval) Monitor() error {

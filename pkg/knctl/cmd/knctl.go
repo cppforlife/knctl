@@ -88,7 +88,7 @@ Knative docs: https://github.com/knative/docs.`,
 
 	cmd.AddCommand(NewVersionCmd(NewVersionOptions(o.ui), flagsFactory))
 	cmd.AddCommand(NewInstallCmd(NewInstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags), flagsFactory))
-	cmd.AddCommand(NewUninstallCmd(NewUninstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags), flagsFactory))
+	cmd.AddCommand(NewUninstallCmd(NewUninstallOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(NewDeployCmd(NewDeployOptions(o.ui, o.configFactory, o.depsFactory), flagsFactory))
 	cmd.AddCommand(NewLogsCmd(NewLogsOptions(o.ui, o.depsFactory, CancelSignals{}), flagsFactory))
 	cmd.AddCommand(NewCurlCmd(NewCurlOptions(o.ui, o.depsFactory), flagsFactory))
