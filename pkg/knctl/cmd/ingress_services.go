@@ -177,7 +177,7 @@ func (s IngressServiceNodePort) Addresses() []string {
 	for _, node := range nodes.Items {
 		for _, addr := range node.Status.Addresses {
 			switch addr.Type {
-			case corev1.NodeHostName, corev1.NodeExternalIP, corev1.NodeExternalDNS:
+			case corev1.NodeHostName, corev1.NodeExternalIP, corev1.NodeExternalDNS, corev1.NodeInternalIP:
 				addrs = append(addrs, addr.Address)
 			}
 		}
