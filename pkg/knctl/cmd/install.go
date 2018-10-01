@@ -107,8 +107,8 @@ func (o *InstallOptions) Run() error {
 	}
 
 	components := []InstallationComponent{
-		{"Istio", YAMLSource{InstallIstioAsset, o.NodePorts}, NamespaceReadiness{istio.SystemNamespaceName(), coreClient}, o.ui, o.kubeconfigFlags, 1},
-		{"Knative", YAMLSource{knativeAsset, o.NodePorts}, NamespaceReadiness{"knative-serving", coreClient}, o.ui, o.kubeconfigFlags, 0},
+		{"Istio", YAMLSource{InstallIstioAsset, o.NodePorts}, NamespaceReadiness{istio.SystemNamespaceName(), o.ui, coreClient}, o.ui, o.kubeconfigFlags, 1},
+		{"Knative", YAMLSource{knativeAsset, o.NodePorts}, NamespaceReadiness{"knative-serving", o.ui, coreClient}, o.ui, o.kubeconfigFlags, 0},
 	}
 
 	for _, c := range components {
@@ -244,6 +244,7 @@ func (YAMLSource) download(url, expectedSHA256 string) (string, error) {
 
 type NamespaceReadiness struct {
 	Namespace  string
+	ui         ui.UI
 	coreClient kubernetes.Interface
 }
 
@@ -271,6 +272,10 @@ func (n NamespaceReadiness) Monitor() error {
 		}
 
 		time.Sleep(500 * time.Millisecond)
+
+		if i%20 == 0 {
+			n.ui.PrintLinef("Non-ready pods: %s", strings.Join(nonReadyPodNames, ", "))
+		}
 	}
 
 	return fmt.Errorf(
