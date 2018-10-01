@@ -36,7 +36,7 @@ func TestNewCurlCmd_Ok(t *testing.T) {
 
 	DeepEqual(t, realCmd.ServiceFlags,
 		ServiceFlags{NamespaceFlags{"test-namespace"}, "test-service"})
-	DeepEqual(t, realCmd.CurlFlags, CurlFlags{Port: int32(1234)})
+	DeepEqual(t, realCmd.CurlFlags, CurlFlags{Port: int32(1234), Verbose: true})
 }
 
 func TestNewCurlCmd_OkLongFlagNames(t *testing.T) {
@@ -52,7 +52,7 @@ func TestNewCurlCmd_OkLongFlagNames(t *testing.T) {
 
 	DeepEqual(t, realCmd.ServiceFlags,
 		ServiceFlags{NamespaceFlags{"test-namespace"}, "test-service"})
-	DeepEqual(t, realCmd.CurlFlags, CurlFlags{Port: int32(1234)})
+	DeepEqual(t, realCmd.CurlFlags, CurlFlags{Port: int32(1234), Verbose: true})
 }
 
 func TestNewCurlCmd_OkMinimum(t *testing.T) {

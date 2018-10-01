@@ -70,19 +70,17 @@ func (o *CurlOptions) Run() error {
 	}
 
 	cmdName := "curl"
-	cmdArgs := []string{"-H", "Host: " + serviceDomain, o.CurlFlags.RequestSchema() + "://" + ingressAddress}
+	cmdArgs := []string{}
+
 	if o.CurlFlags.Verbose {
 		cmdArgs = append(cmdArgs, "-vvv")
 	}
 
+	cmdArgs = append(cmdArgs, []string{"-sS", "-H", "Host: " + serviceDomain, o.CurlFlags.RequestSchema() + "://" + ingressAddress}...)
+
 	o.ui.PrintLinef("Running: %s '%s'", cmdName, strings.Join(cmdArgs, "' '"))
 
-	var out []byte
-	if o.CurlFlags.Verbose {
-		out, err = exec.Command(cmdName, cmdArgs...).CombinedOutput()
-	} else {
-		out, err = exec.Command(cmdName, cmdArgs...).Output()
-	}
+	out, err := exec.Command(cmdName, cmdArgs...).CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("Running curl: %s", err)
 	}
