@@ -51,13 +51,12 @@ func NewRevisionPodWatcher(
 }
 
 func (w RevisionPodWatcher) Watch(podsToWatchCh chan corev1.Pod, cancelCh chan struct{}) error {
-	revisionWatcher, podWatcherFunc := w.watchers()
 	nonUniquePodsToWatchCh := make(chan corev1.Pod)
 	nonUniqueRevisionsToWatchCh := make(chan v1alpha1.Revision)
 
 	// Watch revisions in this service
 	go func() {
-		err := revisionWatcher.Watch(nonUniqueRevisionsToWatchCh, cancelCh)
+		err := w.revisionWatcher().Watch(nonUniqueRevisionsToWatchCh, cancelCh)
 		if err != nil {
 			w.ui.BeginLinef("Revision watching error: %s\n", err)
 		}
@@ -69,6 +68,7 @@ func (w RevisionPodWatcher) Watch(podsToWatchCh chan corev1.Pod, cancelCh chan s
 		var wg sync.WaitGroup
 
 		watchedRevs := map[string]struct{}{}
+		podWatcherFunc := w.podWatcherFunc()
 
 		for revision := range nonUniqueRevisionsToWatchCh {
 			revision := revision
@@ -120,8 +120,8 @@ func (w RevisionPodWatcher) Watch(podsToWatchCh chan corev1.Pod, cancelCh chan s
 	return nil
 }
 
-func (w RevisionPodWatcher) watchers() (ctlservice.RevisionWatcher, func(rev v1alpha1.Revision) ctlservice.PodWatcher) {
-	revisionWatcher := ctlservice.NewRevisionWatcher(
+func (w RevisionPodWatcher) revisionWatcher() ctlservice.RevisionWatcher {
+	return ctlservice.NewRevisionWatcher(
 		w.servingClient.ServingV1alpha1().Revisions(w.serviceNamespace),
 		metav1.ListOptions{
 			LabelSelector: labels.Set(map[string]string{
@@ -129,10 +129,12 @@ func (w RevisionPodWatcher) watchers() (ctlservice.RevisionWatcher, func(rev v1a
 			}).String(),
 		},
 	)
+}
 
+func (w RevisionPodWatcher) podWatcherFunc() func(rev v1alpha1.Revision) ctlservice.PodWatcher {
 	podsClient := w.coreClient.CoreV1().Pods(w.serviceNamespace)
 
-	podWatcherFunc := func(revision v1alpha1.Revision) ctlservice.PodWatcher {
+	return func(revision v1alpha1.Revision) ctlservice.PodWatcher {
 		return ctlservice.NewPodWatcher(
 			podsClient,
 			metav1.ListOptions{
@@ -142,6 +144,4 @@ func (w RevisionPodWatcher) watchers() (ctlservice.RevisionWatcher, func(rev v1a
 			},
 		)
 	}
-
-	return revisionWatcher, podWatcherFunc
 }
