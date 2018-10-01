@@ -74,9 +74,7 @@ func (o *ShowRevisionOptions) Run() error {
 		return err
 	}
 
-	for pod := range podsToWatchCh {
-		PodConditionsTable{pod}.Print(o.ui)
-	}
+	PodConditionsTable{podsToWatchCh}.Print(o.ui)
 
 	return nil
 }

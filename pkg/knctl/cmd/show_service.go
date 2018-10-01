@@ -72,9 +72,7 @@ func (o *ShowServiceOptions) Run() error {
 		return err
 	}
 
-	for pod := range podsToWatchCh {
-		PodConditionsTable{pod}.Print(o.ui)
-	}
+	PodConditionsTable{podsToWatchCh}.Print(o.ui)
 
 	return nil
 }
@@ -169,16 +167,17 @@ func (o *ShowServiceOptions) setUpPodWatching() (chan corev1.Pod, error) {
 }
 
 type PodConditionsTable struct {
-	pod corev1.Pod
+	podsCh chan corev1.Pod
 }
 
 func (t PodConditionsTable) Print(ui ui.UI) {
 	table := uitable.Table{
-		Title: fmt.Sprintf("Pod '%s' conditions", t.pod.Name),
+		Title: fmt.Sprintf("Pods conditions"),
 
 		// TODO Content: "conditions",
 
 		Header: []uitable.Header{
+			uitable.NewHeader("Pod"),
 			uitable.NewHeader("Type"),
 			uitable.NewHeader("Status"),
 			uitable.NewHeader("Age"),
@@ -188,20 +187,24 @@ func (t PodConditionsTable) Print(ui ui.UI) {
 
 		SortBy: []uitable.ColumnSort{
 			{Column: 0, Asc: true},
+			{Column: 1, Asc: true},
 		},
 	}
 
-	for _, cond := range t.pod.Status.Conditions {
-		table.Rows = append(table.Rows, []uitable.Value{
-			uitable.NewValueString(string(cond.Type)),
-			uitable.ValueFmt{
-				V:     uitable.NewValueString(string(cond.Status)),
-				Error: cond.Status != corev1.ConditionTrue,
-			},
-			NewValueAge(cond.LastTransitionTime.Time),
-			uitable.NewValueString(cond.Reason),
-			uitable.NewValueString(wordwrap.WrapString(cond.Message, 80)),
-		})
+	for pod := range t.podsCh {
+		for _, cond := range pod.Status.Conditions {
+			table.Rows = append(table.Rows, []uitable.Value{
+				uitable.NewValueString(pod.Name),
+				uitable.NewValueString(string(cond.Type)),
+				uitable.ValueFmt{
+					V:     uitable.NewValueString(string(cond.Status)),
+					Error: cond.Status != corev1.ConditionTrue,
+				},
+				NewValueAge(cond.LastTransitionTime.Time),
+				uitable.NewValueString(cond.Reason),
+				uitable.NewValueString(wordwrap.WrapString(cond.Message, 80)),
+			})
+		}
 	}
 
 	ui.PrintTable(table)
