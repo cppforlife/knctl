@@ -25,6 +25,7 @@ import (
 	"github.com/knative/serving/pkg/apis/serving"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type LogsOptions struct {
@@ -135,8 +136,12 @@ func (o *LogsOptions) setUpPodWatching() (chan corev1.Pod, chan struct{}, error)
 		return podsToWatchCh, cancelPodTailCh, err
 	}
 
-	watcher := NewServicePodWatcher(
-		o.ServiceFlags.NamespaceFlags.Name, o.ServiceFlags.Name, servingClient, coreClient, o.ui)
+	service, err := servingClient.ServingV1alpha1().Services(o.ServiceFlags.NamespaceFlags.Name).Get(o.ServiceFlags.Name, metav1.GetOptions{})
+	if err != nil {
+		return podsToWatchCh, cancelPodTailCh, err
+	}
+
+	watcher := NewServicePodWatcher(service, servingClient, coreClient, o.ui)
 
 	go func() {
 		watcher.Watch(podsToWatchCh, cancelCh)

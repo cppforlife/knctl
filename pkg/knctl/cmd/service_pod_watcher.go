@@ -31,8 +31,7 @@ import (
 )
 
 type ServicePodWatcher struct {
-	serviceNamespace string
-	serviceName      string
+	service *v1alpha1.Service
 
 	servingClient servingclientset.Interface
 	coreClient    kubernetes.Interface
@@ -41,13 +40,12 @@ type ServicePodWatcher struct {
 }
 
 func NewServicePodWatcher(
-	serviceNamespace string,
-	serviceName string,
+	service *v1alpha1.Service,
 	servingClient servingclientset.Interface,
 	coreClient kubernetes.Interface,
 	ui ui.UI,
 ) ServicePodWatcher {
-	return ServicePodWatcher{serviceNamespace, serviceName, servingClient, coreClient, ui}
+	return ServicePodWatcher{service, servingClient, coreClient, ui}
 }
 
 func (w ServicePodWatcher) Watch(podsToWatchCh chan corev1.Pod, cancelCh chan struct{}) error {
@@ -56,10 +54,10 @@ func (w ServicePodWatcher) Watch(podsToWatchCh chan corev1.Pod, cancelCh chan st
 	// Watch revisions in this service
 	go func() {
 		revisionWatcher := ctlservice.NewRevisionWatcher(
-			w.servingClient.ServingV1alpha1().Revisions(w.serviceNamespace),
+			w.servingClient.ServingV1alpha1().Revisions(w.service.Namespace),
 			metav1.ListOptions{
 				LabelSelector: labels.Set(map[string]string{
-					serving.ConfigurationLabelKey: w.serviceName,
+					serving.ConfigurationLabelKey: w.service.Name,
 				}).String(),
 			},
 		)

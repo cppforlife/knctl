@@ -67,7 +67,7 @@ func (o *ShowServiceOptions) Run() error {
 	o.printStatus(service)
 	o.printConditions(service)
 
-	podsToWatchCh, err := o.setUpPodWatching()
+	podsToWatchCh, err := o.setUpPodWatching(service)
 	if err != nil {
 		return err
 	}
@@ -140,7 +140,7 @@ func (o *ShowServiceOptions) printConditions(service *v1alpha1.Service) {
 	o.ui.PrintTable(table)
 }
 
-func (o *ShowServiceOptions) setUpPodWatching() (chan corev1.Pod, error) {
+func (o *ShowServiceOptions) setUpPodWatching(service *v1alpha1.Service) (chan corev1.Pod, error) {
 	podsToWatchCh := make(chan corev1.Pod)
 	cancelCh := make(chan struct{})
 	close(cancelCh) // Close immediately for just plain listing of revisions and pods
@@ -155,8 +155,7 @@ func (o *ShowServiceOptions) setUpPodWatching() (chan corev1.Pod, error) {
 		return podsToWatchCh, err
 	}
 
-	watcher := NewServicePodWatcher(
-		o.ServiceFlags.NamespaceFlags.Name, o.ServiceFlags.Name, servingClient, coreClient, o.ui)
+	watcher := NewServicePodWatcher(service, servingClient, coreClient, o.ui)
 
 	go func() {
 		watcher.Watch(podsToWatchCh, cancelCh)

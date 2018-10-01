@@ -24,6 +24,7 @@ import (
 	"github.com/knative/serving/pkg/apis/serving"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type ListPodsOptions struct {
@@ -119,8 +120,12 @@ func (o *ListPodsOptions) setUpPodWatching() (chan corev1.Pod, error) {
 		return podsToWatchCh, err
 	}
 
-	watcher := NewServicePodWatcher(
-		o.ServiceFlags.NamespaceFlags.Name, o.ServiceFlags.Name, servingClient, coreClient, o.ui)
+	service, err := servingClient.ServingV1alpha1().Services(o.ServiceFlags.NamespaceFlags.Name).Get(o.ServiceFlags.Name, metav1.GetOptions{})
+	if err != nil {
+		return podsToWatchCh, err
+	}
+
+	watcher := NewServicePodWatcher(service, servingClient, coreClient, o.ui)
 
 	go func() {
 		watcher.Watch(podsToWatchCh, cancelCh)
