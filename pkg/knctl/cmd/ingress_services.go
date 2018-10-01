@@ -18,6 +18,9 @@ package cmd
 
 import (
 	"fmt"
+	"net"
+	"os/exec"
+	"strings"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -153,6 +156,22 @@ func (s IngressServiceNodePort) Addresses() []string {
 	nodes, err := s.coreClient.CoreV1().Nodes().List(metav1.ListOptions{})
 	if err != nil {
 		return nil // TODO propagate error
+	}
+
+	if len(nodes.Items) == 1 && nodes.Items[0].Name == "minikube" {
+		// corev1.InternalIP type addresss may point to inaccessible IP, hence shell out...
+		outBytes, err := exec.Command("minikube", "ip").Output()
+		if err != nil {
+			return nil // TODO propagate error
+		}
+
+		out := strings.TrimSpace(string(outBytes))
+
+		if net.ParseIP(out) != nil {
+			return []string{out}
+		}
+
+		return nil
 	}
 
 	for _, node := range nodes.Items {
