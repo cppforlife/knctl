@@ -29,8 +29,8 @@ type OpenOptions struct {
 	ui          ui.UI
 	depsFactory DepsFactory
 
-	ServiceFlags  ServiceFlags
-	CurlPortFlags CurlPortFlags
+	ServiceFlags ServiceFlags
+	CurlFlags    CurlFlags
 }
 
 func NewOpenOptions(ui ui.UI, depsFactory DepsFactory) *OpenOptions {
@@ -50,7 +50,7 @@ Requires 'open' command installed on the system.`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.ServiceFlags.Set(cmd, flagsFactory)
-	o.CurlPortFlags.Set(cmd, flagsFactory)
+	o.CurlFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 
@@ -61,7 +61,7 @@ func (o *OpenOptions) Run() error {
 	}
 
 	// TODO Determine protocol for the entrypoint
-	cmd := exec.Command("open", []string{o.CurlPortFlags.RequestSchema() + "://" + serviceDomain}...)
+	cmd := exec.Command("open", []string{o.CurlFlags.RequestSchema() + "://" + serviceDomain}...)
 
 	err = cmd.Start()
 	if err != nil {

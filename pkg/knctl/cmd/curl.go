@@ -30,8 +30,8 @@ type CurlOptions struct {
 	ui          ui.UI
 	depsFactory DepsFactory
 
-	ServiceFlags  ServiceFlags
-	CurlPortFlags CurlPortFlags
+	ServiceFlags ServiceFlags
+	CurlFlags    CurlFlags
 }
 
 func NewCurlOptions(ui ui.UI, depsFactory DepsFactory) *CurlOptions {
@@ -54,7 +54,7 @@ Requires 'curl' command installed on the system.`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.ServiceFlags.Set(cmd, flagsFactory)
-	o.CurlPortFlags.Set(cmd, flagsFactory)
+	o.CurlFlags.Set(cmd, flagsFactory)
 	return cmd
 }
 
@@ -70,11 +70,19 @@ func (o *CurlOptions) Run() error {
 	}
 
 	cmdName := "curl"
-	cmdArgs := []string{"-H", "Host: " + serviceDomain, o.CurlPortFlags.RequestSchema() + "://" + ingressAddress}
+	cmdArgs := []string{"-H", "Host: " + serviceDomain, o.CurlFlags.RequestSchema() + "://" + ingressAddress}
+	if o.CurlFlags.Verbose {
+		cmdArgs = append(cmdArgs, "-vvv")
+	}
 
 	o.ui.PrintLinef("Running: %s '%s'", cmdName, strings.Join(cmdArgs, "' '"))
 
-	out, err := exec.Command(cmdName, cmdArgs...).Output()
+	var out []byte
+	if o.CurlFlags.Verbose {
+		out, err = exec.Command(cmdName, cmdArgs...).CombinedOutput()
+	} else {
+		out, err = exec.Command(cmdName, cmdArgs...).Output()
+	}
 	if err != nil {
 		return fmt.Errorf("Running curl: %s", err)
 	}
@@ -108,5 +116,5 @@ func (o *CurlOptions) preferredIngressAddress() (string, error) {
 		return "", err
 	}
 
-	return IngressServices{coreClient}.PreferredAddress(o.CurlPortFlags.Port)
+	return IngressServices{coreClient}.PreferredAddress(o.CurlFlags.Port)
 }
