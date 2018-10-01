@@ -119,7 +119,7 @@ func (o *ListPodsOptions) setUpPodWatching() (chan corev1.Pod, error) {
 		return podsToWatchCh, err
 	}
 
-	watcher := NewRevisionPodWatcher(
+	watcher := NewServicePodWatcher(
 		o.ServiceFlags.NamespaceFlags.Name, o.ServiceFlags.Name, servingClient, coreClient, o.ui)
 
 	go func() {

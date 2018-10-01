@@ -17,6 +17,8 @@ limitations under the License.
 package cmd
 
 import (
+	"sync"
+
 	"github.com/cppforlife/go-cli-ui/ui"
 	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
 	"github.com/knative/serving/pkg/apis/serving"
@@ -28,8 +30,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-type RevisionPodWatcher struct {
-	revision *v1alpha1.Revision
+type ServicePodWatcher struct {
+	serviceNamespace string
+	serviceName      string
 
 	servingClient servingclientset.Interface
 	coreClient    kubernetes.Interface
@@ -37,48 +40,63 @@ type RevisionPodWatcher struct {
 	ui ui.UI // TODO remove
 }
 
-func NewRevisionPodWatcher(
-	revision *v1alpha1.Revision,
+func NewServicePodWatcher(
+	serviceNamespace string,
+	serviceName string,
 	servingClient servingclientset.Interface,
 	coreClient kubernetes.Interface,
 	ui ui.UI,
-) RevisionPodWatcher {
-	return RevisionPodWatcher{revision, servingClient, coreClient, ui}
+) ServicePodWatcher {
+	return ServicePodWatcher{serviceNamespace, serviceName, servingClient, coreClient, ui}
 }
 
-func (w RevisionPodWatcher) Watch(podsToWatchCh chan corev1.Pod, cancelCh chan struct{}) error {
-	nonUniquePodsToWatchCh := make(chan corev1.Pod)
+func (w ServicePodWatcher) Watch(podsToWatchCh chan corev1.Pod, cancelCh chan struct{}) error {
+	nonUniqueRevisionsToWatchCh := make(chan v1alpha1.Revision)
 
+	// Watch revisions in this service
 	go func() {
-		podWatcher := ctlservice.NewPodWatcher(
-			w.coreClient.CoreV1().Pods(w.revision.Namespace),
+		revisionWatcher := ctlservice.NewRevisionWatcher(
+			w.servingClient.ServingV1alpha1().Revisions(w.serviceNamespace),
 			metav1.ListOptions{
 				LabelSelector: labels.Set(map[string]string{
-					serving.RevisionUID: string(w.revision.UID),
+					serving.ConfigurationLabelKey: w.serviceName,
 				}).String(),
 			},
 		)
 
-		err := podWatcher.Watch(nonUniquePodsToWatchCh, cancelCh)
+		err := revisionWatcher.Watch(nonUniqueRevisionsToWatchCh, cancelCh)
 		if err != nil {
-			w.ui.BeginLinef("Pod watching error: %s\n", err)
+			w.ui.BeginLinef("Revision watching error: %s\n", err)
 		}
 
-		close(nonUniquePodsToWatchCh)
+		close(nonUniqueRevisionsToWatchCh)
 	}()
 
-	// Send unique pods to the watcher client
-	watchedPods := map[string]struct{}{}
+	// Watch pods in each revision
+	var wg sync.WaitGroup
+	watchedRevs := map[string]struct{}{}
 
-	for pod := range nonUniquePodsToWatchCh {
-		podUID := string(pod.UID)
-		if _, found := watchedPods[podUID]; found {
+	for revision := range nonUniqueRevisionsToWatchCh {
+		revision := revision
+
+		revUID := string(revision.UID)
+		if _, found := watchedRevs[revUID]; found {
 			continue
 		}
 
-		watchedPods[podUID] = struct{}{}
-		podsToWatchCh <- pod
+		watchedRevs[revUID] = struct{}{}
+		wg.Add(1)
+
+		go func() {
+			err := NewRevisionPodWatcher(&revision, w.servingClient, w.coreClient, w.ui).Watch(podsToWatchCh, cancelCh)
+			if err != nil {
+				w.ui.BeginLinef("Pod watching error: %s\n", err)
+			}
+			wg.Done()
+		}()
 	}
+
+	wg.Wait()
 
 	return nil
 }

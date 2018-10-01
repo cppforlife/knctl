@@ -73,7 +73,7 @@ func (o *ShowServiceOptions) Run() error {
 	}
 
 	for pod := range podsToWatchCh {
-		o.printPodConditions(pod)
+		PodConditionsTable{pod}.Print(o.ui)
 	}
 
 	return nil
@@ -157,7 +157,7 @@ func (o *ShowServiceOptions) setUpPodWatching() (chan corev1.Pod, error) {
 		return podsToWatchCh, err
 	}
 
-	watcher := NewRevisionPodWatcher(
+	watcher := NewServicePodWatcher(
 		o.ServiceFlags.NamespaceFlags.Name, o.ServiceFlags.Name, servingClient, coreClient, o.ui)
 
 	go func() {
@@ -168,9 +168,13 @@ func (o *ShowServiceOptions) setUpPodWatching() (chan corev1.Pod, error) {
 	return podsToWatchCh, nil
 }
 
-func (o *ShowServiceOptions) printPodConditions(pod corev1.Pod) {
+type PodConditionsTable struct {
+	pod corev1.Pod
+}
+
+func (t PodConditionsTable) Print(ui ui.UI) {
 	table := uitable.Table{
-		Title: fmt.Sprintf("Pod '%s' conditions", pod.Name),
+		Title: fmt.Sprintf("Pod '%s' conditions", t.pod.Name),
 
 		// TODO Content: "conditions",
 
@@ -187,7 +191,7 @@ func (o *ShowServiceOptions) printPodConditions(pod corev1.Pod) {
 		},
 	}
 
-	for _, cond := range pod.Status.Conditions {
+	for _, cond := range t.pod.Status.Conditions {
 		table.Rows = append(table.Rows, []uitable.Value{
 			uitable.NewValueString(string(cond.Type)),
 			uitable.ValueFmt{
@@ -200,5 +204,5 @@ func (o *ShowServiceOptions) printPodConditions(pod corev1.Pod) {
 		})
 	}
 
-	o.ui.PrintTable(table)
+	ui.PrintTable(table)
 }

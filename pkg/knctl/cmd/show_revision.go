@@ -69,6 +69,15 @@ func (o *ShowRevisionOptions) Run() error {
 	o.printStatus(revision, tags)
 	o.printConditions(revision)
 
+	podsToWatchCh, err := o.setUpPodWatching(revision)
+	if err != nil {
+		return err
+	}
+
+	for pod := range podsToWatchCh {
+		PodConditionsTable{pod}.Print(o.ui)
+	}
+
 	return nil
 }
 
@@ -133,4 +142,29 @@ func (o *ShowRevisionOptions) printConditions(revision *v1alpha1.Revision) {
 	}
 
 	o.ui.PrintTable(table)
+}
+
+func (o *ShowRevisionOptions) setUpPodWatching(revision *v1alpha1.Revision) (chan corev1.Pod, error) {
+	podsToWatchCh := make(chan corev1.Pod)
+	cancelCh := make(chan struct{})
+	close(cancelCh) // Close immediately for just plain listing of revisions and pods
+
+	servingClient, err := o.depsFactory.ServingClient()
+	if err != nil {
+		return podsToWatchCh, err
+	}
+
+	coreClient, err := o.depsFactory.CoreClient()
+	if err != nil {
+		return podsToWatchCh, err
+	}
+
+	watcher := NewRevisionPodWatcher(revision, servingClient, coreClient, o.ui)
+
+	go func() {
+		watcher.Watch(podsToWatchCh, cancelCh)
+		close(podsToWatchCh)
+	}()
+
+	return podsToWatchCh, nil
 }

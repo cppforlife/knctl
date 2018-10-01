@@ -135,7 +135,7 @@ func (o *LogsOptions) setUpPodWatching() (chan corev1.Pod, chan struct{}, error)
 		return podsToWatchCh, cancelPodTailCh, err
 	}
 
-	watcher := NewRevisionPodWatcher(
+	watcher := NewServicePodWatcher(
 		o.ServiceFlags.NamespaceFlags.Name, o.ServiceFlags.Name, servingClient, coreClient, o.ui)
 
 	go func() {
