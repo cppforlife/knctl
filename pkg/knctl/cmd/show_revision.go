@@ -22,6 +22,7 @@ import (
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
+	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	"github.com/mitchellh/go-wordwrap"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
@@ -65,6 +66,13 @@ func (o *ShowRevisionOptions) Run() error {
 		return err
 	}
 
+	o.printStatus(revision, tags)
+	o.printConditions(revision)
+
+	return nil
+}
+
+func (o *ShowRevisionOptions) printStatus(revision *v1alpha1.Revision, tags ctlservice.Tags) {
 	table := uitable.Table{
 		Title: fmt.Sprintf("Revision '%s'", o.RevisionFlags.Name),
 
@@ -83,15 +91,17 @@ func (o *ShowRevisionOptions) Run() error {
 
 	table.Rows = append(table.Rows, []uitable.Value{
 		uitable.NewValueString(revision.Name),
-		uitable.NewValueStrings(ctlservice.NewTags(servingClient).List(*revision)),
+		uitable.NewValueStrings(tags.List(*revision)),
 		uitable.NewValueString(string(revision.Spec.ServingState)),
 		NewAnnotationsValue(revision.Annotations),
 		NewValueAge(revision.CreationTimestamp.Time),
 	})
 
 	o.ui.PrintTable(table)
+}
 
-	table = uitable.Table{
+func (o *ShowRevisionOptions) printConditions(revision *v1alpha1.Revision) {
+	table := uitable.Table{
 		Title: fmt.Sprintf("Revision '%s' conditions", o.RevisionFlags.Name),
 
 		// TODO Content: "conditions",
@@ -123,6 +133,4 @@ func (o *ShowRevisionOptions) Run() error {
 	}
 
 	o.ui.PrintTable(table)
-
-	return nil
 }

@@ -21,6 +21,7 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
+	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	"github.com/mitchellh/go-wordwrap"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
@@ -63,6 +64,22 @@ func (o *ShowServiceOptions) Run() error {
 		return err
 	}
 
+	o.printStatus(service)
+	o.printConditions(service)
+
+	podsToWatchCh, err := o.setUpPodWatching()
+	if err != nil {
+		return err
+	}
+
+	for pod := range podsToWatchCh {
+		o.printPodConditions(pod)
+	}
+
+	return nil
+}
+
+func (o ShowServiceOptions) printStatus(service *v1alpha1.Service) {
 	table := uitable.Table{
 		Title: fmt.Sprintf("Service '%s'", o.ServiceFlags.Name),
 
@@ -88,8 +105,10 @@ func (o *ShowServiceOptions) Run() error {
 	})
 
 	o.ui.PrintTable(table)
+}
 
-	table = uitable.Table{
+func (o *ShowServiceOptions) printConditions(service *v1alpha1.Service) {
+	table := uitable.Table{
 		Title: fmt.Sprintf("Service '%s' conditions", o.ServiceFlags.Name),
 
 		// TODO Content: "conditions",
@@ -121,6 +140,65 @@ func (o *ShowServiceOptions) Run() error {
 	}
 
 	o.ui.PrintTable(table)
+}
 
-	return nil
+func (o *ShowServiceOptions) setUpPodWatching() (chan corev1.Pod, error) {
+	podsToWatchCh := make(chan corev1.Pod)
+	cancelCh := make(chan struct{})
+	close(cancelCh) // Close immediately for just plain listing of revisions and pods
+
+	servingClient, err := o.depsFactory.ServingClient()
+	if err != nil {
+		return podsToWatchCh, err
+	}
+
+	coreClient, err := o.depsFactory.CoreClient()
+	if err != nil {
+		return podsToWatchCh, err
+	}
+
+	watcher := NewRevisionPodWatcher(
+		o.ServiceFlags.NamespaceFlags.Name, o.ServiceFlags.Name, servingClient, coreClient, o.ui)
+
+	go func() {
+		watcher.Watch(podsToWatchCh, cancelCh)
+		close(podsToWatchCh)
+	}()
+
+	return podsToWatchCh, nil
+}
+
+func (o *ShowServiceOptions) printPodConditions(pod corev1.Pod) {
+	table := uitable.Table{
+		Title: fmt.Sprintf("Pod '%s' conditions", pod.Name),
+
+		// TODO Content: "conditions",
+
+		Header: []uitable.Header{
+			uitable.NewHeader("Type"),
+			uitable.NewHeader("Status"),
+			uitable.NewHeader("Age"),
+			uitable.NewHeader("Reason"),
+			uitable.NewHeader("Message"),
+		},
+
+		SortBy: []uitable.ColumnSort{
+			{Column: 0, Asc: true},
+		},
+	}
+
+	for _, cond := range pod.Status.Conditions {
+		table.Rows = append(table.Rows, []uitable.Value{
+			uitable.NewValueString(string(cond.Type)),
+			uitable.ValueFmt{
+				V:     uitable.NewValueString(string(cond.Status)),
+				Error: cond.Status != corev1.ConditionTrue,
+			},
+			NewValueAge(cond.LastTransitionTime.Time),
+			uitable.NewValueString(cond.Reason),
+			uitable.NewValueString(wordwrap.WrapString(cond.Message, 80)),
+		})
+	}
+
+	o.ui.PrintTable(table)
 }
