@@ -92,6 +92,7 @@ Knative docs: https://github.com/knative/docs.`,
 	cmd.AddCommand(NewDeployCmd(NewDeployOptions(o.ui, o.configFactory, o.depsFactory), flagsFactory))
 	cmd.AddCommand(NewLogsCmd(NewLogsOptions(o.ui, o.depsFactory, CancelSignals{}), flagsFactory))
 	cmd.AddCommand(NewCurlCmd(NewCurlOptions(o.ui, o.depsFactory), flagsFactory))
+	cmd.AddCommand(NewDNSMapCmd(NewDNSMapOptions(o.ui, o.depsFactory), flagsFactory))
 
 	serviceCmd := NewServiceCmd()
 	serviceCmd.AddCommand(NewListServicesCmd(NewListServicesOptions(o.ui, o.depsFactory), flagsFactory))
