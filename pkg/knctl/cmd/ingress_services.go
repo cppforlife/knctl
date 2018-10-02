@@ -86,10 +86,10 @@ func (s IngressServices) List() ([]IngressService, error) {
 	return ingSvcs, nil
 }
 
-func (s IngressServices) PreferredAddress(port int32) (string, error) {
+func (s IngressServices) PreferredAddress(port int32) (string, string, error) {
 	ingSvcs, err := s.List()
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	for _, svc := range ingSvcs {
@@ -97,11 +97,11 @@ func (s IngressServices) PreferredAddress(port int32) (string, error) {
 		port = svc.MappedPort(port)
 
 		if len(addrs) > 0 && port != 0 {
-			return fmt.Sprintf("%s:%d", addrs[0], port), nil
+			return addrs[0], fmt.Sprintf("%d", port), nil
 		}
 	}
 
-	return "", fmt.Errorf("Expected to find at least one ingress address")
+	return "", "", fmt.Errorf("Expected to find at least one ingress address")
 }
 
 func (s IngressServiceLoadBalancer) Name() string { return s.Service.Name }

@@ -59,12 +59,7 @@ Requires 'curl' command installed on the system.`,
 }
 
 func (o *CurlOptions) Run() error {
-	serviceDomain, err := o.serviceDomain()
-	if err != nil {
-		return err
-	}
-
-	ingressAddress, err := o.preferredIngressAddress()
+	domain, url, err := o.addr()
 	if err != nil {
 		return err
 	}
@@ -76,7 +71,7 @@ func (o *CurlOptions) Run() error {
 		cmdArgs = append(cmdArgs, "-vvv")
 	}
 
-	cmdArgs = append(cmdArgs, []string{"-sS", "-H", "Host: " + serviceDomain, o.CurlFlags.RequestSchema() + "://" + ingressAddress}...)
+	cmdArgs = append(cmdArgs, []string{"-sS", "-H", "Host: " + domain, url}...)
 
 	o.ui.PrintLinef("Running: %s '%s'", cmdName, strings.Join(cmdArgs, "' '"))
 
@@ -90,29 +85,33 @@ func (o *CurlOptions) Run() error {
 	return nil
 }
 
-func (o *CurlOptions) serviceDomain() (string, error) {
+func (o *CurlOptions) addr() (string, string, error) {
 	servingClient, err := o.depsFactory.ServingClient()
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	service, err := servingClient.ServingV1alpha1().Services(o.ServiceFlags.NamespaceFlags.Name).Get(o.ServiceFlags.Name, metav1.GetOptions{})
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	if len(service.Status.Domain) == 0 {
-		return "", fmt.Errorf("Expected service '%s' to have non-empty domain", o.ServiceFlags.Name)
-	}
-
-	return service.Status.Domain, nil
-}
-
-func (o *CurlOptions) preferredIngressAddress() (string, error) {
 	coreClient, err := o.depsFactory.CoreClient()
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return IngressServices{coreClient}.PreferredAddress(o.CurlFlags.Port)
+	serviceAddr := ServiceAddress{service, coreClient}
+
+	domain, err := serviceAddr.Domain()
+	if err != nil {
+		return "", "", err
+	}
+
+	url, err := serviceAddr.URL(o.CurlFlags.Port, false)
+	if err != nil {
+		return "", "", err
+	}
+
+	return domain, url, nil
 }

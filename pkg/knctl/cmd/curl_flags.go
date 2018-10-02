@@ -29,10 +29,3 @@ func (s *CurlFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
 	cmd.Flags().Int32VarP(&s.Port, "port", "p", 80, "Set port")
 	cmd.Flags().BoolVarP(&s.Verbose, "verbose", "v", false, "Makes curl verbose during the operation")
 }
-
-func (f CurlFlags) RequestSchema() string {
-	if f.Port == 443 {
-		return "https"
-	}
-	return "http"
-}

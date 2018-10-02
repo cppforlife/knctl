@@ -55,13 +55,14 @@ Requires 'open' command installed on the system.`,
 }
 
 func (o *OpenOptions) Run() error {
-	serviceDomain, err := o.serviceDomain()
+	url, err := o.addr()
 	if err != nil {
 		return err
 	}
 
-	// TODO Determine protocol for the entrypoint
-	cmd := exec.Command("open", []string{o.CurlFlags.RequestSchema() + "://" + serviceDomain}...)
+	o.ui.PrintLinef("Opening '%s'", url)
+
+	cmd := exec.Command("open", url)
 
 	err = cmd.Start()
 	if err != nil {
@@ -71,7 +72,7 @@ func (o *OpenOptions) Run() error {
 	return nil
 }
 
-func (o *OpenOptions) serviceDomain() (string, error) {
+func (o *OpenOptions) addr() (string, error) {
 	servingClient, err := o.depsFactory.ServingClient()
 	if err != nil {
 		return "", err
@@ -82,9 +83,15 @@ func (o *OpenOptions) serviceDomain() (string, error) {
 		return "", err
 	}
 
-	if len(service.Status.Domain) == 0 {
-		return "", fmt.Errorf("Expected service '%s' to have non-empty domain", o.ServiceFlags.Name)
+	coreClient, err := o.depsFactory.CoreClient()
+	if err != nil {
+		return "", err
 	}
 
-	return service.Status.Domain, nil
+	url, err := ServiceAddress{service, coreClient}.URL(o.CurlFlags.Port, true)
+	if err != nil {
+		return "", err
+	}
+
+	return url, nil
 }
