@@ -32,6 +32,7 @@ type CurlOptions struct {
 
 	ServiceFlags ServiceFlags
 	CurlFlags    CurlFlags
+	Verbose      bool
 }
 
 func NewCurlOptions(ui ui.UI, depsFactory DepsFactory) *CurlOptions {
@@ -55,6 +56,7 @@ Requires 'curl' command installed on the system.`,
 	}
 	o.ServiceFlags.Set(cmd, flagsFactory)
 	o.CurlFlags.Set(cmd, flagsFactory)
+	cmd.Flags().BoolVarP(&o.Verbose, "verbose", "v", false, "Makes curl verbose during the operation")
 	return cmd
 }
 
@@ -67,7 +69,7 @@ func (o *CurlOptions) Run() error {
 	cmdName := "curl"
 	cmdArgs := []string{}
 
-	if o.CurlFlags.Verbose {
+	if o.Verbose {
 		cmdArgs = append(cmdArgs, "-vvv")
 	}
 

@@ -41,7 +41,7 @@ Basic Commands:
   logs              Print service logs
   pod               Pod management (list)
   revision          Revision management (annotate, delete, list, show, tag, untag)
-  service           Service management (annotate, delete, list, open, show)
+  service           Service management (annotate, delete, list, open, show, url)
 
 Build Management Commands:
   build             Build management (create, delete, list, show)
@@ -83,7 +83,7 @@ Succeeded
 `
 
 	if out != expectedOutput {
-		t.Fatalf("Expected to find exact help content")
+		t.Fatalf("Expected to find exact help content, got '%s'", out)
 	}
 }
 
@@ -93,7 +93,7 @@ func TestHelpCmdWithChildren(t *testing.T) {
 
 	out, _ := knctl.RunWithOpts([]string{"service", "-h"}, RunOpts{NoNamespace: true})
 
-	const expectedOutput = `Service management (annotate, delete, list, open, show)
+	const expectedOutput = `Service management (annotate, delete, list, open, show, url)
 
 Usage:
   knctl service [flags]
@@ -108,6 +108,7 @@ Available Commands:
   list        List services
   open        Open web browser pointing at a service domain
   show        Show service
+  url         Print service URL
 
 Flags:
   -h, --help   help for service
@@ -127,7 +128,7 @@ Succeeded
 `
 
 	if out != expectedOutput {
-		t.Fatalf("Expected to find exact help content")
+		t.Fatalf("Expected to find exact help content, got '%s'", out)
 	}
 }
 
@@ -168,6 +169,6 @@ Succeeded
 `
 
 	if out != expectedOutput {
-		t.Fatalf("Expected to find exact help content")
+		t.Fatalf("Expected to find exact help content, got '%s'", out)
 	}
 }

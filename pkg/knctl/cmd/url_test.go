@@ -22,44 +22,40 @@ import (
 	. "github.com/cppforlife/knctl/pkg/knctl/cmd"
 )
 
-func TestNewCurlCmd_Ok(t *testing.T) {
-	realCmd := NewCurlOptions(nil, newDepsFactory())
-	cmd := NewTestCmd(t, NewCurlCmd(realCmd, FlagsFactory{}))
+func TestNewURLCmd_Ok(t *testing.T) {
+	realCmd := NewURLOptions(nil, newDepsFactory())
+	cmd := NewTestCmd(t, NewURLCmd(realCmd, FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
 		"-s", "test-service",
 		"-p", "1234",
-		"-v",
 	})
 	cmd.ExpectReachesExecution()
 
 	DeepEqual(t, realCmd.ServiceFlags,
 		ServiceFlags{NamespaceFlags{"test-namespace"}, "test-service"})
 	DeepEqual(t, realCmd.CurlFlags, CurlFlags{Port: int32(1234)})
-	DeepEqual(t, realCmd.Verbose, true)
 }
 
-func TestNewCurlCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewCurlOptions(nil, newDepsFactory())
-	cmd := NewTestCmd(t, NewCurlCmd(realCmd, FlagsFactory{}))
+func TestNewURLCmd_OkLongFlagNames(t *testing.T) {
+	realCmd := NewURLOptions(nil, newDepsFactory())
+	cmd := NewTestCmd(t, NewURLCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--service", "test-service",
 		"--port", "1234",
-		"--verbose",
 	})
 	cmd.ExpectReachesExecution()
 
 	DeepEqual(t, realCmd.ServiceFlags,
 		ServiceFlags{NamespaceFlags{"test-namespace"}, "test-service"})
 	DeepEqual(t, realCmd.CurlFlags, CurlFlags{Port: int32(1234)})
-	DeepEqual(t, realCmd.Verbose, true)
 }
 
-func TestNewCurlCmd_OkMinimum(t *testing.T) {
-	realCmd := NewCurlOptions(nil, newDepsFactory())
-	cmd := NewTestCmd(t, NewCurlCmd(realCmd, FlagsFactory{}))
+func TestNewURLCmd_OkMinimum(t *testing.T) {
+	realCmd := NewURLOptions(nil, newDepsFactory())
+	cmd := NewTestCmd(t, NewURLCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--service", "test-service",
@@ -69,12 +65,11 @@ func TestNewCurlCmd_OkMinimum(t *testing.T) {
 	DeepEqual(t, realCmd.ServiceFlags,
 		ServiceFlags{NamespaceFlags{"test-namespace"}, "test-service"})
 	DeepEqual(t, realCmd.CurlFlags, CurlFlags{Port: int32(80)})
-	DeepEqual(t, realCmd.Verbose, false)
 }
 
-func TestNewCurlCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewCurlOptions(nil, newDepsFactory())
-	cmd := NewTestCmd(t, NewCurlCmd(realCmd, FlagsFactory{}))
+func TestNewURLCmd_RequiredFlags(t *testing.T) {
+	realCmd := NewURLOptions(nil, newDepsFactory())
+	cmd := NewTestCmd(t, NewURLCmd(realCmd, FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"service"})
 }

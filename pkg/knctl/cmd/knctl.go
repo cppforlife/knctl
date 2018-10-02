@@ -100,6 +100,7 @@ Knative docs: https://github.com/knative/docs.`,
 	serviceCmd.AddCommand(NewDeleteServiceCmd(NewDeleteServiceOptions(o.ui, o.depsFactory), flagsFactory))
 	serviceCmd.AddCommand(NewAnnotateServiceCmd(NewAnnotateServiceOptions(o.ui, o.depsFactory), flagsFactory))
 	serviceCmd.AddCommand(NewOpenCmd(NewOpenOptions(o.ui, o.depsFactory), flagsFactory))
+	serviceCmd.AddCommand(NewURLCmd(NewURLOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(serviceCmd)
 
 	revisionCmd := NewRevisionCmd()
