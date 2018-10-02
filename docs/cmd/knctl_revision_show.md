@@ -1,29 +1,29 @@
-## knctl revision list
+## knctl revision show
 
-List revisions
+Show revision
 
 ### Synopsis
 
-List all revisions for a service
+Show revision details in a namespace
 
 ```
-knctl revision list [flags]
+knctl revision show [flags]
 ```
 
 ### Examples
 
 ```
 
-  # List all revisions for service 'svc1' in namespace 'ns1' 
-  knctl revision list -s svc1 -n ns1
+  # Show details for revison 'rev1' in namespace 'ns1'
+  knctl revision show -r rev1 -n ns1
 ```
 
 ### Options
 
 ```
-  -h, --help               help for list
+  -h, --help               help for show
   -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
-  -s, --service string     Specified service
+  -r, --revision string    Specified revision
 ```
 
 ### Options inherited from parent commands

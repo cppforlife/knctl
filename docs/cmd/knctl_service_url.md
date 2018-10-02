@@ -1,28 +1,29 @@
-## knctl revision list
+## knctl service url
 
-List revisions
+Print service URL
 
 ### Synopsis
 
-List all revisions for a service
+Print service URL
 
 ```
-knctl revision list [flags]
+knctl service url [flags]
 ```
 
 ### Examples
 
 ```
 
-  # List all revisions for service 'svc1' in namespace 'ns1' 
-  knctl revision list -s svc1 -n ns1
+  # Print service 'svc1' URL in namespace 'ns1'
+  knctl service url -s svc1 -n ns1
 ```
 
 ### Options
 
 ```
-  -h, --help               help for list
+  -h, --help               help for url
   -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
+  -p, --port int32         Set port (default 80)
   -s, --service string     Specified service
 ```
 
@@ -40,5 +41,5 @@ knctl revision list [flags]
 
 ### SEE ALSO
 
-* [knctl revision](knctl_revision.md)	 - Revision management (annotate, delete, list, show, tag, untag)
+* [knctl service](knctl_service.md)	 - Service management (annotate, delete, list, open, show, url)
 

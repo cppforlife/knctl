@@ -1,6 +1,6 @@
 ## knctl
 
-knctl controls Knative resources (basic-auth-secret, build, curl, deploy, domain, ingress, install, logs, namespace, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
+knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, namespace, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
 
 ### Synopsis
 
@@ -29,7 +29,7 @@ knctl [flags]
 ### SEE ALSO
 
 * [knctl basic-auth-secret](knctl_basic-auth-secret.md)	 - Basic auth secret management (create)
-* [knctl build](knctl_build.md)	 - Build management (create, delete, list)
+* [knctl build](knctl_build.md)	 - Build management (create, delete, list, show)
 * [knctl curl](knctl_curl.md)	 - Curl service
 * [knctl deploy](knctl_deploy.md)	 - Deploy service
 * [knctl domain](knctl_domain.md)	 - Domain management (create, list)
@@ -38,9 +38,9 @@ knctl [flags]
 * [knctl logs](knctl_logs.md)	 - Print service logs
 * [knctl namespace](knctl_namespace.md)	 - Namespace management (create)
 * [knctl pod](knctl_pod.md)	 - Pod management (list)
-* [knctl revision](knctl_revision.md)	 - Revision management (annotate, delete, list, tag, untag)
+* [knctl revision](knctl_revision.md)	 - Revision management (annotate, delete, list, show, tag, untag)
 * [knctl route](knctl_route.md)	 - Route management (create, delete, list)
-* [knctl service](knctl_service.md)	 - Service management (annotate, delete, list, open, show)
+* [knctl service](knctl_service.md)	 - Service management (annotate, delete, list, open, show, url)
 * [knctl service-account](knctl_service-account.md)	 - Service account management (create)
 * [knctl ssh-auth-secret](knctl_ssh-auth-secret.md)	 - SSH auth secret management (create)
 * [knctl uninstall](knctl_uninstall.md)	 - Uninstall Knative and Istio

@@ -1,10 +1,10 @@
 ## knctl revision
 
-Revision management (annotate, delete, list, tag, untag)
+Revision management (annotate, delete, list, show, tag, untag)
 
 ### Synopsis
 
-Revision management (annotate, delete, list, tag, untag)
+Revision management (annotate, delete, list, show, tag, untag)
 
 ```
 knctl revision [flags]
@@ -30,10 +30,11 @@ knctl revision [flags]
 
 ### SEE ALSO
 
-* [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, domain, ingress, install, logs, namespace, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
+* [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, namespace, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
 * [knctl revision annotate](knctl_revision_annotate.md)	 - Annotate revision
 * [knctl revision delete](knctl_revision_delete.md)	 - Delete revision
 * [knctl revision list](knctl_revision_list.md)	 - List revisions
+* [knctl revision show](knctl_revision_show.md)	 - Show revision
 * [knctl revision tag](knctl_revision_tag.md)	 - Tag revision
 * [knctl revision untag](knctl_revision_untag.md)	 - Untag revision
 

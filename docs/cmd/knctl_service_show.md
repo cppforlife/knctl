@@ -40,5 +40,5 @@ knctl service show [flags]
 
 ### SEE ALSO
 
-* [knctl service](knctl_service.md)	 - Service management (annotate, delete, list, open, show)
+* [knctl service](knctl_service.md)	 - Service management (annotate, delete, list, open, show, url)
 

@@ -30,7 +30,7 @@ knctl route [flags]
 
 ### SEE ALSO
 
-* [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, domain, ingress, install, logs, namespace, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
+* [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, namespace, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
 * [knctl route create](knctl_route_create.md)	 - Create or update route
 * [knctl route delete](knctl_route_delete.md)	 - Delete route
 * [knctl route list](knctl_route_list.md)	 - List routes

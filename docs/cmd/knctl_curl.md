@@ -27,6 +27,7 @@ knctl curl [flags]
   -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
   -p, --port int32         Set port (default 80)
   -s, --service string     Specified service
+  -v, --verbose            Makes curl verbose during the operation
 ```
 
 ### Options inherited from parent commands
@@ -43,5 +44,5 @@ knctl curl [flags]
 
 ### SEE ALSO
 
-* [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, domain, ingress, install, logs, namespace, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
+* [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, namespace, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
 

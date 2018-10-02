@@ -1,29 +1,30 @@
-## knctl revision list
+## knctl build show
 
-List revisions
+Show build
 
 ### Synopsis
 
-List all revisions for a service
+Show build details in a namespace
 
 ```
-knctl revision list [flags]
+knctl build show [flags]
 ```
 
 ### Examples
 
 ```
 
-  # List all revisions for service 'svc1' in namespace 'ns1' 
-  knctl revision list -s svc1 -n ns1
+  # Show details for build 'build1' in namespace 'ns1'
+  knctl build show -b build1 -n ns1
 ```
 
 ### Options
 
 ```
-  -h, --help               help for list
+  -b, --build string       Specified build
+  -h, --help               help for show
+      --logs               Show logs (default true)
   -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
-  -s, --service string     Specified service
 ```
 
 ### Options inherited from parent commands
@@ -40,5 +41,5 @@ knctl revision list [flags]
 
 ### SEE ALSO
 
-* [knctl revision](knctl_revision.md)	 - Revision management (annotate, delete, list, show, tag, untag)
+* [knctl build](knctl_build.md)	 - Build management (create, delete, list, show)
 

@@ -1,10 +1,10 @@
 ## knctl service
 
-Service management (annotate, delete, list, open, show)
+Service management (annotate, delete, list, open, show, url)
 
 ### Synopsis
 
-Service management (annotate, delete, list, open, show)
+Service management (annotate, delete, list, open, show, url)
 
 ```
 knctl service [flags]
@@ -30,10 +30,11 @@ knctl service [flags]
 
 ### SEE ALSO
 
-* [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, domain, ingress, install, logs, namespace, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
+* [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, namespace, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
 * [knctl service annotate](knctl_service_annotate.md)	 - Annotate service
 * [knctl service delete](knctl_service_delete.md)	 - Delete service
 * [knctl service list](knctl_service_list.md)	 - List services
 * [knctl service open](knctl_service_open.md)	 - Open web browser pointing at a service domain
 * [knctl service show](knctl_service_show.md)	 - Show service
+* [knctl service url](knctl_service_url.md)	 - Print service URL
 

@@ -60,5 +60,5 @@ knctl build create [flags]
 
 ### SEE ALSO
 
-* [knctl build](knctl_build.md)	 - Build management (create, delete, list)
+* [knctl build](knctl_build.md)	 - Build management (create, delete, list, show)
 
