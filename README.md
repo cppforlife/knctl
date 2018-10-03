@@ -20,7 +20,7 @@ Grab pre-built binaries from the [Releases page](https://github.com/cppforlife/k
   - [Ingresses](./docs/ingresses.md)
   - [Complete command reference](./docs/cmd/knctl.md)
 - Blog posts
-  - [https://starkandwayne.com/blog/deploying-12factor-apps-to-knative/]()
+  - [starkandwayne.com: Deploying 12-factor apps to Knative](https://starkandwayne.com/blog/deploying-12factor-apps-to-knative/)
 
 ## Development
 
