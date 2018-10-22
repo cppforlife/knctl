@@ -31,6 +31,7 @@ func TestNewCreateSSHAuthSecretCmd_Ok(t *testing.T) {
 		"-s", "test-secret",
 		"--url", "test-url",
 		"--private-key", "test-private-key-pem",
+		"--private-key-path", "test-private-key-path",
 		"--known-hosts", "test-known-hosts",
 	})
 	cmd.ExpectReachesExecution()
@@ -39,9 +40,10 @@ func TestNewCreateSSHAuthSecretCmd_Ok(t *testing.T) {
 		SecretFlags{NamespaceFlags{"test-namespace"}, "test-secret"})
 
 	DeepEqual(t, realCmd.SSHAuthSecretCreateFlags, SSHAuthSecretCreateFlags{
-		URL:        "test-url",
-		PrivateKey: "test-private-key-pem",
-		KnownHosts: "test-known-hosts",
+		URL:            "test-url",
+		PrivateKey:     "test-private-key-pem",
+		PrivateKeyPath: "test-private-key-path",
+		KnownHosts:     "test-known-hosts",
 	})
 }
 

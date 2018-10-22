@@ -48,7 +48,7 @@ func (s *SSHAuthSecretCreateFlags) Set(cmd *cobra.Command, flagsFactory FlagsFac
 
 	defaultKey := os.Getenv("KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY")
 	cmd.Flags().StringVar(&s.PrivateKey, "private-key", defaultKey, "Set private key in PEM format ($KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY)")
-	cmd.Flags().StringVar(&s.PrivateKey, "private-key-path", "", "Set private key in PEM format from file path")
+	cmd.Flags().StringVar(&s.PrivateKeyPath, "private-key-path", "", "Set private key in PEM format from file path")
 
 	cmd.Flags().StringVar(&s.KnownHosts, "known-hosts", "", "Set known hosts")
 
