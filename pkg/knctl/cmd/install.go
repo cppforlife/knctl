@@ -36,8 +36,8 @@ import (
 
 var (
 	InstallIstioAsset = InstallationAsset{
-		URL:    "https://raw.githubusercontent.com/knative/serving/4fcdd64a2c1a3ea111b9dbe4191b0f6612105535/third_party/istio-1.0.0/istio.yaml",
-		SHA256: "f1ec0ac4a056fe2d53550db76f260818ca009d598225f318320bafa42d23c4fb",
+		URL:    "https://raw.githubusercontent.com/knative/serving/38c0d500fcd4a65b24b103b54bedf6dacc985170/third_party/istio-1.0.2/istio.yaml",
+		SHA256: "92377c1600653bddb7e0e0a3a481e15d4f193f3dee36bb30399cc9aba7d628bf",
 	}
 	InstallKnativeFullAsset = InstallationAsset{
 		URL:    "https://github.com/knative/serving/releases/download/v0.1.1/release.yaml",
