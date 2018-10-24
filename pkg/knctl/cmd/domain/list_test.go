@@ -14,21 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package domain_test
 
 import (
+	"testing"
+
+	. "github.com/cppforlife/knctl/pkg/knctl/cmd"
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
-	"github.com/spf13/cobra"
+	. "github.com/cppforlife/knctl/pkg/knctl/cmd/domain"
 )
 
-func NewNamespaceCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "namespace",
-		Aliases: []string{"ns"},
-		Short:   "Namespace management",
-		Annotations: map[string]string{
-			cmdcore.OtherHelpGroup.Key: cmdcore.OtherHelpGroup.Value,
-		},
-	}
-	return cmd
+func TestNewListCmd_OkMinimum(t *testing.T) {
+	realCmd := NewListOptions(nil, cmdcore.NewDepsFactory())
+	cmd := NewTestCmd(t, NewListCmd(realCmd, cmdcore.FlagsFactory{}))
+	cmd.ExpectBasicConfig()
+	cmd.Execute([]string{})
+	cmd.ExpectReachesExecution()
 }

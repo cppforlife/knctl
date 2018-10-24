@@ -14,21 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package core
 
-import (
-	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
-	"github.com/spf13/cobra"
+var (
+	ListAliases   = []string{"l", "ls"}
+	DeleteAliases = []string{"del"}
 )
-
-func NewNamespaceCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "namespace",
-		Aliases: []string{"ns"},
-		Short:   "Namespace management",
-		Annotations: map[string]string{
-			cmdcore.OtherHelpGroup.Key: cmdcore.OtherHelpGroup.Value,
-		},
-	}
-	return cmd
-}

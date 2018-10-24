@@ -24,14 +24,15 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	. "github.com/cppforlife/knctl/pkg/knctl/cmd"
+	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	"github.com/cppforlife/knctl/pkg/knctl/cobrautil"
 	"github.com/spf13/cobra"
 )
 
 func TestNewKnctlCmd_Ok(t *testing.T) {
 	noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-	realCmd := NewKnctlOptions(noopUI, NewConfigFactoryImpl(), newDepsFactory())
-	cobraCmd := NewKnctlCmd(realCmd, FlagsFactory{})
+	realCmd := NewKnctlOptions(noopUI, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
+	cobraCmd := NewKnctlCmd(realCmd, cmdcore.FlagsFactory{})
 
 	cmd := NewTestCmd(t, cobraCmd)
 	cmd.ExpectBasicConfig()
@@ -46,18 +47,18 @@ func TestNewKnctlCmd_Ok(t *testing.T) {
 
 func TestNewKnctlCmd_OkMinimum(t *testing.T) {
 	noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-	realCmd := NewKnctlOptions(noopUI, NewConfigFactoryImpl(), newDepsFactory())
-	cmd := NewTestCmd(t, NewKnctlCmd(realCmd, FlagsFactory{}))
+	realCmd := NewKnctlOptions(noopUI, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
+	cmd := NewTestCmd(t, NewKnctlCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectReachesExecution()
 
-	DeepEqual(t, realCmd.UIFlags, UIFlags{})
+	DeepEqual(t, realCmd.UIFlags, cmdcore.UIFlags{})
 }
 
 func TestNewKnctlCmd_OkUIFlags(t *testing.T) {
 	noopUI := ui.NewWrappingConfUI(ui.NewNoopUI(), ui.NewNoopLogger())
-	realCmd := NewKnctlOptions(noopUI, NewConfigFactoryImpl(), newDepsFactory())
-	cmd := NewTestCmd(t, NewKnctlCmd(realCmd, FlagsFactory{}))
+	realCmd := NewKnctlOptions(noopUI, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
+	cmd := NewTestCmd(t, NewKnctlCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.Execute([]string{
 		"--tty",
 		"--no-color",
@@ -68,7 +69,7 @@ func TestNewKnctlCmd_OkUIFlags(t *testing.T) {
 	})
 	cmd.ExpectReachesExecution()
 
-	DeepEqual(t, realCmd.UIFlags, UIFlags{
+	DeepEqual(t, realCmd.UIFlags, cmdcore.UIFlags{
 		TTY:            true,
 		NoColor:        true,
 		JSON:           true,

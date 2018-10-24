@@ -14,21 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package core
 
-import (
-	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
-	"github.com/spf13/cobra"
-)
+type FlagsFactory struct {
+	configFactory ConfigFactory
+	depsFactory   DepsFactory
+}
 
-func NewNamespaceCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "namespace",
-		Aliases: []string{"ns"},
-		Short:   "Namespace management",
-		Annotations: map[string]string{
-			cmdcore.OtherHelpGroup.Key: cmdcore.OtherHelpGroup.Value,
-		},
-	}
-	return cmd
+func NewFlagsFactory(configFactory ConfigFactory, depsFactory DepsFactory) FlagsFactory {
+	return FlagsFactory{configFactory, depsFactory}
+}
+
+func (f FlagsFactory) NewNamespaceNameFlag(str *string) *NamespaceNameFlag {
+	return NewNamespaceNameFlag(str, f.configFactory)
 }

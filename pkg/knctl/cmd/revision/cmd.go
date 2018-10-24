@@ -14,42 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package revision
 
 import (
-	"fmt"
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
-
-	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/spf13/cobra"
 )
 
-const (
-	Version = "0.0.10-dev.1"
-)
-
-type VersionOptions struct {
-	ui ui.UI
-}
-
-func NewVersionOptions(ui ui.UI) *VersionOptions {
-	return &VersionOptions{ui}
-}
-
-func NewVersionCmd(o *VersionOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
+func NewCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "version",
-		Short: "Print client version",
+		Use:     "revision",
+		Aliases: []string{"r", "rs", "rev", "revs", "revisions"},
+		Short:   "Revision management",
 		Annotations: map[string]string{
-			cmdcore.SystemHelpGroup.Key: cmdcore.SystemHelpGroup.Value,
+			cmdcore.BasicHelpGroup.Key: cmdcore.BasicHelpGroup.Value,
 		},
-		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	return cmd
-}
-
-func (o *VersionOptions) Run() error {
-	o.ui.PrintBlock([]byte(fmt.Sprintf("Client Version: %s\n", Version)))
-
-	return nil
 }

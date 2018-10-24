@@ -17,6 +17,7 @@ limitations under the License.
 package cmd_test
 
 import (
+	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	"testing"
 
 	. "github.com/cppforlife/knctl/pkg/knctl/cmd"
@@ -24,7 +25,7 @@ import (
 
 func TestNewVersionCmd_OkMinimum(t *testing.T) {
 	realCmd := NewVersionOptions(nil)
-	cmd := NewTestCmd(t, NewVersionCmd(realCmd, FlagsFactory{}))
+	cmd := NewTestCmd(t, NewVersionCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{})
 	cmd.ExpectReachesExecution()

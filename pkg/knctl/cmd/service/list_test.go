@@ -14,43 +14,42 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd_test
+package service_test
 
 import (
-	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	"testing"
 
 	. "github.com/cppforlife/knctl/pkg/knctl/cmd"
+	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
+	. "github.com/cppforlife/knctl/pkg/knctl/cmd/service"
 )
 
-func TestNewCreateNamespaceCmd_Ok(t *testing.T) {
-	realCmd := NewCreateNamespaceOptions(nil, cmdcore.NewDepsFactory())
-	cmd := NewTestCmd(t, NewCreateNamespaceCmd(realCmd, cmdcore.FlagsFactory{}))
+func TestNewListCmd_Ok(t *testing.T) {
+	realCmd := NewListOptions(nil, cmdcore.NewDepsFactory())
+	cmd := NewTestCmd(t, NewListCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
 		"-n", "test-namespace",
 	})
 	cmd.ExpectReachesExecution()
 
-	DeepEqual(t, realCmd.NamespaceFlags,
-		cmdcore.NamespaceFlags{"test-namespace"})
+	DeepEqual(t, realCmd.NamespaceFlags, cmdcore.NamespaceFlags{"test-namespace"})
 }
 
-func TestNewCreateNamespaceCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewCreateNamespaceOptions(nil, cmdcore.NewDepsFactory())
-	cmd := NewTestCmd(t, NewCreateNamespaceCmd(realCmd, cmdcore.FlagsFactory{}))
+func TestNewListCmd_OkLongFlagNames(t *testing.T) {
+	realCmd := NewListOptions(nil, cmdcore.NewDepsFactory())
+	cmd := NewTestCmd(t, NewListCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 	})
 	cmd.ExpectReachesExecution()
 
-	DeepEqual(t, realCmd.NamespaceFlags,
-		cmdcore.NamespaceFlags{"test-namespace"})
+	DeepEqual(t, realCmd.NamespaceFlags, cmdcore.NamespaceFlags{"test-namespace"})
 }
 
-func TestNewCreateNamespaceCmd_OkMinimum(t *testing.T) {
-	realCmd := NewCreateNamespaceOptions(nil, cmdcore.NewDepsFactory())
-	cmd := NewTestCmd(t, NewCreateNamespaceCmd(realCmd, cmdcore.FlagsFactory{}))
+func TestNewListCmd_OkMinimum(t *testing.T) {
+	realCmd := NewListOptions(nil, cmdcore.NewDepsFactory())
+	cmd := NewTestCmd(t, NewListCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectReachesExecution()
 }

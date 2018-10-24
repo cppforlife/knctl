@@ -14,21 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package core
 
 import (
-	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
-	"github.com/spf13/cobra"
+	"fmt"
+
+	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 )
 
-func NewNamespaceCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "namespace",
-		Aliases: []string{"ns"},
-		Short:   "Namespace management",
-		Annotations: map[string]string{
-			cmdcore.OtherHelpGroup.Key: cmdcore.OtherHelpGroup.Value,
-		},
-	}
-	return cmd
+type ValueUnknownBool struct {
+	B *bool
 }
+
+var _ uitable.Value = ValueUnknownBool{}
+
+func NewValueUnknownBool(b *bool) ValueUnknownBool { return ValueUnknownBool{B: b} }
+
+func (t ValueUnknownBool) String() string {
+	if t.B != nil {
+		return fmt.Sprintf("%t", *t.B)
+	}
+	return ""
+}
+
+func (t ValueUnknownBool) Value() uitable.Value            { return t }
+func (t ValueUnknownBool) Compare(other uitable.Value) int { panic("Never called") }

@@ -18,20 +18,24 @@ package cmd
 
 import (
 	"encoding/json"
+
 	"github.com/cppforlife/go-cli-ui/ui"
+	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
+	cmddom "github.com/cppforlife/knctl/pkg/knctl/cmd/domain"
+	ctling "github.com/cppforlife/knctl/pkg/knctl/ingress"
 	"github.com/spf13/cobra"
 )
 
 type DNSMapOptions struct {
 	ui          ui.UI
-	depsFactory DepsFactory
+	depsFactory cmdcore.DepsFactory
 }
 
-func NewDNSMapOptions(ui ui.UI, depsFactory DepsFactory) *DNSMapOptions {
+func NewDNSMapOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *DNSMapOptions {
 	return &DNSMapOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewDNSMapCmd(o *DNSMapOptions, flagsFactory FlagsFactory) *cobra.Command {
+func NewDNSMapCmd(o *DNSMapOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "dns-map",
 		Short: "Print domain to IP map in JSON format",
@@ -47,12 +51,12 @@ func (o *DNSMapOptions) Run() error {
 		return err
 	}
 
-	domains, err := NewDomains(coreClient).List()
+	domains, err := cmddom.NewDomains(coreClient).List()
 	if err != nil {
 		return err
 	}
 
-	ingSvcs, err := IngressServices{coreClient}.List()
+	ingSvcs, err := ctling.NewIngressServices(coreClient).List()
 	if err != nil {
 		return err
 	}

@@ -14,21 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package core
 
 import (
-	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
-	"github.com/spf13/cobra"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
-func NewNamespaceCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "namespace",
-		Aliases: []string{"ns"},
-		Short:   "Namespace management",
-		Annotations: map[string]string{
-			cmdcore.OtherHelpGroup.Key: cmdcore.OtherHelpGroup.Value,
-		},
-	}
-	return cmd
+type CancelSignals struct{}
+
+func (CancelSignals) Watch(stopFunc func()) {
+	signalCh := make(chan os.Signal, 1)
+	signal.Notify(signalCh, syscall.SIGINT, syscall.SIGHUP)
+	go func() {
+		defer signal.Stop(signalCh)
+		select {
+		case <-signalCh:
+			stopFunc()
+		}
+	}()
 }

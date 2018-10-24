@@ -1,7 +1,7 @@
 /*
 Copyright 2018 The Knative Authors
 
-Licensed under the Apache License, Version 2.0 (the "License");
+Licensed under the Apache License, Open 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
@@ -14,21 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package flags
 
 import (
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	"github.com/spf13/cobra"
 )
 
-func NewNamespaceCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "namespace",
-		Aliases: []string{"ns"},
-		Short:   "Namespace management",
-		Annotations: map[string]string{
-			cmdcore.OtherHelpGroup.Key: cmdcore.OtherHelpGroup.Value,
-		},
-	}
-	return cmd
+type ServiceFlags struct {
+	NamespaceFlags cmdcore.NamespaceFlags
+	Name           string
+}
+
+func (s *ServiceFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory) {
+	s.NamespaceFlags.Set(cmd, flagsFactory)
+
+	cmd.Flags().StringVarP(&s.Name, "service", "s", "", "Specified service")
+	cmd.MarkFlagRequired("service")
 }

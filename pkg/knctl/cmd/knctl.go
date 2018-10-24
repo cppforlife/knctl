@@ -22,32 +22,44 @@ import (
 	"strings"
 
 	"github.com/cppforlife/go-cli-ui/ui"
+	cmdbas "github.com/cppforlife/knctl/pkg/knctl/cmd/basicauthsecret"
+	cmdbld "github.com/cppforlife/knctl/pkg/knctl/cmd/build"
+	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
+	cmddom "github.com/cppforlife/knctl/pkg/knctl/cmd/domain"
+	cmding "github.com/cppforlife/knctl/pkg/knctl/cmd/ingress"
+	cmdkn "github.com/cppforlife/knctl/pkg/knctl/cmd/knative"
+	cmdpod "github.com/cppforlife/knctl/pkg/knctl/cmd/pod"
+	cmdrev "github.com/cppforlife/knctl/pkg/knctl/cmd/revision"
+	cmdrte "github.com/cppforlife/knctl/pkg/knctl/cmd/route"
+	cmdsvc "github.com/cppforlife/knctl/pkg/knctl/cmd/service"
+	cmdsa "github.com/cppforlife/knctl/pkg/knctl/cmd/serviceaccount"
+	cmdsas "github.com/cppforlife/knctl/pkg/knctl/cmd/sshauthsecret"
 	"github.com/cppforlife/knctl/pkg/knctl/cobrautil"
 	"github.com/spf13/cobra"
 )
 
 type KnctlOptions struct {
 	ui            *ui.ConfUI
-	configFactory ConfigFactory
-	depsFactory   DepsFactory
+	configFactory cmdcore.ConfigFactory
+	depsFactory   cmdcore.DepsFactory
 
-	UIFlags         UIFlags
-	KubeconfigFlags KubeconfigFlags
+	UIFlags         cmdcore.UIFlags
+	KubeconfigFlags cmdcore.KubeconfigFlags
 }
 
-func NewKnctlOptions(ui *ui.ConfUI, configFactory ConfigFactory, depsFactory DepsFactory) *KnctlOptions {
+func NewKnctlOptions(ui *ui.ConfUI, configFactory cmdcore.ConfigFactory, depsFactory cmdcore.DepsFactory) *KnctlOptions {
 	return &KnctlOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory}
 }
 
 func NewDefaultKnctlCmd(ui *ui.ConfUI) *cobra.Command {
-	configFactory := NewConfigFactoryImpl()
-	depsFactory := NewDepsFactoryImpl(configFactory)
+	configFactory := cmdcore.NewConfigFactoryImpl()
+	depsFactory := cmdcore.NewDepsFactoryImpl(configFactory)
 	options := NewKnctlOptions(ui, configFactory, depsFactory)
-	flagsFactory := NewFlagsFactory(configFactory, depsFactory)
+	flagsFactory := cmdcore.NewFlagsFactory(configFactory, depsFactory)
 	return NewKnctlCmd(options, flagsFactory)
 }
 
-func NewKnctlCmd(o *KnctlOptions, flagsFactory FlagsFactory) *cobra.Command {
+func NewKnctlCmd(o *KnctlOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "knctl",
 		Short: "knctl controls Knative resources",
@@ -71,13 +83,13 @@ Knative docs: https://github.com/knative/docs.`,
 	cmd.SetOutput(uiBlockWriter{o.ui}) // setting output for cmd.Help()
 
 	cmd.SetUsageTemplate(cobrautil.HelpSectionsUsageTemplate([]cobrautil.HelpSection{
-		basicGroup,
-		buildMgmtGroup,
-		secretMgmtGroup,
-		routeMgmtGroup,
-		otherGroup,
-		systemGroup,
-		restOfCommandsGroup,
+		cmdcore.BasicHelpGroup,
+		cmdcore.BuildMgmtHelpGroup,
+		cmdcore.SecretMgmtHelpGroup,
+		cmdcore.RouteMgmtHelpGroup,
+		cmdcore.OtherHelpGroup,
+		cmdcore.SystemHelpGroup,
+		cmdcore.RestOfCommandsHelpGroup,
 	}))
 
 	o.UIFlags.Set(cmd, flagsFactory)
@@ -87,71 +99,75 @@ Knative docs: https://github.com/knative/docs.`,
 	o.configFactory.ConfigureContextResolver(o.KubeconfigFlags.Context.Value)
 
 	cmd.AddCommand(NewVersionCmd(NewVersionOptions(o.ui), flagsFactory))
-	cmd.AddCommand(NewInstallCmd(NewInstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags), flagsFactory))
-	cmd.AddCommand(NewUninstallCmd(NewUninstallOptions(o.ui, o.depsFactory), flagsFactory))
-	cmd.AddCommand(NewDeployCmd(NewDeployOptions(o.ui, o.configFactory, o.depsFactory), flagsFactory))
-	cmd.AddCommand(NewLogsCmd(NewLogsOptions(o.ui, o.depsFactory, CancelSignals{}), flagsFactory))
-	cmd.AddCommand(NewCurlCmd(NewCurlOptions(o.ui, o.depsFactory), flagsFactory))
-	cmd.AddCommand(NewDNSMapCmd(NewDNSMapOptions(o.ui, o.depsFactory), flagsFactory))
 
-	serviceCmd := NewServiceCmd()
-	serviceCmd.AddCommand(NewListServicesCmd(NewListServicesOptions(o.ui, o.depsFactory), flagsFactory))
-	serviceCmd.AddCommand(NewShowServiceCmd(NewShowServiceOptions(o.ui, o.depsFactory), flagsFactory))
-	serviceCmd.AddCommand(NewDeleteServiceCmd(NewDeleteServiceOptions(o.ui, o.depsFactory), flagsFactory))
-	serviceCmd.AddCommand(NewAnnotateServiceCmd(NewAnnotateServiceOptions(o.ui, o.depsFactory), flagsFactory))
-	serviceCmd.AddCommand(NewOpenCmd(NewOpenOptions(o.ui, o.depsFactory), flagsFactory))
-	serviceCmd.AddCommand(NewURLCmd(NewURLOptions(o.ui, o.depsFactory), flagsFactory))
+	// Knative
+	cmd.AddCommand(cmdkn.NewInstallCmd(cmdkn.NewInstallOptions(o.ui, o.depsFactory, &o.KubeconfigFlags), flagsFactory))
+	cmd.AddCommand(cmdkn.NewUninstallCmd(cmdkn.NewUninstallOptions(o.ui, o.depsFactory), flagsFactory))
+
+	serviceCmd := cmdsvc.NewCmd()
+	serviceCmd.AddCommand(cmdsvc.NewListCmd(cmdsvc.NewListOptions(o.ui, o.depsFactory), flagsFactory))
+	serviceCmd.AddCommand(cmdsvc.NewShowCmd(cmdsvc.NewShowOptions(o.ui, o.depsFactory), flagsFactory))
+	serviceCmd.AddCommand(cmdsvc.NewDeleteCmd(cmdsvc.NewDeleteOptions(o.ui, o.depsFactory), flagsFactory))
+	serviceCmd.AddCommand(cmdsvc.NewAnnotateCmd(cmdsvc.NewAnnotateOptions(o.ui, o.depsFactory), flagsFactory))
+	serviceCmd.AddCommand(cmdsvc.NewOpenCmd(cmdsvc.NewOpenOptions(o.ui, o.depsFactory), flagsFactory))
+	serviceCmd.AddCommand(cmdsvc.NewURLCmd(cmdsvc.NewURLOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(serviceCmd)
 
-	revisionCmd := NewRevisionCmd()
-	revisionCmd.AddCommand(NewListRevisionsCmd(NewListRevisionsOptions(o.ui, o.depsFactory), flagsFactory))
-	revisionCmd.AddCommand(NewShowRevisionCmd(NewShowRevisionOptions(o.ui, o.depsFactory), flagsFactory))
-	revisionCmd.AddCommand(NewDeleteRevisionCmd(NewDeleteRevisionOptions(o.ui, o.depsFactory), flagsFactory))
-	revisionCmd.AddCommand(NewTagRevisionCmd(NewTagRevisionOptions(o.ui, o.depsFactory), flagsFactory))
-	revisionCmd.AddCommand(NewUntagRevisionCmd(NewUntagRevisionOptions(o.ui, o.depsFactory), flagsFactory))
-	revisionCmd.AddCommand(NewAnnotateRevisionCmd(NewAnnotateRevisionOptions(o.ui, o.depsFactory), flagsFactory))
+	cmd.AddCommand(cmdsvc.NewDeployCmd(cmdsvc.NewDeployOptions(o.ui, o.configFactory, o.depsFactory), flagsFactory))
+	cmd.AddCommand(cmdsvc.NewLogsCmd(cmdsvc.NewLogsOptions(o.ui, o.depsFactory, cmdcore.CancelSignals{}), flagsFactory))
+	cmd.AddCommand(cmdsvc.NewCurlCmd(cmdsvc.NewCurlOptions(o.ui, o.depsFactory), flagsFactory))
+
+	revisionCmd := cmdrev.NewCmd()
+	revisionCmd.AddCommand(cmdrev.NewListCmd(cmdrev.NewListOptions(o.ui, o.depsFactory), flagsFactory))
+	revisionCmd.AddCommand(cmdrev.NewShowCmd(cmdrev.NewShowOptions(o.ui, o.depsFactory), flagsFactory))
+	revisionCmd.AddCommand(cmdrev.NewDeleteCmd(cmdrev.NewDeleteOptions(o.ui, o.depsFactory), flagsFactory))
+	revisionCmd.AddCommand(cmdrev.NewTagCmd(cmdrev.NewTagOptions(o.ui, o.depsFactory), flagsFactory))
+	revisionCmd.AddCommand(cmdrev.NewUntagCmd(cmdrev.NewUntagOptions(o.ui, o.depsFactory), flagsFactory))
+	revisionCmd.AddCommand(cmdrev.NewAnnotateCmd(cmdrev.NewAnnotateOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(revisionCmd)
 
-	routeCmd := NewRouteCmd()
-	routeCmd.AddCommand(NewCreateRouteCmd(NewCreateRouteOptions(o.ui, o.depsFactory), flagsFactory))
-	routeCmd.AddCommand(NewListRoutesCmd(NewListRoutesOptions(o.ui, o.depsFactory), flagsFactory))
-	routeCmd.AddCommand(NewDeleteRouteCmd(NewDeleteRouteOptions(o.ui, o.depsFactory), flagsFactory))
+	routeCmd := cmdrte.NewCmd()
+	routeCmd.AddCommand(cmdrte.NewCreateCmd(cmdrte.NewCreateOptions(o.ui, o.depsFactory), flagsFactory))
+	routeCmd.AddCommand(cmdrte.NewListCmd(cmdrte.NewListOptions(o.ui, o.depsFactory), flagsFactory))
+	routeCmd.AddCommand(cmdrte.NewDeleteCmd(cmdrte.NewDeleteOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(routeCmd)
 
-	buildCmd := NewBuildCmd()
-	buildCmd.AddCommand(NewCreateBuildCmd(NewCreateBuildOptions(o.ui, o.configFactory, o.depsFactory, CancelSignals{}), flagsFactory))
-	buildCmd.AddCommand(NewListBuildsCmd(NewListBuildsOptions(o.ui, o.depsFactory), flagsFactory))
-	buildCmd.AddCommand(NewShowBuildCmd(NewShowBuildOptions(o.ui, o.configFactory, o.depsFactory, CancelSignals{}), flagsFactory))
-	buildCmd.AddCommand(NewDeleteBuildCmd(NewDeleteBuildOptions(o.ui, o.depsFactory), flagsFactory))
+	buildCmd := cmdbld.NewCmd()
+	buildCmd.AddCommand(cmdbld.NewCreateCmd(cmdbld.NewCreateOptions(o.ui, o.configFactory, o.depsFactory, cmdcore.CancelSignals{}), flagsFactory))
+	buildCmd.AddCommand(cmdbld.NewListCmd(cmdbld.NewListOptions(o.ui, o.depsFactory), flagsFactory))
+	buildCmd.AddCommand(cmdbld.NewShowCmd(cmdbld.NewShowOptions(o.ui, o.configFactory, o.depsFactory, cmdcore.CancelSignals{}), flagsFactory))
+	buildCmd.AddCommand(cmdbld.NewDeleteCmd(cmdbld.NewDeleteOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(buildCmd)
 
-	domainCmd := NewDomainCmd()
-	domainCmd.AddCommand(NewCreateDomainCmd(NewCreateDomainOptions(o.ui, o.depsFactory), flagsFactory))
-	domainCmd.AddCommand(NewListDomainsCmd(NewListDomainsOptions(o.ui, o.depsFactory), flagsFactory))
+	domainCmd := cmddom.NewCmd()
+	domainCmd.AddCommand(cmddom.NewCreateCmd(cmddom.NewCreateOptions(o.ui, o.depsFactory), flagsFactory))
+	domainCmd.AddCommand(cmddom.NewListCmd(cmddom.NewListOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(domainCmd)
 
-	ingressCmd := NewIngressCmd()
-	ingressCmd.AddCommand(NewListIngressesCmd(NewListIngressesOptions(o.ui, o.depsFactory), flagsFactory))
+	ingressCmd := cmding.NewCmd()
+	ingressCmd.AddCommand(cmding.NewListCmd(cmding.NewListOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(ingressCmd)
 
-	podCmd := NewPodCmd()
-	podCmd.AddCommand(NewListPodsCmd(NewListPodsOptions(o.ui, o.depsFactory), flagsFactory))
+	cmd.AddCommand(NewDNSMapCmd(NewDNSMapOptions(o.ui, o.depsFactory), flagsFactory))
+
+	podCmd := cmdpod.NewCmd()
+	podCmd.AddCommand(cmdpod.NewListCmd(cmdpod.NewListOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(podCmd)
 
 	namespaceCmd := NewNamespaceCmd()
 	namespaceCmd.AddCommand(NewCreateNamespaceCmd(NewCreateNamespaceOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(namespaceCmd)
 
-	serviceAccountCmd := NewServiceAccountCmd()
-	serviceAccountCmd.AddCommand(NewCreateServiceAccountCmd(NewCreateServiceAccountOptions(o.ui, o.depsFactory), flagsFactory))
+	serviceAccountCmd := cmdsa.NewCmd()
+	serviceAccountCmd.AddCommand(cmdsa.NewCreateCmd(cmdsa.NewCreateOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(serviceAccountCmd)
 
-	basicAuthSecretCmd := NewBasicAuthSecretCmd()
-	basicAuthSecretCmd.AddCommand(NewCreateBasicAuthSecretCmd(NewCreateBasicAuthSecretOptions(o.ui, o.depsFactory), flagsFactory))
+	basicAuthSecretCmd := cmdbas.NewCmd()
+	basicAuthSecretCmd.AddCommand(cmdbas.NewCreateCmd(cmdbas.NewCreateOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(basicAuthSecretCmd)
 
-	sshAuthSecretCmd := NewSSHAuthSecretCmd()
-	sshAuthSecretCmd.AddCommand(NewCreateSSHAuthSecretCmd(NewCreateSSHAuthSecretOptions(o.ui, o.depsFactory), flagsFactory))
+	sshAuthSecretCmd := cmdsas.NewCmd()
+	sshAuthSecretCmd.AddCommand(cmdsas.NewCreateCmd(cmdsas.NewCreateOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(sshAuthSecretCmd)
 
 	// Last one runs first

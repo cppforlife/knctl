@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
@@ -28,17 +29,17 @@ import (
 
 type CreateNamespaceOptions struct {
 	ui          ui.UI
-	depsFactory DepsFactory
+	depsFactory cmdcore.DepsFactory
 
-	NamespaceFlags    NamespaceFlags
-	GenerateNameFlags GenerateNameFlags
+	NamespaceFlags    cmdcore.NamespaceFlags
+	GenerateNameFlags cmdcore.GenerateNameFlags
 }
 
-func NewCreateNamespaceOptions(ui ui.UI, depsFactory DepsFactory) *CreateNamespaceOptions {
+func NewCreateNamespaceOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *CreateNamespaceOptions {
 	return &CreateNamespaceOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewCreateNamespaceCmd(o *CreateNamespaceOptions, flagsFactory FlagsFactory) *cobra.Command {
+func NewCreateNamespaceCmd(o *CreateNamespaceOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create namespace",

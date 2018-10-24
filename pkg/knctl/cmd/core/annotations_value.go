@@ -14,21 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package core
 
 import (
-	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
-	"github.com/spf13/cobra"
+	"strings"
+
+	uitable "github.com/cppforlife/go-cli-ui/ui/table"
+	"github.com/knative/serving/pkg/apis/serving"
 )
 
-func NewNamespaceCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "namespace",
-		Aliases: []string{"ns"},
-		Short:   "Namespace management",
-		Annotations: map[string]string{
-			cmdcore.OtherHelpGroup.Key: cmdcore.OtherHelpGroup.Value,
-		},
+const (
+	kubectlLastAppliedAnnotation = "kubectl.kubernetes.io/last-applied-configuration"
+)
+
+func NewAnnotationsValue(anns map[string]string) uitable.Value {
+	result := map[string]string{}
+	for k, v := range anns {
+		if !strings.HasPrefix(k, serving.GroupName) && k != kubectlLastAppliedAnnotation {
+			result[k] = v
+		}
 	}
-	return cmd
+	return uitable.NewValueInterface(result)
 }
