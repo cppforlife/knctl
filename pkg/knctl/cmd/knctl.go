@@ -154,10 +154,6 @@ Knative docs: https://github.com/knative/docs.`,
 	podCmd.AddCommand(cmdpod.NewListCmd(cmdpod.NewListOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(podCmd)
 
-	namespaceCmd := NewNamespaceCmd()
-	namespaceCmd.AddCommand(NewCreateNamespaceCmd(NewCreateNamespaceOptions(o.ui, o.depsFactory), flagsFactory))
-	cmd.AddCommand(namespaceCmd)
-
 	serviceAccountCmd := cmdsa.NewCmd()
 	serviceAccountCmd.AddCommand(cmdsa.NewCreateCmd(cmdsa.NewCreateOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(serviceAccountCmd)

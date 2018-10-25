@@ -5,7 +5,7 @@ See [Basic Workflow](./basic-workflow.md) for introduction.
 Create new namespace
 
 ```bash
-$ knctl namespace create -n standalone-build
+$ kubectl create ns standalone-build
 
 $ export KNCTL_NAMESPACE=standalone-build
 ```

@@ -13,7 +13,7 @@ $ cd simple-app
 Create new namespace
 
 ```bash
-$ knctl namespace create -n deploy-from-source
+$ kubectl create ns deploy-from-source
 
 $ export KNCTL_NAMESPACE=deploy-from-source
 ```

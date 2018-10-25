@@ -1,6 +1,6 @@
 ## knctl
 
-knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, namespace, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
+knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
 
 ### Synopsis
 
@@ -36,7 +36,6 @@ knctl [flags]
 * [knctl ingress](knctl_ingress.md)	 - Ingress management (list)
 * [knctl install](knctl_install.md)	 - Install Knative and Istio
 * [knctl logs](knctl_logs.md)	 - Print service logs
-* [knctl namespace](knctl_namespace.md)	 - Namespace management (create)
 * [knctl pod](knctl_pod.md)	 - Pod management (list)
 * [knctl revision](knctl_revision.md)	 - Revision management (annotate, delete, list, show, tag, untag)
 * [knctl route](knctl_route.md)	 - Route management (create, delete, list)

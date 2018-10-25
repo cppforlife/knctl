@@ -30,7 +30,7 @@ knctl build [flags]
 
 ### SEE ALSO
 
-* [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, namespace, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
+* [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
 * [knctl build create](knctl_build_create.md)	 - Build source code into image
 * [knctl build delete](knctl_build_delete.md)	 - Delete build
 * [knctl build list](knctl_build_list.md)	 - List builds

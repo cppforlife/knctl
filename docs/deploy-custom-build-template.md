@@ -5,7 +5,7 @@ See [Basic Workflow](./basic-workflow.md) for introduction.
 Create new namespace
 
 ```bash
-$ knctl namespace create -n deploy-with-buildpack
+$ kubectl create ns deploy-with-buildpack
 
 $ export KNCTL_NAMESPACE=deploy-with-buildpack
 ```

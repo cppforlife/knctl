@@ -56,9 +56,6 @@ Route Management Commands:
   ingress           Ingress management (list)
   route             Route management (create, delete, list)
 
-Other Commands:
-  namespace         Namespace management (create)
-
 System Commands:
   install           Install Knative and Istio
   uninstall         Uninstall Knative and Istio

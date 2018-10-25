@@ -5,7 +5,7 @@ See [Basic Workflow](./basic-workflow.md) for introduction.
 Create new namespace
 
 ```bash
-$ knctl namespace create -n deploy-from-git
+$ kubectl create ns deploy-from-git
 
 $ export KNCTL_NAMESPACE=deploy-from-git
 ```
