@@ -144,11 +144,11 @@ Knative docs: https://github.com/knative/docs.`,
 	domainCmd.AddCommand(cmddom.NewListCmd(cmddom.NewListOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(domainCmd)
 
+	cmd.AddCommand(cmddom.NewDNSMapCmd(cmddom.NewDNSMapOptions(o.ui, o.depsFactory), flagsFactory))
+
 	ingressCmd := cmding.NewCmd()
 	ingressCmd.AddCommand(cmding.NewListCmd(cmding.NewListOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(ingressCmd)
-
-	cmd.AddCommand(NewDNSMapCmd(NewDNSMapOptions(o.ui, o.depsFactory), flagsFactory))
 
 	podCmd := cmdpod.NewCmd()
 	podCmd.AddCommand(cmdpod.NewListCmd(cmdpod.NewListOptions(o.ui, o.depsFactory), flagsFactory))

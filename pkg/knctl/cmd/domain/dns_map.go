@@ -14,14 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package domain
 
 import (
 	"encoding/json"
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
-	cmddom "github.com/cppforlife/knctl/pkg/knctl/cmd/domain"
 	ctling "github.com/cppforlife/knctl/pkg/knctl/ingress"
 	"github.com/spf13/cobra"
 )
@@ -51,7 +50,7 @@ func (o *DNSMapOptions) Run() error {
 		return err
 	}
 
-	domains, err := cmddom.NewDomains(coreClient).List()
+	domains, err := NewDomains(coreClient).List()
 	if err != nil {
 		return err
 	}
