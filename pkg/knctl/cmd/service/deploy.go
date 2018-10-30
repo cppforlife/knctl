@@ -17,14 +17,19 @@ limitations under the License.
 package service
 
 import (
+	"time"
+
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 	ctlbuild "github.com/cppforlife/knctl/pkg/knctl/build"
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	cmdflags "github.com/cppforlife/knctl/pkg/knctl/cmd/flags"
+	"github.com/cppforlife/knctl/pkg/knctl/logs"
 	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
+	servingclientset "github.com/knative/serving/pkg/client/clientset/versioned"
 	"github.com/spf13/cobra"
+	"k8s.io/client-go/kubernetes"
 )
 
 type DeployOptions struct {
@@ -34,10 +39,12 @@ type DeployOptions struct {
 
 	ServiceFlags cmdflags.ServiceFlags
 	DeployFlags  DeployFlags
+
+	cancelSignals cmdcore.CancelSignals
 }
 
-func NewDeployOptions(ui ui.UI, configFactory cmdcore.ConfigFactory, depsFactory cmdcore.DepsFactory) *DeployOptions {
-	return &DeployOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory}
+func NewDeployOptions(ui ui.UI, configFactory cmdcore.ConfigFactory, depsFactory cmdcore.DepsFactory, cancelSignals cmdcore.CancelSignals) *DeployOptions {
+	return &DeployOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory, cancelSignals: cancelSignals}
 }
 
 func NewDeployCmd(o *DeployOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
@@ -121,7 +128,18 @@ func (o *DeployOptions) Run() error {
 
 	tags := ctlservice.NewTags(servingClient)
 
-	err = o.updateRevisionTags(serviceObj, tags, lastRevision)
+	if lastRevision != nil {
+		o.ui.PrintLinef("Waiting for new revision (after revision '%s') to be created...", lastRevision.Name)
+	} else {
+		o.ui.PrintLinef("Waiting for new revision to be created...")
+	}
+
+	newLastRevision, err := serviceObj.CreatedRevisionSinceRevision(lastRevision)
+	if err != nil {
+		return err
+	}
+
+	err = o.updateRevisionTags(tags, lastRevision, newLastRevision)
 	if err != nil {
 		return err
 	}
@@ -149,26 +167,31 @@ func (o *DeployOptions) Run() error {
 		return buildObj.Error(cancelCh)
 	}
 
-	return nil
+	return o.watchPodsStarting(newLastRevision, servingClient, coreClient)
+}
+
+func (o *DeployOptions) printTable(svc *v1alpha1.Service) {
+	table := uitable.Table{
+		Header: []uitable.Header{
+			uitable.NewHeader("Name"),
+		},
+
+		Transpose: true,
+
+		Rows: [][]uitable.Value{
+			{uitable.NewValueString(svc.Name)},
+		},
+	}
+
+	o.ui.PrintTable(table)
 }
 
 func (o *DeployOptions) updateRevisionTags(
-	serviceObj *ctlservice.Service, tags ctlservice.Tags, lastRevision *v1alpha1.Revision) error {
-
-	if lastRevision != nil {
-		o.ui.PrintLinef("Waiting for new revision (after revision '%s') to be created...", lastRevision.Name)
-	} else {
-		o.ui.PrintLinef("Waiting for new revision to be created...")
-	}
-
-	newLastRevision, err := serviceObj.CreatedRevisionSinceRevision(lastRevision)
-	if err != nil {
-		return err
-	}
+	tags ctlservice.Tags, lastRevision *v1alpha1.Revision, newLastRevision *v1alpha1.Revision) error {
 
 	o.ui.PrintLinef("Tagging new revision '%s' as '%s'", newLastRevision.Name, ctlservice.TagsLatest)
 
-	err = tags.Repoint(newLastRevision, ctlservice.TagsLatest)
+	err := tags.Repoint(newLastRevision, ctlservice.TagsLatest)
 	if err != nil {
 		return err
 	}
@@ -193,18 +216,28 @@ func (o *DeployOptions) updateRevisionTags(
 	return nil
 }
 
-func (o *DeployOptions) printTable(svc *v1alpha1.Service) {
-	table := uitable.Table{
-		Header: []uitable.Header{
-			uitable.NewHeader("Name"),
-		},
+func (o *DeployOptions) watchPodsStarting(
+	newLastRevision *v1alpha1.Revision, servingClient servingclientset.Interface, coreClient kubernetes.Interface) error {
 
-		Transpose: true,
+	o.ui.PrintLinef("Waiting for new revision '%s' to be ready (logs below)...", newLastRevision.Name)
+	cancelLogsCh := make(chan struct{})
 
-		Rows: [][]uitable.Value{
-			{uitable.NewValueString(svc.Name)},
-		},
-	}
+	go func() {
+		ready, _ := RevisionReadyStatusWatcher{newLastRevision, servingClient}.Wait(make(chan struct{}))
+		if ready {
+			o.ui.PrintLinef("Revision '%s' became ready", newLastRevision.Name)
+		} else {
+			o.ui.PrintLinef("Revision '%s' did not became ready", newLastRevision.Name)
+		}
 
-	o.ui.PrintTable(table)
+		o.ui.PrintLinef("Waiting 5s before exiting")
+		time.Sleep(5 * time.Second)
+
+		close(cancelLogsCh)
+	}()
+
+	tailOpts := logs.PodLogOpts{Follow: true}
+	podWatcher := ctlservice.NewRevisionPodWatcher(newLastRevision, servingClient, coreClient, o.ui)
+
+	return LogsView{tailOpts, podWatcher, coreClient, o.ui, o.cancelSignals}.Show(cancelLogsCh)
 }

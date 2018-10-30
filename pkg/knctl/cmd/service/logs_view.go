@@ -40,11 +40,34 @@ type LogsView struct {
 	cancelSignals cmdcore.CancelSignals
 }
 
-func (v LogsView) Show() error {
-	podsToWatchCh, cancelPodTailCh, err := v.setUpPodWatching()
-	if err != nil {
-		return err
+func (v LogsView) Show(cancelCh chan struct{}) error {
+	podsToWatchCh := make(chan corev1.Pod)
+	cancelPodTailCh := make(chan struct{})
+	cancelPodWatcherCh := make(chan struct{})
+
+	if v.tailOpts.Follow {
+		v.cancelSignals.Watch(func() {
+			close(cancelPodWatcherCh)
+			close(cancelPodTailCh)
+		})
+	} else {
+		close(cancelPodWatcherCh)
 	}
+
+	go func() {
+		// TODO leaks goroutine
+		select {
+		case <-cancelCh:
+			// TODO do only once
+			close(cancelPodWatcherCh)
+			close(cancelPodTailCh)
+		}
+	}()
+
+	go func() {
+		v.podWatcher.Watch(podsToWatchCh, cancelPodWatcherCh)
+		close(podsToWatchCh)
+	}()
 
 	var wg sync.WaitGroup
 
@@ -68,26 +91,4 @@ func (v LogsView) Show() error {
 	wg.Wait()
 
 	return nil
-}
-
-func (v LogsView) setUpPodWatching() (chan corev1.Pod, chan struct{}, error) {
-	podsToWatchCh := make(chan corev1.Pod)
-	cancelPodTailCh := make(chan struct{})
-	cancelCh := make(chan struct{})
-
-	if v.tailOpts.Follow {
-		v.cancelSignals.Watch(func() {
-			close(cancelCh)
-			close(cancelPodTailCh)
-		})
-	} else {
-		close(cancelCh)
-	}
-
-	go func() {
-		v.podWatcher.Watch(podsToWatchCh, cancelCh)
-		close(podsToWatchCh)
-	}()
-
-	return podsToWatchCh, cancelPodTailCh, nil
 }

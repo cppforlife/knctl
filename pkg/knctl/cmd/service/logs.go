@@ -94,6 +94,7 @@ func (o *LogsOptions) Run() error {
 	}
 
 	podWatcher := ctlservice.NewServicePodWatcher(service, servingClient, coreClient, o.ui)
+	cancelCh := make(chan struct{})
 
-	return LogsView{tailOpts, podWatcher, coreClient, o.ui, o.cancelSignals}.Show()
+	return LogsView{tailOpts, podWatcher, coreClient, o.ui, o.cancelSignals}.Show(cancelCh)
 }
