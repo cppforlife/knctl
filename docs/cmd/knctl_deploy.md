@@ -50,6 +50,8 @@ knctl deploy [flags]
       --template string          Set template name
       --template-arg strings     Set template argument (format: key=value) (can be specified multiple times)
       --template-env strings     Set template environment variable (format: key=value) (can be specified multiple times)
+      --watch-pod-logs           Watch pod logs for new revision (default true)
+      --watch-revision-ready     Wait for new revision to become ready (default true)
 ```
 
 ### Options inherited from parent commands

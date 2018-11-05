@@ -167,7 +167,11 @@ func (o *DeployOptions) Run() error {
 		return buildObj.Error(cancelCh)
 	}
 
-	return o.watchPodsStarting(newLastRevision, servingClient, coreClient)
+	if o.DeployFlags.WatchRevisionReady {
+		return o.watchRevisionReady(newLastRevision, servingClient, coreClient)
+	}
+
+	return nil
 }
 
 func (o *DeployOptions) printTable(svc *v1alpha1.Service) {
@@ -216,7 +220,7 @@ func (o *DeployOptions) updateRevisionTags(
 	return nil
 }
 
-func (o *DeployOptions) watchPodsStarting(
+func (o *DeployOptions) watchRevisionReady(
 	newLastRevision *v1alpha1.Revision, servingClient servingclientset.Interface, coreClient kubernetes.Interface) error {
 
 	o.ui.PrintLinef("Waiting for new revision '%s' to be ready (logs below)...", newLastRevision.Name)
@@ -236,8 +240,17 @@ func (o *DeployOptions) watchPodsStarting(
 		close(cancelLogsCh)
 	}()
 
-	tailOpts := logs.PodLogOpts{Follow: true}
-	podWatcher := ctlservice.NewRevisionPodWatcher(newLastRevision, servingClient, coreClient, o.ui)
+	if o.DeployFlags.WatchPodLogs {
+		tailOpts := logs.PodLogOpts{Follow: true}
+		podWatcher := ctlservice.NewRevisionPodWatcher(newLastRevision, servingClient, coreClient, o.ui)
 
-	return LogsView{tailOpts, podWatcher, coreClient, o.ui, o.cancelSignals}.Show(cancelLogsCh)
+		err := LogsView{tailOpts, podWatcher, coreClient, o.ui, o.cancelSignals}.Show(cancelLogsCh)
+		if err != nil {
+			return err
+		}
+	} else {
+		<-cancelLogsCh
+	}
+
+	return nil
 }
