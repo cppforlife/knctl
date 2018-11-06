@@ -232,8 +232,10 @@ func (o *DeployOptions) watchRevisionReady(
 			o.ui.PrintLinef("Revision '%s' did not became ready", newLastRevision.Name)
 		}
 
-		o.ui.PrintLinef("Waiting 5s before exiting")
-		time.Sleep(5 * time.Second)
+		if o.DeployFlags.WatchPodLogs {
+			o.ui.PrintLinef("Waiting 5s before exiting to see additional logs")
+			time.Sleep(5 * time.Second)
+		}
 
 		close(cancelLogsCh)
 	}()
