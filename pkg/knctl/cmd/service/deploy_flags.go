@@ -17,6 +17,8 @@ limitations under the License.
 package service
 
 import (
+	"time"
+
 	cmdbld "github.com/cppforlife/knctl/pkg/knctl/cmd/build"
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	"github.com/spf13/cobra"
@@ -29,8 +31,9 @@ type DeployFlags struct {
 	Image string
 	Env   []string
 
-	WatchRevisionReady bool
-	WatchPodLogs       bool
+	WatchRevisionReady            bool
+	WatchRevisionReadyMaxDuration time.Duration
+	WatchPodLogs                  bool
 
 	RemoveKnctlDeployEnvVar bool
 }
@@ -45,6 +48,8 @@ func (s *DeployFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory)
 	cmd.MarkFlagRequired("image")
 
 	cmd.Flags().BoolVar(&s.WatchRevisionReady, "watch-revision-ready", true, "Wait for new revision to become ready")
+	cmd.Flags().DurationVar(&s.WatchRevisionReadyMaxDuration, "watch-revision-ready-max-duration",
+		5*time.Minute, "Maximum duration of time to wait for new revision to become ready")
 	cmd.Flags().BoolVar(&s.WatchPodLogs, "watch-pod-logs", true, "Watch pod logs for new revision")
 
 	cmd.Flags().StringSliceVarP(&s.Env, "env", "e", nil, "Set environment variable (format: key=value) (can be specified multiple times)")

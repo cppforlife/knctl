@@ -224,12 +224,15 @@ func (o *DeployOptions) updateRevisionTags(
 func (o *DeployOptions) watchRevisionReady(
 	newLastRevision *v1alpha1.Revision, servingClient servingclientset.Interface, coreClient kubernetes.Interface) error {
 
-	o.ui.PrintLinef("Waiting for new revision '%s' to be ready (logs below)...", newLastRevision.Name)
+	totalWaitDur := o.DeployFlags.WatchRevisionReadyMaxDuration
+	logCollectDur := 5 * time.Second
+
+	o.ui.PrintLinef("Waiting for new revision '%s' to be ready for up to %s (logs below)...", newLastRevision.Name, totalWaitDur)
 	cancelWatchCh := make(chan struct{})
 	cancelLogsCh := make(chan struct{})
 
 	go func() {
-		time.Sleep(5 * time.Minute)
+		time.Sleep(totalWaitDur)
 		close(cancelWatchCh)
 	}()
 
@@ -242,8 +245,8 @@ func (o *DeployOptions) watchRevisionReady(
 		}
 
 		if o.DeployFlags.WatchPodLogs {
-			o.ui.PrintLinef("Waiting 5s before exiting to see additional logs")
-			time.Sleep(5 * time.Second)
+			o.ui.PrintLinef("Waiting for %s before exiting to see additional logs", logCollectDur)
+			time.Sleep(logCollectDur)
 		}
 
 		close(cancelLogsCh)
