@@ -113,7 +113,7 @@ Knative docs: https://github.com/knative/docs.`,
 	serviceCmd.AddCommand(cmdsvc.NewURLCmd(cmdsvc.NewURLOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(serviceCmd)
 
-	cmd.AddCommand(cmdsvc.NewDeployCmd(cmdsvc.NewDeployOptions(o.ui, o.configFactory, o.depsFactory, cmdcore.CancelSignals{}), flagsFactory))
+	cmd.AddCommand(cmdsvc.NewDeployCmd(cmdsvc.NewDeployOptions(o.ui, o.configFactory, o.depsFactory), flagsFactory))
 	cmd.AddCommand(cmdsvc.NewLogsCmd(cmdsvc.NewLogsOptions(o.ui, o.depsFactory, cmdcore.CancelSignals{}), flagsFactory))
 	cmd.AddCommand(cmdsvc.NewCurlCmd(cmdsvc.NewCurlOptions(o.ui, o.depsFactory), flagsFactory))
 

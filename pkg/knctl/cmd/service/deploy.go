@@ -39,12 +39,10 @@ type DeployOptions struct {
 
 	ServiceFlags cmdflags.ServiceFlags
 	DeployFlags  DeployFlags
-
-	cancelSignals cmdcore.CancelSignals
 }
 
-func NewDeployOptions(ui ui.UI, configFactory cmdcore.ConfigFactory, depsFactory cmdcore.DepsFactory, cancelSignals cmdcore.CancelSignals) *DeployOptions {
-	return &DeployOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory, cancelSignals: cancelSignals}
+func NewDeployOptions(ui ui.UI, configFactory cmdcore.ConfigFactory, depsFactory cmdcore.DepsFactory) *DeployOptions {
+	return &DeployOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory}
 }
 
 func NewDeployCmd(o *DeployOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
@@ -244,7 +242,7 @@ func (o *DeployOptions) watchRevisionReady(
 		tailOpts := logs.PodLogOpts{Follow: true}
 		podWatcher := ctlservice.NewRevisionPodWatcher(newLastRevision, servingClient, coreClient, o.ui)
 
-		err := LogsView{tailOpts, podWatcher, coreClient, o.ui, o.cancelSignals}.Show(cancelLogsCh)
+		err := LogsView{tailOpts, podWatcher, coreClient, o.ui}.Show(cancelLogsCh)
 		if err != nil {
 			return err
 		}

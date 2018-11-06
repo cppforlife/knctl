@@ -21,7 +21,6 @@ import (
 	"sync"
 
 	"github.com/cppforlife/go-cli-ui/ui"
-	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	"github.com/cppforlife/knctl/pkg/knctl/logs"
 	"github.com/knative/serving/pkg/apis/serving"
 	corev1 "k8s.io/api/core/v1"
@@ -33,11 +32,10 @@ type podWatcher interface {
 }
 
 type LogsView struct {
-	tailOpts      logs.PodLogOpts
-	podWatcher    podWatcher
-	coreClient    kubernetes.Interface
-	ui            ui.UI
-	cancelSignals cmdcore.CancelSignals
+	tailOpts   logs.PodLogOpts
+	podWatcher podWatcher
+	coreClient kubernetes.Interface
+	ui         ui.UI
 }
 
 func (v LogsView) Show(cancelCh chan struct{}) error {
@@ -46,23 +44,18 @@ func (v LogsView) Show(cancelCh chan struct{}) error {
 	cancelPodWatcherCh := make(chan struct{})
 
 	if v.tailOpts.Follow {
-		v.cancelSignals.Watch(func() {
-			close(cancelPodWatcherCh)
-			close(cancelPodTailCh)
-		})
+		go func() {
+			// TODO leaks goroutine
+			select {
+			case <-cancelCh:
+				close(cancelPodWatcherCh)
+				close(cancelPodTailCh)
+			}
+		}()
 	} else {
 		close(cancelPodWatcherCh)
+		// Do not close cancelPodTailCh to let logs stream out on their own
 	}
-
-	go func() {
-		// TODO leaks goroutine
-		select {
-		case <-cancelCh:
-			// TODO do only once
-			close(cancelPodWatcherCh)
-			close(cancelPodTailCh)
-		}
-	}()
 
 	go func() {
 		v.podWatcher.Watch(podsToWatchCh, cancelPodWatcherCh)

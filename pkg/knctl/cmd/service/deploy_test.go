@@ -28,7 +28,7 @@ import (
 )
 
 func TestNewDeployCmd_Ok(t *testing.T) {
-	realCmd := NewDeployOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory(), cmdcore.CancelSignals{})
+	realCmd := NewDeployOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
 	cmd := NewTestCmd(t, NewDeployCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -62,7 +62,7 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 }
 
 func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewDeployOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory(), cmdcore.CancelSignals{})
+	realCmd := NewDeployOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
 	cmd := NewTestCmd(t, NewDeployCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -95,7 +95,7 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewDeployCmd_OkMinimum(t *testing.T) {
-	realCmd := NewDeployOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory(), cmdcore.CancelSignals{})
+	realCmd := NewDeployOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
 	cmd := NewTestCmd(t, NewDeployCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -115,7 +115,7 @@ func TestNewDeployCmd_OkMinimum(t *testing.T) {
 }
 
 func TestNewDeployCmd_WatchingDisabled(t *testing.T) {
-	realCmd := NewDeployOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory(), cmdcore.CancelSignals{})
+	realCmd := NewDeployOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
 	cmd := NewTestCmd(t, NewDeployCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -137,7 +137,7 @@ func TestNewDeployCmd_WatchingDisabled(t *testing.T) {
 }
 
 func TestNewDeployCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewDeployOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory(), cmdcore.CancelSignals{})
+	realCmd := NewDeployOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
 	cmd := NewTestCmd(t, NewDeployCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"image", "service"})
