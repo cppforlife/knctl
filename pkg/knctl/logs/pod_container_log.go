@@ -20,6 +20,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"sync/atomic"
 	"time"
 
 	"github.com/cppforlife/go-cli-ui/ui"
@@ -55,6 +56,8 @@ func NewPodContainerLog(
 }
 
 func (l PodContainerLog) Tail(ui ui.UI, cancelCh chan struct{}) error {
+	var streamCanceled atomic.Value
+
 	stream, err := l.obtainStream(cancelCh)
 	if err != nil {
 		return err
@@ -68,6 +71,7 @@ func (l PodContainerLog) Tail(ui ui.UI, cancelCh chan struct{}) error {
 
 	go func() {
 		<-cancelCh
+		streamCanceled.Store(true)
 		stream.Close()
 	}()
 
@@ -78,6 +82,10 @@ func (l PodContainerLog) Tail(ui ui.UI, cancelCh chan struct{}) error {
 		if err != nil {
 			if err == io.EOF {
 				return nil
+			}
+			typedCanceled, ok := streamCanceled.Load().(bool)
+			if ok && typedCanceled {
+				return nil // ignore error if stream was canceled
 			}
 			return err
 		}
