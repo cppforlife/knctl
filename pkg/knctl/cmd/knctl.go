@@ -133,9 +133,9 @@ Knative docs: https://github.com/knative/docs.`,
 	cmd.AddCommand(routeCmd)
 
 	buildCmd := cmdbld.NewCmd()
-	buildCmd.AddCommand(cmdbld.NewCreateCmd(cmdbld.NewCreateOptions(o.ui, o.configFactory, o.depsFactory, cmdcore.CancelSignals{}), flagsFactory))
+	buildCmd.AddCommand(cmdbld.NewCreateCmd(cmdbld.NewCreateOptions(o.ui, o.configFactory, o.depsFactory), flagsFactory))
 	buildCmd.AddCommand(cmdbld.NewListCmd(cmdbld.NewListOptions(o.ui, o.depsFactory), flagsFactory))
-	buildCmd.AddCommand(cmdbld.NewShowCmd(cmdbld.NewShowOptions(o.ui, o.configFactory, o.depsFactory, cmdcore.CancelSignals{}), flagsFactory))
+	buildCmd.AddCommand(cmdbld.NewShowCmd(cmdbld.NewShowOptions(o.ui, o.configFactory, o.depsFactory), flagsFactory))
 	buildCmd.AddCommand(cmdbld.NewDeleteCmd(cmdbld.NewDeleteOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(buildCmd)
 

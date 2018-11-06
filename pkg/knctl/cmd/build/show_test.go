@@ -25,7 +25,7 @@ import (
 )
 
 func TestNewShowCmd_Ok(t *testing.T) {
-	realCmd := NewShowOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory(), cmdcore.CancelSignals{})
+	realCmd := NewShowOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
 	cmd := NewTestCmd(t, NewShowCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.ExpectBasicConfig()
 	cmd.Execute([]string{
@@ -42,7 +42,7 @@ func TestNewShowCmd_Ok(t *testing.T) {
 }
 
 func TestNewShowCmd_OkLongFlagNames(t *testing.T) {
-	realCmd := NewShowOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory(), cmdcore.CancelSignals{})
+	realCmd := NewShowOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
 	cmd := NewTestCmd(t, NewShowCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -58,7 +58,7 @@ func TestNewShowCmd_OkLongFlagNames(t *testing.T) {
 }
 
 func TestNewShowCmd_OkMinimum(t *testing.T) {
-	realCmd := NewShowOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory(), cmdcore.CancelSignals{})
+	realCmd := NewShowOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
 	cmd := NewTestCmd(t, NewShowCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
@@ -73,7 +73,7 @@ func TestNewShowCmd_OkMinimum(t *testing.T) {
 }
 
 func TestNewShowCmd_RequiredFlags(t *testing.T) {
-	realCmd := NewShowOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory(), cmdcore.CancelSignals{})
+	realCmd := NewShowOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
 	cmd := NewTestCmd(t, NewShowCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.Execute([]string{})
 	cmd.ExpectRequiredFlags([]string{"build"})

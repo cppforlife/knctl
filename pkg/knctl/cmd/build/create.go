@@ -30,7 +30,6 @@ type CreateOptions struct {
 	ui            ui.UI
 	configFactory cmdcore.ConfigFactory
 	depsFactory   cmdcore.DepsFactory
-	cancelSignals cmdcore.CancelSignals
 
 	BuildFlags  BuildFlags
 	CreateFlags CreateFlags
@@ -40,9 +39,8 @@ func NewCreateOptions(
 	ui ui.UI,
 	configFactory cmdcore.ConfigFactory,
 	depsFactory cmdcore.DepsFactory,
-	cancelSignals cmdcore.CancelSignals,
 ) *CreateOptions {
-	return &CreateOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory, cancelSignals: cancelSignals}
+	return &CreateOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory}
 }
 
 func NewCreateCmd(o *CreateOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
@@ -106,7 +104,6 @@ func (o *CreateOptions) Run() error {
 	o.printTable(createdBuild)
 
 	cancelCh := make(chan struct{})
-	o.cancelSignals.Watch(func() { close(cancelCh) })
 
 	buildObjFactory := ctlbuild.NewFactory(buildClient, coreClient, restConfig)
 	buildObj := buildObjFactory.New(createdBuild)

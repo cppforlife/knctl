@@ -35,14 +35,13 @@ type ShowOptions struct {
 	ui            ui.UI
 	configFactory cmdcore.ConfigFactory
 	depsFactory   cmdcore.DepsFactory
-	cancelSignals cmdcore.CancelSignals
 
 	BuildFlags BuildFlags
 	Logs       bool
 }
 
-func NewShowOptions(ui ui.UI, configFactory cmdcore.ConfigFactory, depsFactory cmdcore.DepsFactory, cancelSignals cmdcore.CancelSignals) *ShowOptions {
-	return &ShowOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory, cancelSignals: cancelSignals}
+func NewShowOptions(ui ui.UI, configFactory cmdcore.ConfigFactory, depsFactory cmdcore.DepsFactory) *ShowOptions {
+	return &ShowOptions{ui: ui, configFactory: configFactory, depsFactory: depsFactory}
 }
 
 func NewShowCmd(o *ShowOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
@@ -144,9 +143,7 @@ func (o *ShowOptions) showLogs(build *v1alpha1.Build, buildClient buildclientset
 	}
 
 	buildObjFactory := ctlbuild.NewFactory(buildClient, coreClient, restConfig)
-
 	cancelCh := make(chan struct{})
-	o.cancelSignals.Watch(func() { close(cancelCh) })
 
 	return buildObjFactory.New(build).TailLogs(o.ui, cancelCh)
 }
