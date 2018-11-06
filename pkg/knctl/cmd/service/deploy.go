@@ -162,7 +162,10 @@ func (o *DeployOptions) Run() error {
 			return err
 		}
 
-		return buildObj.Error(cancelCh)
+		err = buildObj.Error(cancelCh)
+		if err != nil {
+			return err
+		}
 	}
 
 	if o.DeployFlags.WatchRevisionReady {
