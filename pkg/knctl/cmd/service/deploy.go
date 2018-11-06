@@ -225,10 +225,16 @@ func (o *DeployOptions) watchRevisionReady(
 	newLastRevision *v1alpha1.Revision, servingClient servingclientset.Interface, coreClient kubernetes.Interface) error {
 
 	o.ui.PrintLinef("Waiting for new revision '%s' to be ready (logs below)...", newLastRevision.Name)
+	cancelWatchCh := make(chan struct{})
 	cancelLogsCh := make(chan struct{})
 
 	go func() {
-		ready, _ := RevisionReadyStatusWatcher{newLastRevision, servingClient}.Wait(make(chan struct{}))
+		time.Sleep(5 * time.Minute)
+		close(cancelWatchCh)
+	}()
+
+	go func() {
+		ready, _ := RevisionReadyStatusWatcher{newLastRevision, servingClient}.Wait(cancelWatchCh)
 		if ready {
 			o.ui.PrintLinef("Revision '%s' became ready", newLastRevision.Name)
 		} else {
