@@ -39,7 +39,9 @@ knctl deploy [flags]
 ```
       --build-timeout duration                  Set timeout for building stage (Knative Build has a 10m default)
   -d, --directory string                        Set source code directory
-  -e, --env strings                             Set environment variable (format: key=value) (can be specified multiple times)
+  -e, --env strings                             Set environment variable (format: ENV_KEY=value) (can be specified multiple times)
+      --env-config-map strings                  Set environment variable from a config map (format: ENV_KEY=config-map-name/key) (can be specified multiple times)
+      --env-secret strings                      Set environment variable from a secret (format: ENV_KEY=secret-name/key) (can be specified multiple times)
       --generate-name                           Set to generate name
       --git-revision string                     Set Git revision (examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
       --git-url string                          Set Git URL

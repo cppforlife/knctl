@@ -47,8 +47,8 @@ func TestServiceSpecWithBuildConfiguration(t *testing.T) {
 				ServiceAccountName: "test-service-account",
 			},
 		},
-		Image: "test-image",
-		Env:   []string{"test-env-key1=test-env-val1"},
+		Image:   "test-image",
+		EnvVars: []string{"test-env-key1=test-env-val1"},
 
 		RemoveKnctlDeployEnvVar: true,
 	}
@@ -113,8 +113,8 @@ func TestServiceSpecWithoutBuildConfiguration(t *testing.T) {
 	}
 
 	deployFlags := DeployFlags{
-		Image: "test-image",
-		Env:   []string{"test-env-key1=test-env-val1"},
+		Image:   "test-image",
+		EnvVars: []string{"test-env-key1=test-env-val1"},
 
 		RemoveKnctlDeployEnvVar: true,
 	}
@@ -160,8 +160,8 @@ func TestServiceSpecWithInvalidEnv(t *testing.T) {
 	}
 
 	deployFlags := DeployFlags{
-		Image: "test-image",
-		Env:   []string{"test-env-key1"},
+		Image:   "test-image",
+		EnvVars: []string{"test-env-key1"},
 
 		RemoveKnctlDeployEnvVar: true,
 	}
@@ -171,7 +171,7 @@ func TestServiceSpecWithInvalidEnv(t *testing.T) {
 		t.Fatalf("Expected error to happen")
 	}
 
-	if err.Error() != "Expected environment variable to be in format 'KEY=VALUE'" {
+	if err.Error() != "Expected environment variable to be in format 'ENV_KEY=value'" {
 		t.Fatalf("Expected error to happen, but was '%s'", err)
 	}
 }
@@ -185,8 +185,10 @@ func TestServiceSpecWithMultipleEnv(t *testing.T) {
 	}
 
 	deployFlags := DeployFlags{
-		Image: "test-image",
-		Env:   []string{"test-env-key1=test-env-val1", "test-env-key2=test-env-val2"},
+		Image:         "test-image",
+		EnvVars:       []string{"test-env-key1=test-env-val1", "test-env-key2=test-env-val2"},
+		EnvSecrets:    []string{"test-env-key3=test-secret1/key", "test-env-key4=test-secret2/key"},
+		EnvConfigMaps: []string{"test-env-key5=test-config-map1/key", "test-env-key6=test-config-map2/key"},
 
 		RemoveKnctlDeployEnvVar: true,
 	}
@@ -212,6 +214,38 @@ func TestServiceSpecWithMultipleEnv(t *testing.T) {
 								Env: []corev1.EnvVar{
 									{Name: "test-env-key1", Value: "test-env-val1"},
 									{Name: "test-env-key2", Value: "test-env-val2"},
+									{Name: "test-env-key3", ValueFrom: &corev1.EnvVarSource{
+										SecretKeyRef: &corev1.SecretKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-secret1",
+											},
+											Key: "key",
+										},
+									}},
+									{Name: "test-env-key4", ValueFrom: &corev1.EnvVarSource{
+										SecretKeyRef: &corev1.SecretKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-secret2",
+											},
+											Key: "key",
+										},
+									}},
+									{Name: "test-env-key5", ValueFrom: &corev1.EnvVarSource{
+										ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-config-map1",
+											},
+											Key: "key",
+										},
+									}},
+									{Name: "test-env-key6", ValueFrom: &corev1.EnvVarSource{
+										ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-config-map2",
+											},
+											Key: "key",
+										},
+									}},
 								},
 							},
 						},
@@ -223,5 +257,55 @@ func TestServiceSpecWithMultipleEnv(t *testing.T) {
 
 	if !reflect.DeepEqual(spec, expectedSpec) {
 		t.Fatalf("Expected spec '%#v' to equal '%#v'", spec, expectedSpec)
+	}
+}
+
+func TestServiceSpecWithInvalidEnvSecret(t *testing.T) {
+	serviceFlags := cmdflags.ServiceFlags{
+		NamespaceFlags: cmdcore.NamespaceFlags{
+			Name: "test-namespace",
+		},
+		Name: "test-service",
+	}
+
+	deployFlags := DeployFlags{
+		Image:      "test-image",
+		EnvSecrets: []string{"test-env-secret-key1"},
+
+		RemoveKnctlDeployEnvVar: true,
+	}
+
+	_, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	if err == nil {
+		t.Fatalf("Expected error to happen")
+	}
+
+	if err.Error() != "Expected environment variable from secret to be in format 'ENV_KEY=secret-name/key'" {
+		t.Fatalf("Expected error to happen, but was '%s'", err)
+	}
+}
+
+func TestServiceSpecWithInvalidEnvConfigMap(t *testing.T) {
+	serviceFlags := cmdflags.ServiceFlags{
+		NamespaceFlags: cmdcore.NamespaceFlags{
+			Name: "test-namespace",
+		},
+		Name: "test-service",
+	}
+
+	deployFlags := DeployFlags{
+		Image:         "test-image",
+		EnvConfigMaps: []string{"test-env-config-map-key1"},
+
+		RemoveKnctlDeployEnvVar: true,
+	}
+
+	_, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	if err == nil {
+		t.Fatalf("Expected error to happen")
+	}
+
+	if err.Error() != "Expected environment variable from config map to be in format 'ENV_KEY=config-map-name/key'" {
+		t.Fatalf("Expected error to happen, but was '%s'", err)
 	}
 }

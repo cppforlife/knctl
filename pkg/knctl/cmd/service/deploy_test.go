@@ -58,8 +58,8 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 				Timeout:            1 * time.Second,
 			},
 		},
-		Image: "test-image",
-		Env:   []string{"key1=val1", "key2=val2"},
+		Image:   "test-image",
+		EnvVars: []string{"key1=val1", "key2=val2"},
 
 		WatchRevisionReady:        true,
 		WatchRevisionReadyTimeout: 5 * time.Minute,
@@ -98,8 +98,8 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 				Timeout:            1 * time.Second,
 			},
 		},
-		Image: "test-image",
-		Env:   []string{"key1=val1", "key2=val2"},
+		Image:   "test-image",
+		EnvVars: []string{"key1=val1", "key2=val2"},
 
 		WatchRevisionReady:        true,
 		WatchRevisionReadyTimeout: 5 * time.Minute,

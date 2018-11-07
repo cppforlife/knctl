@@ -31,7 +31,7 @@ import (
 
 type ServiceSpec struct{}
 
-func (ServiceSpec) Build(serviceFlags cmdflags.ServiceFlags, deployFlags DeployFlags) (v1alpha1.Service, error) {
+func (s ServiceSpec) Build(serviceFlags cmdflags.ServiceFlags, deployFlags DeployFlags) (v1alpha1.Service, error) {
 	var buildSpec *buildv1alpha1.BuildSpec
 
 	if deployFlags.BuildCreateArgsFlags.IsProvided() {
@@ -50,13 +50,27 @@ func (ServiceSpec) Build(serviceFlags cmdflags.ServiceFlags, deployFlags DeployF
 		Image: deployFlags.Image,
 	}
 
-	for _, kv := range deployFlags.Env {
+	for _, kv := range deployFlags.EnvVars {
 		pieces := strings.SplitN(kv, "=", 2)
 		if len(pieces) != 2 {
-			return v1alpha1.Service{}, fmt.Errorf("Expected environment variable to be in format 'KEY=VALUE'")
+			return v1alpha1.Service{}, fmt.Errorf("Expected environment variable to be in format 'ENV_KEY=value'")
 		}
 		serviceCont.Env = append(serviceCont.Env, corev1.EnvVar{Name: pieces[0], Value: pieces[1]})
 	}
+
+	envVars, err := s.buildEnvFromSecrets(deployFlags)
+	if err != nil {
+		return v1alpha1.Service{}, err
+	}
+
+	serviceCont.Env = append(serviceCont.Env, envVars...)
+
+	envVars, err = s.buildEnvFromConfigMaps(deployFlags)
+	if err != nil {
+		return v1alpha1.Service{}, err
+	}
+
+	serviceCont.Env = append(serviceCont.Env, envVars...)
 
 	// TODO it's convenient to force redeploy anytime deploy is issued
 	if !deployFlags.RemoveKnctlDeployEnvVar {
@@ -88,4 +102,64 @@ func (ServiceSpec) Build(serviceFlags cmdflags.ServiceFlags, deployFlags DeployF
 	}
 
 	return service, nil
+}
+
+func (ServiceSpec) buildEnvFromSecrets(deployFlags DeployFlags) ([]corev1.EnvVar, error) {
+	var result []corev1.EnvVar
+
+	for _, kv := range deployFlags.EnvSecrets {
+		pieces := strings.SplitN(kv, "=", 2)
+		if len(pieces) != 2 {
+			return nil, fmt.Errorf("Expected environment variable from secret to be in format 'ENV_KEY=secret-name/key'")
+		}
+
+		secretPieces := strings.SplitN(pieces[1], "/", 2)
+		if len(secretPieces) != 2 {
+			return nil, fmt.Errorf("Expected environment variable secret ref to be in format 'secret-name/key'")
+		}
+
+		result = append(result, corev1.EnvVar{
+			Name: pieces[0],
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: secretPieces[0],
+					},
+					Key: secretPieces[1],
+				},
+			},
+		})
+	}
+
+	return result, nil
+}
+
+func (ServiceSpec) buildEnvFromConfigMaps(deployFlags DeployFlags) ([]corev1.EnvVar, error) {
+	var result []corev1.EnvVar
+
+	for _, kv := range deployFlags.EnvConfigMaps {
+		pieces := strings.SplitN(kv, "=", 2)
+		if len(pieces) != 2 {
+			return nil, fmt.Errorf("Expected environment variable from config map to be in format 'ENV_KEY=config-map-name/key'")
+		}
+
+		mapPieces := strings.SplitN(pieces[1], "/", 2)
+		if len(mapPieces) != 2 {
+			return nil, fmt.Errorf("Expected environment variable config map ref to be in format 'config-map-name/key'")
+		}
+
+		result = append(result, corev1.EnvVar{
+			Name: pieces[0],
+			ValueFrom: &corev1.EnvVarSource{
+				ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: mapPieces[0],
+					},
+					Key: mapPieces[1],
+				},
+			},
+		})
+	}
+
+	return result, nil
 }
