@@ -81,9 +81,15 @@ func (k Knctl) RunWithOpts(args []string, opts RunOpts) (string, error) {
 
 	err := cmd.Run()
 	stdoutStr := stdout.String()
+	stderrStr := stderr.String()
+
+	if os.Getenv("KNCTL_E2E_SHOW_RUN_STDOUT") == "true" {
+		k.l.Debugf("Command stdout:\n%s\n", stdoutStr)
+		k.l.Debugf("Command stderr:\n%s\n", stderrStr)
+	}
 
 	if err != nil {
-		err = fmt.Errorf("Execution error: stdout: '%s' stderr: '%s' error: '%s'", stdoutStr, stderr.String(), err)
+		err = fmt.Errorf("Execution error: stdout: '%s' stderr: '%s' error: '%s'", stdoutStr, stderrStr, err)
 
 		if !opts.AllowError {
 			k.t.Fatalf("Failed to successfully execute '%s': %v", k.cmdDesc(args, opts), err)
