@@ -18,6 +18,7 @@ package core
 
 import (
 	"fmt"
+	"strings"
 
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -57,7 +58,11 @@ func (f *ConfigFactoryImpl) RESTConfig() (*rest.Config, error) {
 
 	restConfig, err := config.ClientConfig()
 	if err != nil {
-		return nil, fmt.Errorf("Building Kubernetes config: %s", err)
+		hintMsg := ""
+		if strings.Contains(err.Error(), ".kube/config: no such file or directory") {
+			hintMsg = " (create Kubernetes cluster first, obtain Kubernetes config file, and check that `kubectl get node` works)"
+		}
+		return nil, fmt.Errorf("Building Kubernetes config: %s%s", err, hintMsg)
 	}
 
 	return restConfig, nil
