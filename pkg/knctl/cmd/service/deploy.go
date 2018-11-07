@@ -224,7 +224,7 @@ func (o *DeployOptions) updateRevisionTags(
 func (o *DeployOptions) watchRevisionReady(
 	newLastRevision *v1alpha1.Revision, servingClient servingclientset.Interface, coreClient kubernetes.Interface) error {
 
-	totalWaitDur := o.DeployFlags.WatchRevisionReadyMaxDuration
+	totalWaitDur := o.DeployFlags.WatchRevisionReadyTimeout
 	logCollectDur := 5 * time.Second
 
 	o.ui.PrintLinef("Waiting for new revision '%s' to be ready for up to %s (logs below)...", newLastRevision.Name, totalWaitDur)

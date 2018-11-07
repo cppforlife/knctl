@@ -57,10 +57,11 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 				Timeout:            1 * time.Second,
 			},
 		},
-		Image:              "test-image",
-		Env:                []string{"key1=val1", "key2=val2"},
-		WatchRevisionReady: true,
-		WatchPodLogs:       true,
+		Image:                     "test-image",
+		Env:                       []string{"key1=val1", "key2=val2"},
+		WatchRevisionReady:        true,
+		WatchRevisionReadyTimeout: 5 * time.Minute,
+		WatchPodLogs:              true,
 	})
 }
 
@@ -92,10 +93,11 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 				Timeout:            1 * time.Second,
 			},
 		},
-		Image:              "test-image",
-		Env:                []string{"key1=val1", "key2=val2"},
-		WatchRevisionReady: true,
-		WatchPodLogs:       true,
+		Image:                     "test-image",
+		Env:                       []string{"key1=val1", "key2=val2"},
+		WatchRevisionReady:        true,
+		WatchRevisionReadyTimeout: 5 * time.Minute,
+		WatchPodLogs:              true,
 	})
 }
 
@@ -113,9 +115,10 @@ func TestNewDeployCmd_OkMinimum(t *testing.T) {
 		cmdflags.ServiceFlags{cmdcore.NamespaceFlags{"test-namespace"}, "test-service"})
 
 	DeepEqual(t, realCmd.DeployFlags, DeployFlags{
-		Image:              "test-image",
-		WatchRevisionReady: true,
-		WatchPodLogs:       true,
+		Image:                     "test-image",
+		WatchRevisionReady:        true,
+		WatchRevisionReadyTimeout: 5 * time.Minute,
+		WatchPodLogs:              true,
 	})
 }
 
@@ -135,9 +138,10 @@ func TestNewDeployCmd_WatchingDisabled(t *testing.T) {
 		cmdflags.ServiceFlags{cmdcore.NamespaceFlags{"test-namespace"}, "test-service"})
 
 	DeepEqual(t, realCmd.DeployFlags, DeployFlags{
-		Image:              "test-image",
-		WatchRevisionReady: false,
-		WatchPodLogs:       false,
+		Image:                     "test-image",
+		WatchRevisionReady:        false,
+		WatchRevisionReadyTimeout: 5 * time.Minute,
+		WatchPodLogs:              false,
 	})
 }
 

@@ -31,9 +31,9 @@ type DeployFlags struct {
 	Image string
 	Env   []string
 
-	WatchRevisionReady            bool
-	WatchRevisionReadyMaxDuration time.Duration
-	WatchPodLogs                  bool
+	WatchRevisionReady        bool
+	WatchRevisionReadyTimeout time.Duration
+	WatchPodLogs              bool
 
 	RemoveKnctlDeployEnvVar bool
 }
@@ -48,8 +48,8 @@ func (s *DeployFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory)
 	cmd.MarkFlagRequired("image")
 
 	cmd.Flags().BoolVar(&s.WatchRevisionReady, "watch-revision-ready", true, "Wait for new revision to become ready")
-	cmd.Flags().DurationVar(&s.WatchRevisionReadyMaxDuration, "watch-revision-ready-max-duration",
-		5*time.Minute, "Maximum duration of time to wait for new revision to become ready")
+	cmd.Flags().DurationVar(&s.WatchRevisionReadyTimeout, "watch-revision-ready-timeout",
+		5*time.Minute, "Set timeout for waiting for new revision to become ready")
 	cmd.Flags().BoolVar(&s.WatchPodLogs, "watch-pod-logs", true, "Watch pod logs for new revision")
 
 	cmd.Flags().StringSliceVarP(&s.Env, "env", "e", nil, "Set environment variable (format: key=value) (can be specified multiple times)")
