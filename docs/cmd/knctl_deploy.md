@@ -37,22 +37,23 @@ knctl deploy [flags]
 ### Options
 
 ```
-  -d, --directory string                             Set source code directory
-  -e, --env strings                                  Set environment variable (format: key=value) (can be specified multiple times)
-      --generate-name                                Set to generate name
-      --git-revision string                          Set Git revision (examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
-      --git-url string                               Set Git URL
-  -h, --help                                         help for deploy
-  -i, --image string                                 Set image URL
-  -n, --namespace string                             Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
-  -s, --service string                               Specified service
-      --service-account string                       Set service account name for building
-      --template string                              Set template name
-      --template-arg strings                         Set template argument (format: key=value) (can be specified multiple times)
-      --template-env strings                         Set template environment variable (format: key=value) (can be specified multiple times)
-      --watch-pod-logs                               Watch pod logs for new revision (default true)
-      --watch-revision-ready                         Wait for new revision to become ready (default true)
-      --watch-revision-ready-max-duration duration   Maximum duration of time to wait for new revision to become ready (default 5m0s)
+      --build-timeout duration                  Set timeout for building stage (Knative Build has a 10m default)
+  -d, --directory string                        Set source code directory
+  -e, --env strings                             Set environment variable (format: key=value) (can be specified multiple times)
+      --generate-name                           Set to generate name
+      --git-revision string                     Set Git revision (examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
+      --git-url string                          Set Git URL
+  -h, --help                                    help for deploy
+  -i, --image string                            Set image URL
+  -n, --namespace string                        Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
+  -s, --service string                          Specified service
+      --service-account string                  Set service account name for building
+      --template string                         Set template name
+      --template-arg strings                    Set template argument (format: key=value) (can be specified multiple times)
+      --template-env strings                    Set template environment variable (format: key=value) (can be specified multiple times)
+      --watch-pod-logs                          Watch pod logs for new revision (default true)
+      --watch-revision-ready                    Wait for new revision to become ready (default true)
+      --watch-revision-ready-timeout duration   Set timeout for waiting for new revision to become ready (default 5m0s)
 ```
 
 ### Options inherited from parent commands

@@ -19,9 +19,11 @@ package build
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/knative/build/pkg/apis/build/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
@@ -42,7 +44,8 @@ type BuildSpecOpts struct {
 	TemplateArgs []string
 	TemplateEnv  []string
 
-	Image string
+	Image   string
+	Timeout time.Duration
 }
 
 func (s BuildSpec) Build(opts BuildSpecOpts) (v1alpha1.BuildSpec, error) {
@@ -63,6 +66,10 @@ func (s BuildSpec) Build(opts BuildSpecOpts) (v1alpha1.BuildSpec, error) {
 		Source:             source,
 		Template:           template,
 		Steps:              steps,
+	}
+
+	if opts.Timeout.Nanoseconds() > 0 {
+		spec.Timeout = &metav1.Duration{opts.Timeout}
 	}
 
 	return spec, nil

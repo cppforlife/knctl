@@ -40,7 +40,7 @@ type DeployFlags struct {
 
 func (s *DeployFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory) {
 	s.GenerateNameFlags.Set(cmd, flagsFactory)
-	s.BuildCreateArgsFlags.Set(cmd, flagsFactory)
+	s.BuildCreateArgsFlags.SetWithBuildPrefix(cmd, flagsFactory)
 
 	// TODO separate service account for pulling?
 

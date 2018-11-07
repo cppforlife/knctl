@@ -18,6 +18,7 @@ package service_test
 
 import (
 	"testing"
+	"time"
 
 	ctlbuild "github.com/cppforlife/knctl/pkg/knctl/build"
 	. "github.com/cppforlife/knctl/pkg/knctl/cmd"
@@ -40,6 +41,7 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 		"-i", "test-image",
 		"-e", "key1=val1",
 		"-e", "key2=val2",
+		"--build-timeout", "1s",
 	})
 	cmd.ExpectReachesExecution()
 
@@ -52,6 +54,7 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 				GitURL:             "test-git-url",
 				GitRevision:        "test-git-revision",
 				ServiceAccountName: "test-service-account",
+				Timeout:            1 * time.Second,
 			},
 		},
 		Image:              "test-image",
@@ -73,6 +76,7 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 		"--image", "test-image",
 		"--env", "key1=val1",
 		"--env", "key2=val2",
+		"--build-timeout", "1s",
 	})
 	cmd.ExpectReachesExecution()
 
@@ -85,6 +89,7 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 				GitURL:             "test-git-url",
 				GitRevision:        "test-git-revision",
 				ServiceAccountName: "test-service-account",
+				Timeout:            1 * time.Second,
 			},
 		},
 		Image:              "test-image",

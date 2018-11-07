@@ -17,6 +17,8 @@ limitations under the License.
 package build
 
 import (
+	"time"
+
 	ctlbuild "github.com/cppforlife/knctl/pkg/knctl/build"
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	"github.com/spf13/cobra"
@@ -44,6 +46,18 @@ func (s *CreateFlags) Validate() error {
 }
 
 func (s *CreateArgsFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory) {
+	s.setWithPrefix("", cmd, flagsFactory)
+}
+
+func (s *CreateArgsFlags) SetWithBuildPrefix(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory) {
+	s.setWithPrefix("build", cmd, flagsFactory)
+}
+
+func (s *CreateArgsFlags) setWithPrefix(prefix string, cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory) {
+	if len(prefix) > 0 {
+		prefix += "-"
+	}
+
 	cmd.Flags().StringVarP(&s.SourceDirectory, "directory", "d", "", "Set source code directory")
 
 	cmd.Flags().StringVar(&s.GitURL, "git-url", "", "Set Git URL")
@@ -54,6 +68,8 @@ func (s *CreateArgsFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFact
 	cmd.Flags().StringVar(&s.Template, "template", "", "Set template name")
 	cmd.Flags().StringSliceVar(&s.TemplateArgs, "template-arg", nil, "Set template argument (format: key=value) (can be specified multiple times)")
 	cmd.Flags().StringSliceVar(&s.TemplateEnv, "template-env", nil, "Set template environment variable (format: key=value) (can be specified multiple times)")
+
+	cmd.Flags().DurationVar(&s.Timeout, prefix+"timeout", time.Duration(0), "Set timeout for building stage (Knative Build has a 10m default)")
 }
 
 func (s *CreateArgsFlags) IsProvided() bool {

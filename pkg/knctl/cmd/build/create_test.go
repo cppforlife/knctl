@@ -18,6 +18,7 @@ package build_test
 
 import (
 	"testing"
+	"time"
 
 	ctlbuild "github.com/cppforlife/knctl/pkg/knctl/build"
 	. "github.com/cppforlife/knctl/pkg/knctl/cmd"
@@ -36,6 +37,7 @@ func TestNewCreateCmd_Ok(t *testing.T) {
 		"--git-revision", "test-git-revision",
 		"--service-account", "test-service-account",
 		"-i", "test-image",
+		"--timeout", "1s",
 	})
 	cmd.ExpectReachesExecution()
 
@@ -50,6 +52,7 @@ func TestNewCreateCmd_Ok(t *testing.T) {
 				GitRevision:        "test-git-revision",
 				ServiceAccountName: "test-service-account",
 				Image:              "test-image",
+				Timeout:            1 * time.Second,
 			},
 		},
 	})
@@ -65,6 +68,7 @@ func TestNewCreateCmd_OkLongFlagNames(t *testing.T) {
 		"--git-revision", "test-git-revision",
 		"--service-account", "test-service-account",
 		"--image", "test-image",
+		"--timeout", "1s",
 	})
 	cmd.ExpectReachesExecution()
 
@@ -79,6 +83,34 @@ func TestNewCreateCmd_OkLongFlagNames(t *testing.T) {
 				GitRevision:        "test-git-revision",
 				ServiceAccountName: "test-service-account",
 				Image:              "test-image",
+				Timeout:            1 * time.Second,
+			},
+		},
+	})
+}
+
+func TestNewCreateCmd_OkMinimum(t *testing.T) {
+	realCmd := NewCreateOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
+	cmd := NewTestCmd(t, NewCreateCmd(realCmd, cmdcore.FlagsFactory{}))
+	cmd.Execute([]string{
+		"--namespace", "test-namespace",
+		"--build", "test-build",
+		"--git-url", "test-git-url",
+		"--git-revision", "test-git-revision",
+		"--image", "test-image",
+	})
+	cmd.ExpectReachesExecution()
+
+	DeepEqual(t, realCmd.BuildFlags,
+		BuildFlags{cmdcore.NamespaceFlags{"test-namespace"}, "test-build"})
+
+	DeepEqual(t, realCmd.CreateFlags, CreateFlags{
+		cmdcore.GenerateNameFlags{},
+		CreateArgsFlags{
+			ctlbuild.BuildSpecOpts{
+				GitURL:      "test-git-url",
+				GitRevision: "test-git-revision",
+				Image:       "test-image",
 			},
 		},
 	})

@@ -65,6 +65,12 @@ type BuildSpec struct {
 	// populate fields in the build, and optional Arguments to pass to the
 	// template.
 	Template *TemplateInstantiationSpec `json:"template,omitempty"`
+
+	// Time after which the build times out. Defaults to 10 minutes.
+	// Specified build timeout should be less than 24h.
+	// Refer Go's ParseDuration documentation for expected format: https://golang.org/pkg/time/#ParseDuration
+	// +optional
+	Timeout *metav1.Duration `json:"timeout,omitempty"`
 }
 
 // TemplateInstantiationSpec specifies how a BuildTemplate is instantiated into
