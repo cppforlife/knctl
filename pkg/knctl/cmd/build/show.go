@@ -87,9 +87,15 @@ func (o *ShowOptions) Run() error {
 		Transpose: true,
 	}
 
+	durationVal := uitable.NewValueString("")
+
+	if build.Spec.Timeout != nil {
+		durationVal = uitable.NewValueString(build.Spec.Timeout.Duration.String())
+	}
+
 	table.Rows = append(table.Rows, []uitable.Value{
 		uitable.NewValueString(build.Name),
-		uitable.NewValueString(build.Spec.Timeout.Duration.String()),
+		durationVal,
 		uitable.NewValueTime(build.Status.StartTime.Time),
 		uitable.NewValueTime(build.Status.CompletionTime.Time),
 		NewBuildSucceededValue(*build),
