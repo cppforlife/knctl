@@ -77,6 +77,9 @@ func (o *ShowOptions) Run() error {
 
 		Header: []uitable.Header{
 			uitable.NewHeader("Name"),
+			uitable.NewHeader("Timeout"),
+			uitable.NewHeader("Started at"),
+			uitable.NewHeader("Completed at"),
 			uitable.NewHeader("Succeeded"),
 			uitable.NewHeader("Age"),
 		},
@@ -86,6 +89,9 @@ func (o *ShowOptions) Run() error {
 
 	table.Rows = append(table.Rows, []uitable.Value{
 		uitable.NewValueString(build.Name),
+		uitable.NewValueString(build.Spec.Timeout.Duration.String()),
+		uitable.NewValueTime(build.Status.StartTime.Time),
+		uitable.NewValueTime(build.Status.CompletionTime.Time),
 		NewBuildSucceededValue(*build),
 		cmdcore.NewValueAge(build.CreationTimestamp.Time),
 	})
