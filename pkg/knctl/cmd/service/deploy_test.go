@@ -42,6 +42,7 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 		"-e", "key1=val1",
 		"-e", "key2=val2",
 		"--build-timeout", "1s",
+		"-l",
 	})
 	cmd.ExpectReachesExecution()
 
@@ -57,11 +58,14 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 				Timeout:            1 * time.Second,
 			},
 		},
-		Image:                     "test-image",
-		Env:                       []string{"key1=val1", "key2=val2"},
+		Image: "test-image",
+		Env:   []string{"key1=val1", "key2=val2"},
+
 		WatchRevisionReady:        true,
 		WatchRevisionReadyTimeout: 5 * time.Minute,
-		WatchPodLogs:              true,
+
+		WatchPodLogs:             true,
+		WatchPodLogsIndefinitely: true,
 	})
 }
 
@@ -78,6 +82,7 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 		"--env", "key1=val1",
 		"--env", "key2=val2",
 		"--build-timeout", "1s",
+		"--watch-pod-logs-indefinitely=true",
 	})
 	cmd.ExpectReachesExecution()
 
@@ -93,11 +98,14 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 				Timeout:            1 * time.Second,
 			},
 		},
-		Image:                     "test-image",
-		Env:                       []string{"key1=val1", "key2=val2"},
+		Image: "test-image",
+		Env:   []string{"key1=val1", "key2=val2"},
+
 		WatchRevisionReady:        true,
 		WatchRevisionReadyTimeout: 5 * time.Minute,
-		WatchPodLogs:              true,
+
+		WatchPodLogs:             true,
+		WatchPodLogsIndefinitely: true,
 	})
 }
 

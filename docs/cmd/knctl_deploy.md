@@ -52,6 +52,7 @@ knctl deploy [flags]
       --template-arg strings                    Set template argument (format: key=value) (can be specified multiple times)
       --template-env strings                    Set template environment variable (format: key=value) (can be specified multiple times)
       --watch-pod-logs                          Watch pod logs for new revision (default true)
+  -l, --watch-pod-logs-indefinitely             Watch pod logs for new revision indefinitely
       --watch-revision-ready                    Wait for new revision to become ready (default true)
       --watch-revision-ready-timeout duration   Set timeout for waiting for new revision to become ready (default 5m0s)
 ```

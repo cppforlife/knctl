@@ -244,8 +244,13 @@ func (o *DeployOptions) watchRevisionReady(
 			o.ui.PrintLinef("Revision '%s' did not became ready", newLastRevision.Name)
 		}
 
+		if ready && o.DeployFlags.WatchPodLogsIndefinitely {
+			o.ui.PrintLinef("Continuing to watch logs indefinitely")
+			return
+		}
+
 		if o.DeployFlags.WatchPodLogs {
-			o.ui.PrintLinef("Waiting for %s before exiting to see additional logs", logCollectDur)
+			o.ui.PrintLinef("Continuing to watch logs for %s before exiting", logCollectDur)
 			time.Sleep(logCollectDur)
 		}
 
