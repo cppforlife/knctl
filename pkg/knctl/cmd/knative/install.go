@@ -38,16 +38,19 @@ import (
 
 var (
 	InstallIstioAsset = InstallationAsset{
-		URL:    "https://raw.githubusercontent.com/knative/serving/38c0d500fcd4a65b24b103b54bedf6dacc985170/third_party/istio-1.0.2/istio.yaml",
-		SHA256: "92377c1600653bddb7e0e0a3a481e15d4f193f3dee36bb30399cc9aba7d628bf",
+		Version: "1.0.2",
+		URL:     "https://github.com/knative/serving/releases/download/v0.2.1/istio.yaml",
+		SHA256:  "92377c1600653bddb7e0e0a3a481e15d4f193f3dee36bb30399cc9aba7d628bf",
 	}
 	InstallKnativeFullAsset = InstallationAsset{
-		URL:    "https://github.com/knative/serving/releases/download/v0.1.1/release.yaml",
-		SHA256: "81d619b995ee36650ac4fe5ba54705cde569a92457aee18a03a8a45e5a9b8b77",
+		Version: "0.2.1",
+		URL:     "https://github.com/knative/serving/releases/download/v0.2.1/release.yaml",
+		SHA256:  "83539bc2257217f230b031566204aa52848b52bc3f64f19156c3d540016f7d11",
 	}
 	InstallKnativeNoMonAsset = InstallationAsset{
-		URL:    "https://github.com/knative/serving/releases/download/v0.1.1/release-no-mon.yaml",
-		SHA256: "db82bf221513bf5738bec694f3654df6111d74ad5cd1f3d69cb25422755437a7",
+		Version: "0.2.1",
+		URL:     "https://github.com/knative/serving/releases/download/v0.2.1/release-no-mon.yaml",
+		SHA256:  "6ec74658556241300af1e0c0ae6f08d92f36209c54ae7a213cc52c3adec972d5",
 	}
 )
 
@@ -294,8 +297,9 @@ func (p PodReadiness) IsRunningOrComplete() bool {
 }
 
 type InstallationAsset struct {
-	URL    string
-	SHA256 string
+	Version string
+	URL     string
+	SHA256  string
 }
 
 type uiLinesWriter struct {
