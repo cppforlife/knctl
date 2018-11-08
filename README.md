@@ -11,6 +11,7 @@ Grab pre-built binaries from the [Releases page](https://github.com/cppforlife/k
 - [Deploy from private Git repo](./docs/deploy-private-git-repo.md)
 - [Deploy from local source directory](./docs/deploy-source-directory.md)
 - [Deploy with custom Build Template (for example Buildpack)](./docs/deploy-custom-build-template.md)
+- [Deploy with secrets](./docs/deploy-secrets.md)
 - [`knctl` as a `kubectl` plugin](./docs/kubectl-plugin.md)
 - Advanced
   - [Manage domains](./docs/manage-domains.md)

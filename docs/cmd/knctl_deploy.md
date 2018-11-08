@@ -32,6 +32,13 @@ knctl deploy [flags]
       --template buildpack --template-env GOPACKAGENAME=main \
       --service-account serv-acct1 --image index.docker.io/your-account/your-repo \
       --env SIMPLE_MSG=123
+
+  # Deploy service 'srv1' that needs secret values in environment variables
+  # ( https://github.com/cppforlife/knctl/blob/master/docs/deploy-secrets.md )
+  knctl deploy -s srv1 -n ns1 \
+      --image gcr.io/knative-samples/helloworld-go \
+      --env-secret TARGET=secret/key1 \
+      --env-secret TARGET=secret/key2
 ```
 
 ### Options
