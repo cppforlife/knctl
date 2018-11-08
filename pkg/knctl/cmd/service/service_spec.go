@@ -31,6 +31,10 @@ import (
 
 type ServiceSpec struct{}
 
+func (ServiceSpec) HasBuild(service v1alpha1.Service) bool {
+	return service.Spec.RunLatest.Configuration.Build.BuildSpec != nil
+}
+
 func (s ServiceSpec) Build(serviceFlags cmdflags.ServiceFlags, deployFlags DeployFlags) (v1alpha1.Service, error) {
 	var buildSpec *buildv1alpha1.BuildSpec
 

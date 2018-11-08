@@ -149,7 +149,8 @@ func (o *DeployOptions) Run() error {
 		return err
 	}
 
-	if service.Spec.RunLatest.Configuration.Build != nil {
+	// TODO support non Knative builders
+	if (ServiceSpec{}).HasBuild(service) {
 		cancelCh := make(chan struct{})
 
 		buildObj, err := serviceObj.CreatedBuildSinceRevision(lastRevision)
