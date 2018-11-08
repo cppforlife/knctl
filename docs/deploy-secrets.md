@@ -12,6 +12,8 @@ $ kubectl create ns deploy-with-secrets
 $ export KNCTL_NAMESPACE=deploy-with-secrets
 ```
 
+Create a generic secret `simple-msg` that has one key-value `val=123`
+
 ```bash
 $ kubectl -n deploy-with-secrets create secret generic simple-msg --from-literal=val=123
 ```
