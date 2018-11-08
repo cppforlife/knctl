@@ -21,6 +21,24 @@ Deploy sample service (to current namespace)
 
 ```bash
 $ knctl deploy --service hello --image gcr.io/knative-samples/helloworld-go --env TARGET=123
+
+Name  hello
+
+Waiting for new revision to be created...
+
+Tagging new revision 'hello-00001' as 'latest'
+
+Tagging new revision 'hello-00001' as 'previous'
+
+Waiting for new revision 'hello-00001' to be ready for up to 5m0s (logs below)...
+
+hello-00001 > hello-00001-deployment-6f49b78fd9-7xlgw | 2018/11/08 01:07:01 Hello world sample started.
+
+Revision 'hello-00001' became ready
+
+Continuing to watch logs for 5s before exiting
+
+Succeeded
 ```
 
 List deployed services
