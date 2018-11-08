@@ -90,7 +90,6 @@ func (o *ShowOptions) printStatus(revision *v1alpha1.Revision, tags ctlservice.T
 		Header: []uitable.Header{
 			uitable.NewHeader("Name"),
 			uitable.NewHeader("Tags"),
-			uitable.NewHeader("Serving State"),
 			uitable.NewHeader("Annotations"),
 			uitable.NewHeader("Age"),
 		},
@@ -101,7 +100,6 @@ func (o *ShowOptions) printStatus(revision *v1alpha1.Revision, tags ctlservice.T
 	table.Rows = append(table.Rows, []uitable.Value{
 		uitable.NewValueString(revision.Name),
 		uitable.NewValueStrings(tags.List(*revision)),
-		uitable.NewValueString(string(revision.Spec.ServingState)),
 		cmdcore.NewAnnotationsValue(revision.Annotations),
 		cmdcore.NewValueAge(revision.CreationTimestamp.Time),
 	})
@@ -135,7 +133,7 @@ func (o *ShowOptions) printConditions(revision *v1alpha1.Revision) {
 				V:     uitable.NewValueString(string(cond.Status)),
 				Error: cond.Status != corev1.ConditionTrue,
 			},
-			cmdcore.NewValueAge(cond.LastTransitionTime.Time),
+			cmdcore.NewValueAge(cond.LastTransitionTime.Inner.Time),
 			uitable.NewValueString(cond.Reason),
 			uitable.NewValueString(wordwrap.WrapString(cond.Message, 80)),
 		})

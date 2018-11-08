@@ -66,21 +66,23 @@ func TestServiceSpecWithBuildConfiguration(t *testing.T) {
 		Spec: v1alpha1.ServiceSpec{
 			RunLatest: &v1alpha1.RunLatestType{
 				Configuration: v1alpha1.ConfigurationSpec{
-					Build: &buildv1alpha1.BuildSpec{
-						ServiceAccountName: "test-service-account",
-						Source: &buildv1alpha1.SourceSpec{
-							Git: &buildv1alpha1.GitSourceSpec{
-								Url:      "test-git-url",
-								Revision: "test-git-revision",
+					Build: &v1alpha1.RawExtension{
+						BuildSpec: &buildv1alpha1.BuildSpec{
+							ServiceAccountName: "test-service-account",
+							Source: &buildv1alpha1.SourceSpec{
+								Git: &buildv1alpha1.GitSourceSpec{
+									Url:      "test-git-url",
+									Revision: "test-git-revision",
+								},
 							},
-						},
-						Steps: []corev1.Container{
-							{
-								Name:  "build-and-push",
-								Image: "gcr.io/kaniko-project/executor",
-								Args: []string{
-									"--dockerfile=/workspace/Dockerfile",
-									"--destination=test-image",
+							Steps: []corev1.Container{
+								{
+									Name:  "build-and-push",
+									Image: "gcr.io/kaniko-project/executor",
+									Args: []string{
+										"--dockerfile=/workspace/Dockerfile",
+										"--destination=test-image",
+									},
 								},
 							},
 						},
@@ -132,7 +134,7 @@ func TestServiceSpecWithoutBuildConfiguration(t *testing.T) {
 		Spec: v1alpha1.ServiceSpec{
 			RunLatest: &v1alpha1.RunLatestType{
 				Configuration: v1alpha1.ConfigurationSpec{
-					Build: nil,
+					Build: &v1alpha1.RawExtension{},
 					RevisionTemplate: v1alpha1.RevisionTemplateSpec{
 						Spec: v1alpha1.RevisionSpec{
 							Container: corev1.Container{
@@ -206,7 +208,7 @@ func TestServiceSpecWithMultipleEnv(t *testing.T) {
 		Spec: v1alpha1.ServiceSpec{
 			RunLatest: &v1alpha1.RunLatestType{
 				Configuration: v1alpha1.ConfigurationSpec{
-					Build: nil,
+					Build: &v1alpha1.RawExtension{},
 					RevisionTemplate: v1alpha1.RevisionTemplateSpec{
 						Spec: v1alpha1.RevisionSpec{
 							Container: corev1.Container{

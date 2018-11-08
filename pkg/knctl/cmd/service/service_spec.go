@@ -88,7 +88,7 @@ func (s ServiceSpec) Build(serviceFlags cmdflags.ServiceFlags, deployFlags Deplo
 		Spec: v1alpha1.ServiceSpec{
 			RunLatest: &v1alpha1.RunLatestType{
 				Configuration: v1alpha1.ConfigurationSpec{
-					Build: buildSpec,
+					Build: &v1alpha1.RawExtension{BuildSpec: buildSpec},
 					RevisionTemplate: v1alpha1.RevisionTemplateSpec{
 						Spec: v1alpha1.RevisionSpec{
 							// TODO service account may be different for runtime vs build

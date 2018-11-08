@@ -135,7 +135,7 @@ func (o *ShowOptions) printConditions(service *v1alpha1.Service) {
 				V:     uitable.NewValueString(string(cond.Status)),
 				Error: cond.Status != corev1.ConditionTrue,
 			},
-			cmdcore.NewValueAge(cond.LastTransitionTime.Time),
+			cmdcore.NewValueAge(cond.LastTransitionTime.Inner.Time),
 			uitable.NewValueString(cond.Reason),
 			uitable.NewValueString(wordwrap.WrapString(cond.Message, 80)),
 		})
