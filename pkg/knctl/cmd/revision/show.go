@@ -18,6 +18,7 @@ package revision
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
@@ -90,6 +91,8 @@ func (o *ShowOptions) printStatus(revision *v1alpha1.Revision, tags ctlservice.T
 		Header: []uitable.Header{
 			uitable.NewHeader("Name"),
 			uitable.NewHeader("Tags"),
+			uitable.NewHeader("Image digest"),
+			uitable.NewHeader("Log URL"),
 			uitable.NewHeader("Annotations"),
 			uitable.NewHeader("Age"),
 		},
@@ -100,6 +103,8 @@ func (o *ShowOptions) printStatus(revision *v1alpha1.Revision, tags ctlservice.T
 	table.Rows = append(table.Rows, []uitable.Value{
 		uitable.NewValueString(revision.Name),
 		uitable.NewValueStrings(tags.List(*revision)),
+		uitable.NewValueString(revision.Status.ImageDigest),
+		uitable.NewValueString(strings.TrimSpace(revision.Status.LogURL)),
 		cmdcore.NewAnnotationsValue(revision.Annotations),
 		cmdcore.NewValueAge(revision.CreationTimestamp.Time),
 	})
