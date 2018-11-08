@@ -66,6 +66,7 @@ func (o *UninstallOptions) Run() error {
 	components := []UninstallationComponent{
 		{"Knative Build", NamespaceRemoval{"knative-build", coreClient}, o.ui},
 		{"Knative Serving", NamespaceRemoval{"knative-serving", coreClient}, o.ui},
+		{"Knative Monitoring", NamespaceRemoval{"knative-monitoring", coreClient}, o.ui},
 		{"Istio", NamespaceRemoval{istio.SystemNamespaceName(), coreClient}, o.ui},
 	}
 
