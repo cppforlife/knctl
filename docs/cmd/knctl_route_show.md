@@ -1,27 +1,27 @@
-## knctl route delete
+## knctl route show
 
-Delete route
+Show route
 
 ### Synopsis
 
-Delete route
+Show route details in a namespace
 
 ```
-knctl route delete [flags]
+knctl route show [flags]
 ```
 
 ### Examples
 
 ```
 
-  # Delete route 'route1' in namespace 'ns1'
-  knctl route delete --route route1 -n ns1
+  # Show details for route 'route1' in namespace 'ns1'
+  knctl route show -b route1 -n ns1
 ```
 
 ### Options
 
 ```
-  -h, --help               help for delete
+  -h, --help               help for show
   -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
       --route string       Specified route
 ```

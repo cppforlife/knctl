@@ -1,29 +1,33 @@
-## knctl route delete
+## knctl route curl
 
-Delete route
+Curl route
 
 ### Synopsis
 
-Delete route
+Send a HTTP request to the first ingress address with the Host header set to the service's domain.
+
+Requires 'curl' command installed on the system.
 
 ```
-knctl route delete [flags]
+knctl route curl [flags]
 ```
 
 ### Examples
 
 ```
 
-  # Delete route 'route1' in namespace 'ns1'
-  knctl route delete --route route1 -n ns1
+  # Curl route 'rt1' in namespace 'ns1'
+  knctl route curl --route rt1 -n ns1
 ```
 
 ### Options
 
 ```
-  -h, --help               help for delete
+  -h, --help               help for curl
   -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
+  -p, --port int32         Set port (default 80)
       --route string       Specified route
+  -v, --verbose            Makes curl verbose during the operation
 ```
 
 ### Options inherited from parent commands

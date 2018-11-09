@@ -32,8 +32,16 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+type ServiceSpec interface {
+	Namespace() string
+	Name() string
+	Service() (v1alpha1.Service, error)
+	NeedsConfigurationUpdate() bool
+	Configuration() (v1alpha1.Configuration, error)
+}
+
 type Service struct {
-	service         v1alpha1.Service
+	serviceSpec     ServiceSpec
 	servingClient   servingclientset.Interface
 	buildClient     buildclientset.Interface
 	coreClient      kubernetes.Interface
@@ -41,13 +49,13 @@ type Service struct {
 }
 
 func NewService(
-	service v1alpha1.Service,
+	serviceSpec ServiceSpec,
 	servingClient servingclientset.Interface,
 	buildClient buildclientset.Interface,
 	coreClient kubernetes.Interface,
 	buildObjFactory ctlbuild.Factory,
 ) *Service {
-	return &Service{service, servingClient, buildClient, coreClient, buildObjFactory}
+	return &Service{serviceSpec, servingClient, buildClient, coreClient, buildObjFactory}
 }
 
 func (l *Service) CreatedBuildSinceRevision(lastRevision *v1alpha1.Revision) (ctlbuild.Build, error) {
@@ -60,7 +68,7 @@ func (l *Service) CreatedBuildSinceRevision(lastRevision *v1alpha1.Revision) (ct
 	buildsToWatchCh := make(chan buildv1alpha1.Build)
 
 	// TODO build is not not necessarily in same namespace as service
-	buildsClient := l.buildClient.BuildV1alpha1().Builds(l.service.Namespace)
+	buildsClient := l.buildClient.BuildV1alpha1().Builds(l.serviceSpec.Namespace())
 
 	// Watch builds for new revision
 	go func() {
@@ -97,10 +105,10 @@ func (l *Service) CreatedRevisionSinceRevision(lastRevision *v1alpha1.Revision) 
 	// Watch revisions in this service
 	go func() {
 		revisionWatcher := NewRevisionWatcher(
-			l.servingClient.ServingV1alpha1().Revisions(l.service.Namespace),
+			l.servingClient.ServingV1alpha1().Revisions(l.serviceSpec.Namespace()),
 			metav1.ListOptions{
 				LabelSelector: labels.Set(map[string]string{
-					serving.ConfigurationLabelKey: l.service.Name,
+					serving.ConfigurationLabelKey: l.serviceSpec.Name(),
 				}).String(),
 			},
 		)
@@ -136,12 +144,12 @@ func (l *Service) CreatedRevisionSinceRevision(lastRevision *v1alpha1.Revision) 
 func (l *Service) LastRevision() (*v1alpha1.Revision, error) {
 	listOpts := metav1.ListOptions{
 		LabelSelector: labels.Set(map[string]string{
-			serving.ConfigurationLabelKey: l.service.Name,
+			serving.ConfigurationLabelKey: l.serviceSpec.Name(),
 		}).String(),
 	}
 
 	// TODO LatestCreatedRevisionName may not be updated that quickly
-	revisions, err := l.servingClient.ServingV1alpha1().Revisions(l.service.Namespace).List(listOpts)
+	revisions, err := l.servingClient.ServingV1alpha1().Revisions(l.serviceSpec.Namespace()).List(listOpts)
 	if err != nil {
 		return nil, err
 	}

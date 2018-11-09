@@ -45,6 +45,7 @@ knctl deploy [flags]
 
 ```
       --build-timeout duration                  Set timeout for building stage (Knative Build has a 10m default)
+      --custom-route                            Custom route configuration
   -d, --directory string                        Set source code directory
   -e, --env strings                             Set environment variable (format: ENV_KEY=value) (can be specified multiple times)
       --env-config-map strings                  Set environment variable from a config map (format: ENV_KEY=config-map-name/key) (can be specified multiple times)

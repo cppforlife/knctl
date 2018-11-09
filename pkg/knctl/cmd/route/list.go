@@ -18,10 +18,10 @@ package route
 
 import (
 	"fmt"
-	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
+	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"

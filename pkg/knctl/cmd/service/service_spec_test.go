@@ -53,7 +53,7 @@ func TestServiceSpecWithBuildConfiguration(t *testing.T) {
 		RemoveKnctlDeployEnvVar: true,
 	}
 
-	spec, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	spec, err := NewServiceSpec(serviceFlags, deployFlags).Service()
 	if err != nil {
 		t.Fatalf("Expected error to not happen: %s", err)
 	}
@@ -121,7 +121,7 @@ func TestServiceSpecWithoutBuildConfiguration(t *testing.T) {
 		RemoveKnctlDeployEnvVar: true,
 	}
 
-	spec, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	spec, err := NewServiceSpec(serviceFlags, deployFlags).Service()
 	if err != nil {
 		t.Fatalf("Expected error to not happen: %s", err)
 	}
@@ -168,7 +168,7 @@ func TestServiceSpecWithInvalidEnv(t *testing.T) {
 		RemoveKnctlDeployEnvVar: true,
 	}
 
-	_, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	_, err := NewServiceSpec(serviceFlags, deployFlags).Service()
 	if err == nil {
 		t.Fatalf("Expected error to happen")
 	}
@@ -195,7 +195,7 @@ func TestServiceSpecWithMultipleEnv(t *testing.T) {
 		RemoveKnctlDeployEnvVar: true,
 	}
 
-	spec, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	spec, err := NewServiceSpec(serviceFlags, deployFlags).Service()
 	if err != nil {
 		t.Fatalf("Expected error to not happen: %s", err)
 	}
@@ -277,7 +277,7 @@ func TestServiceSpecWithInvalidEnvSecret(t *testing.T) {
 		RemoveKnctlDeployEnvVar: true,
 	}
 
-	_, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	_, err := NewServiceSpec(serviceFlags, deployFlags).Service()
 	if err == nil {
 		t.Fatalf("Expected error to happen")
 	}
@@ -302,7 +302,7 @@ func TestServiceSpecWithInvalidEnvConfigMap(t *testing.T) {
 		RemoveKnctlDeployEnvVar: true,
 	}
 
-	_, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	_, err := NewServiceSpec(serviceFlags, deployFlags).Service()
 	if err == nil {
 		t.Fatalf("Expected error to happen")
 	}

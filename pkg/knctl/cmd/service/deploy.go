@@ -106,13 +106,9 @@ func (o *DeployOptions) Run() error {
 		return err
 	}
 
-	service, err := ServiceSpec{}.Build(o.ServiceFlags, o.DeployFlags)
-	if err != nil {
-		return err
-	}
-
+	serviceSpec := NewServiceSpec(o.ServiceFlags, o.DeployFlags)
 	buildObjFactory := ctlbuild.NewFactory(buildClient, coreClient, restConfig)
-	serviceObj := ctlservice.NewService(service, servingClient, buildClient, coreClient, buildObjFactory)
+	serviceObj := ctlservice.NewService(serviceSpec, servingClient, buildClient, coreClient, buildObjFactory)
 
 	var lastRevision *v1alpha1.Revision
 
@@ -150,7 +146,7 @@ func (o *DeployOptions) Run() error {
 	}
 
 	// TODO support non Knative builders
-	if (ServiceSpec{}).HasBuild(service) {
+	if serviceSpec.HasBuild() {
 		cancelCh := make(chan struct{})
 
 		buildObj, err := serviceObj.CreatedBuildSinceRevision(lastRevision)
