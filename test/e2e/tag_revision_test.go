@@ -47,7 +47,6 @@ func TestDefaultRevisionTags(t *testing.T) {
 	logger.Section("Deploy first revision", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContentRev1,
@@ -82,7 +81,6 @@ func TestDefaultRevisionTags(t *testing.T) {
 	logger.Section("Deploy second revision", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContentRev2,
@@ -118,7 +116,6 @@ func TestDefaultRevisionTags(t *testing.T) {
 	logger.Section("Deploy third revision", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContentRev3,
@@ -193,7 +190,6 @@ func TestTagRevisions(t *testing.T) {
 	logger.Section("Deploy two revisions", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContentRev1,
@@ -201,7 +197,6 @@ func TestTagRevisions(t *testing.T) {
 
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=" + expectedContentRev2,

@@ -44,7 +44,6 @@ func TestAnnotateService(t *testing.T) {
 	logger.Section("Deploy service", func() {
 		knctl.Run([]string{
 			"deploy",
-			"-n", "default",
 			"-s", serviceName,
 			"-i", "gcr.io/knative-samples/helloworld-go",
 			"-e", "TARGET=target",
