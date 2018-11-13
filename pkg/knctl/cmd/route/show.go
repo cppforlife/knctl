@@ -23,9 +23,7 @@ import (
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
-	"github.com/mitchellh/go-wordwrap"
 	"github.com/spf13/cobra"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -65,6 +63,15 @@ func (o *ShowOptions) Run() error {
 		return err
 	}
 
+	o.printStatus(route)
+	o.printTargets(route)
+
+	cmdcore.NewConditionsTable(route.Status.Conditions).Print(o.ui)
+
+	return nil
+}
+
+func (o *ShowOptions) printStatus(route *v1alpha1.Route) {
 	table := uitable.Table{
 		Title: fmt.Sprintf("Route '%s'", o.RouteFlags.Name),
 
@@ -88,42 +95,6 @@ func (o *ShowOptions) Run() error {
 	})
 
 	o.ui.PrintTable(table)
-
-	o.printTargets(route)
-
-	table = uitable.Table{
-		Title: "Conditions",
-
-		// TODO Content: "conditions",
-
-		Header: []uitable.Header{
-			uitable.NewHeader("Type"),
-			uitable.NewHeader("Status"),
-			uitable.NewHeader("Reason"),
-			uitable.NewHeader("Message"),
-		},
-
-		SortBy: []uitable.ColumnSort{
-			{Column: 0, Asc: true},
-		},
-	}
-
-	for _, cond := range route.Status.Conditions {
-		table.Rows = append(table.Rows, []uitable.Value{
-			uitable.NewValueString(string(cond.Type)),
-			uitable.ValueFmt{
-				V:     uitable.NewValueString(string(cond.Status)),
-				Error: cond.Status != corev1.ConditionTrue,
-			},
-			// TODO age
-			uitable.NewValueString(cond.Reason),
-			uitable.NewValueString(wordwrap.WrapString(cond.Message, 80)),
-		})
-	}
-
-	o.ui.PrintTable(table)
-
-	return nil
 }
 
 func (o *ShowOptions) printTargets(route *v1alpha1.Route) {

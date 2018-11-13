@@ -26,7 +26,6 @@ import (
 	cmdrev "github.com/cppforlife/knctl/pkg/knctl/cmd/revision"
 	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
-	"github.com/mitchellh/go-wordwrap"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -69,7 +68,8 @@ func (o *ShowOptions) Run() error {
 	}
 
 	o.printStatus(service)
-	o.printConditions(service)
+
+	cmdcore.NewConditionsTable(service.Status.Conditions).Print(o.ui)
 
 	podsToWatchCh, err := o.setUpPodWatching(service)
 	if err != nil {
@@ -105,41 +105,6 @@ func (o ShowOptions) printStatus(service *v1alpha1.Service) {
 		cmdcore.NewAnnotationsValue(service.Annotations),
 		cmdcore.NewValueAge(service.CreationTimestamp.Time),
 	})
-
-	o.ui.PrintTable(table)
-}
-
-func (o *ShowOptions) printConditions(service *v1alpha1.Service) {
-	table := uitable.Table{
-		Title: fmt.Sprintf("Service '%s' conditions", o.ServiceFlags.Name),
-
-		// TODO Content: "conditions",
-
-		Header: []uitable.Header{
-			uitable.NewHeader("Type"),
-			uitable.NewHeader("Status"),
-			uitable.NewHeader("Age"),
-			uitable.NewHeader("Reason"),
-			uitable.NewHeader("Message"),
-		},
-
-		SortBy: []uitable.ColumnSort{
-			{Column: 0, Asc: true},
-		},
-	}
-
-	for _, cond := range service.Status.Conditions {
-		table.Rows = append(table.Rows, []uitable.Value{
-			uitable.NewValueString(string(cond.Type)),
-			uitable.ValueFmt{
-				V:     uitable.NewValueString(string(cond.Status)),
-				Error: cond.Status != corev1.ConditionTrue,
-			},
-			cmdcore.NewValueAge(cond.LastTransitionTime.Inner.Time),
-			uitable.NewValueString(cond.Reason),
-			uitable.NewValueString(wordwrap.WrapString(cond.Message, 80)),
-		})
-	}
 
 	o.ui.PrintTable(table)
 }

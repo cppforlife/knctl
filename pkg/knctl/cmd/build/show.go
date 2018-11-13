@@ -25,9 +25,7 @@ import (
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	"github.com/knative/build/pkg/apis/build/v1alpha1"
 	buildclientset "github.com/knative/build/pkg/client/clientset/versioned"
-	"github.com/mitchellh/go-wordwrap"
 	"github.com/spf13/cobra"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -70,6 +68,18 @@ func (o *ShowOptions) Run() error {
 		return err
 	}
 
+	o.printStatus(build)
+
+	cmdcore.NewConditionsTable(build.Status.Conditions).Print(o.ui)
+
+	if o.Logs {
+		return o.showLogs(build, buildClient)
+	}
+
+	return nil
+}
+
+func (o *ShowOptions) printStatus(build *v1alpha1.Build) {
 	table := uitable.Table{
 		Title: fmt.Sprintf("Build '%s'", o.BuildFlags.Name),
 
@@ -103,44 +113,6 @@ func (o *ShowOptions) Run() error {
 	})
 
 	o.ui.PrintTable(table)
-
-	table = uitable.Table{
-		Title: fmt.Sprintf("Build '%s' conditions", o.BuildFlags.Name),
-
-		// TODO Content: "conditions",
-
-		Header: []uitable.Header{
-			uitable.NewHeader("Type"),
-			uitable.NewHeader("Status"),
-			uitable.NewHeader("Reason"),
-			uitable.NewHeader("Message"),
-		},
-
-		SortBy: []uitable.ColumnSort{
-			{Column: 0, Asc: true},
-		},
-	}
-
-	for _, cond := range build.Status.Conditions {
-		table.Rows = append(table.Rows, []uitable.Value{
-			uitable.NewValueString(string(cond.Type)),
-			uitable.ValueFmt{
-				V:     uitable.NewValueString(string(cond.Status)),
-				Error: cond.Status != corev1.ConditionTrue,
-			},
-			// TODO age
-			uitable.NewValueString(cond.Reason),
-			uitable.NewValueString(wordwrap.WrapString(cond.Message, 80)),
-		})
-	}
-
-	o.ui.PrintTable(table)
-
-	if o.Logs {
-		return o.showLogs(build, buildClient)
-	}
-
-	return nil
 }
 
 func (o *ShowOptions) showLogs(build *v1alpha1.Build, buildClient buildclientset.Interface) error {
