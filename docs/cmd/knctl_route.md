@@ -1,10 +1,10 @@
 ## knctl route
 
-Route management (curl, delete, list, show)
+Route management (annotate, curl, delete, list, show)
 
 ### Synopsis
 
-Route management (curl, delete, list, show)
+Route management (annotate, curl, delete, list, show)
 
 ```
 knctl route [flags]
@@ -31,6 +31,7 @@ knctl route [flags]
 ### SEE ALSO
 
 * [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, pod, revision, rollout, route, service, service-account, ssh-auth-secret, uninstall, version)
+* [knctl route annotate](knctl_route_annotate.md)	 - Annotate route
 * [knctl route curl](knctl_route_curl.md)	 - Curl route
 * [knctl route delete](knctl_route_delete.md)	 - Delete route
 * [knctl route list](knctl_route_list.md)	 - List routes

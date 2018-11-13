@@ -76,6 +76,7 @@ func (o *ListOptions) Run() error {
 			uitable.NewHeader("Traffic"),
 			uitable.NewHeader("Domain"),
 			internalDomainHeader,
+			uitable.NewHeader("Annotations"),
 			uitable.NewHeader("Conditions"),
 			uitable.NewHeader("Age"),
 		},
@@ -91,6 +92,7 @@ func (o *ListOptions) Run() error {
 			o.configurationValue(route),
 			uitable.NewValueString(route.Status.Domain),
 			uitable.NewValueString(route.Status.DomainInternal),
+			cmdcore.NewAnnotationsValue(route.Annotations),
 			cmdcore.NewConditionsValue(route.Status.Conditions),
 			cmdcore.NewValueAge(route.CreationTimestamp.Time),
 		})

@@ -1,33 +1,30 @@
-## knctl route curl
+## knctl route annotate
 
-Curl route
+Annotate route
 
 ### Synopsis
 
-Send a HTTP request to the first ingress address with the Host header set to the service's domain.
-
-Requires 'curl' command installed on the system.
+Annotate route
 
 ```
-knctl route curl [flags]
+knctl route annotate [flags]
 ```
 
 ### Examples
 
 ```
 
-  # Curl route 'rt1' in namespace 'ns1'
-  knctl route curl --route rt1 -n ns1
+  # Annotate route 'rt1' in namespace 'ns1' with key and value
+  knctl route annotate --route rt1 -a key=value -n ns1
 ```
 
 ### Options
 
 ```
-  -h, --help               help for curl
-  -n, --namespace string   Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
-  -p, --port int32         Set port (default 80)
-      --route string       Specified route
-  -v, --verbose            Makes curl verbose during the operation
+  -a, --annotation strings   Set annotation (format: key=value) (can be specified multiple times)
+  -h, --help                 help for annotate
+  -n, --namespace string     Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
+      --route string         Specified route
 ```
 
 ### Options inherited from parent commands

@@ -39,5 +39,5 @@ knctl route list [flags]
 
 ### SEE ALSO
 
-* [knctl route](knctl_route.md)	 - Route management (curl, delete, list, show)
+* [knctl route](knctl_route.md)	 - Route management (annotate, curl, delete, list, show)
 
