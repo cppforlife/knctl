@@ -24,11 +24,13 @@ import (
 type TrafficFlags struct {
 	GenerateNameFlags cmdcore.GenerateNameFlags
 
-	Percentages []string
+	RevisionPercentages []string
+	ServicePercentages  []string
 }
 
 func (s *TrafficFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory) {
 	s.GenerateNameFlags.Set(cmd, flagsFactory)
 
-	cmd.Flags().StringSliceVarP(&s.Percentages, "percentage", "p", nil, "Set percentage (format: revision=percentage, example: latest=100%) (can be specified multiple times)")
+	cmd.Flags().StringSliceVarP(&s.RevisionPercentages, "percentage", "p", nil, "Set revision percentage (format: revision=percentage, example: app-00001=100%, app:latest=100%) (can be specified multiple times)")
+	cmd.Flags().StringSliceVar(&s.ServicePercentages, "service-percentage", nil, "Set service percentage (format: service=percentage, example: app=100%) (can be specified multiple times)")
 }

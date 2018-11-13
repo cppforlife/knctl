@@ -54,7 +54,8 @@ Secret Management Commands:
 Route Management Commands:
   domain            Domain management (create, list)
   ingress           Ingress management (list)
-  route             Route management (create, delete, list)
+  rollout           Create or update route
+  route             Route management (curl, delete, list, show)
 
 System Commands:
   install           Install Knative and Istio

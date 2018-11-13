@@ -44,3 +44,21 @@ func (c Curl) WaitForContent(serviceName, expectedContent string) {
 		c.t.Fatalf("Expected to find output '%s' in '%s' but did not", expectedContent, out)
 	}
 }
+
+func (c Curl) WaitForRouteContent(routeName, expectedContent string) {
+	var curledSuccessfully bool
+	var out string
+
+	for i := 0; i < 300; i++ {
+		out, _ = c.knctl.RunWithOpts([]string{"route", "curl", "-n", "default", "--route", routeName}, RunOpts{AllowError: true})
+		if strings.Contains(out, expectedContent) {
+			curledSuccessfully = true
+			break
+		}
+		time.Sleep(1 * time.Second)
+	}
+
+	if !curledSuccessfully {
+		c.t.Fatalf("Expected to find output '%s' in '%s' but did not", expectedContent, out)
+	}
+}

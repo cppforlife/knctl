@@ -29,89 +29,120 @@ import (
 	apirand "k8s.io/apimachinery/pkg/util/rand"
 )
 
-type ServiceSpec struct{}
-
-func (ServiceSpec) HasBuild(service v1alpha1.Service) bool {
-	return service.Spec.RunLatest.Configuration.Build.BuildSpec != nil
+type ServiceSpec struct {
+	serviceFlags cmdflags.ServiceFlags
+	deployFlags  DeployFlags
 }
 
-func (s ServiceSpec) Build(serviceFlags cmdflags.ServiceFlags, deployFlags DeployFlags) (v1alpha1.Service, error) {
-	var buildSpec *buildv1alpha1.BuildSpec
+func NewServiceSpec(serviceFlags cmdflags.ServiceFlags, deployFlags DeployFlags) ServiceSpec {
+	return ServiceSpec{serviceFlags, deployFlags}
+}
 
-	if deployFlags.BuildCreateArgsFlags.IsProvided() {
-		// TODO assumes that same image is used for building and running
-		deployFlags.BuildCreateArgsFlags.Image = deployFlags.Image
+func (s ServiceSpec) Namespace() string { return s.serviceFlags.NamespaceFlags.Name }
+func (s ServiceSpec) Name() string      { return s.serviceFlags.Name }
 
-		spec, err := ctlbuild.BuildSpec{}.Build(deployFlags.BuildCreateArgsFlags.BuildSpecOpts)
+func (s ServiceSpec) HasBuild() bool {
+	return s.deployFlags.BuildCreateArgsFlags.IsProvided()
+}
+
+func (s ServiceSpec) NeedsConfigurationUpdate() bool {
+	return !s.deployFlags.ManagedRoute
+}
+
+func (s ServiceSpec) Service() (v1alpha1.Service, error) {
+	service := v1alpha1.Service{
+		ObjectMeta: s.deployFlags.GenerateNameFlags.Apply(metav1.ObjectMeta{
+			Name:      s.serviceFlags.Name,
+			Namespace: s.serviceFlags.NamespaceFlags.Name,
+		}),
+	}
+
+	if s.NeedsConfigurationUpdate() {
+		service.Spec.Manual = &v1alpha1.ManualType{}
+	} else {
+		conf, err := s.Configuration()
 		if err != nil {
 			return v1alpha1.Service{}, err
+		}
+
+		service.Spec.RunLatest = &v1alpha1.RunLatestType{
+			Configuration: conf.Spec,
+		}
+	}
+
+	return service, nil
+}
+
+func (s ServiceSpec) Configuration() (v1alpha1.Configuration, error) {
+	var buildSpec *buildv1alpha1.BuildSpec
+
+	if s.deployFlags.BuildCreateArgsFlags.IsProvided() {
+		// TODO assumes that same image is used for building and running
+		s.deployFlags.BuildCreateArgsFlags.Image = s.deployFlags.Image
+
+		spec, err := ctlbuild.BuildSpec{}.Build(s.deployFlags.BuildCreateArgsFlags.BuildSpecOpts)
+		if err != nil {
+			return v1alpha1.Configuration{}, err
 		}
 
 		buildSpec = &spec
 	}
 
 	serviceCont := corev1.Container{
-		Image: deployFlags.Image,
+		Image: s.deployFlags.Image,
 	}
 
-	for _, kv := range deployFlags.EnvVars {
+	for _, kv := range s.deployFlags.EnvVars {
 		pieces := strings.SplitN(kv, "=", 2)
 		if len(pieces) != 2 {
-			return v1alpha1.Service{}, fmt.Errorf("Expected environment variable to be in format 'ENV_KEY=value'")
+			return v1alpha1.Configuration{}, fmt.Errorf("Expected environment variable to be in format 'ENV_KEY=value'")
 		}
 		serviceCont.Env = append(serviceCont.Env, corev1.EnvVar{Name: pieces[0], Value: pieces[1]})
 	}
 
-	envVars, err := s.buildEnvFromSecrets(deployFlags)
+	envVars, err := s.buildEnvFromSecrets(s.deployFlags)
 	if err != nil {
-		return v1alpha1.Service{}, err
+		return v1alpha1.Configuration{}, err
 	}
 
 	serviceCont.Env = append(serviceCont.Env, envVars...)
 
-	envVars, err = s.buildEnvFromConfigMaps(deployFlags)
+	envVars, err = s.buildEnvFromConfigMaps(s.deployFlags)
 	if err != nil {
-		return v1alpha1.Service{}, err
+		return v1alpha1.Configuration{}, err
 	}
 
 	serviceCont.Env = append(serviceCont.Env, envVars...)
 
 	// TODO it's convenient to force redeploy anytime deploy is issued
-	if !deployFlags.RemoveKnctlDeployEnvVar {
+	if !s.deployFlags.RemoveKnctlDeployEnvVar {
 		serviceCont.Env = append(serviceCont.Env, corev1.EnvVar{
 			Name:  "KNCTL_DEPLOY",
 			Value: apirand.String(10),
 		})
 	}
 
-	service := v1alpha1.Service{
-		ObjectMeta: deployFlags.GenerateNameFlags.Apply(metav1.ObjectMeta{
-			Name:      serviceFlags.Name,
-			Namespace: serviceFlags.NamespaceFlags.Name,
-		}),
-		Spec: v1alpha1.ServiceSpec{
-			RunLatest: &v1alpha1.RunLatestType{
-				Configuration: v1alpha1.ConfigurationSpec{
-					Build: &v1alpha1.RawExtension{BuildSpec: buildSpec},
-					RevisionTemplate: v1alpha1.RevisionTemplateSpec{
-						Spec: v1alpha1.RevisionSpec{
-							// TODO service account may be different for runtime vs build
-							ServiceAccountName: deployFlags.BuildCreateArgsFlags.ServiceAccountName,
-							Container:          serviceCont,
-						},
-					},
+	conf := v1alpha1.Configuration{
+		// ObjectMeta is populated when object is being created
+		Spec: v1alpha1.ConfigurationSpec{
+			Build: &v1alpha1.RawExtension{BuildSpec: buildSpec},
+			RevisionTemplate: v1alpha1.RevisionTemplateSpec{
+				Spec: v1alpha1.RevisionSpec{
+					// TODO service account may be different for runtime vs build
+					ServiceAccountName: s.deployFlags.BuildCreateArgsFlags.ServiceAccountName,
+					Container:          serviceCont,
 				},
 			},
 		},
 	}
 
-	return service, nil
+	return conf, nil
 }
 
-func (ServiceSpec) buildEnvFromSecrets(deployFlags DeployFlags) ([]corev1.EnvVar, error) {
+func (s ServiceSpec) buildEnvFromSecrets(deployFlags DeployFlags) ([]corev1.EnvVar, error) {
 	var result []corev1.EnvVar
 
-	for _, kv := range deployFlags.EnvSecrets {
+	for _, kv := range s.deployFlags.EnvSecrets {
 		pieces := strings.SplitN(kv, "=", 2)
 		if len(pieces) != 2 {
 			return nil, fmt.Errorf("Expected environment variable from secret to be in format 'ENV_KEY=secret-name/key'")
@@ -138,10 +169,10 @@ func (ServiceSpec) buildEnvFromSecrets(deployFlags DeployFlags) ([]corev1.EnvVar
 	return result, nil
 }
 
-func (ServiceSpec) buildEnvFromConfigMaps(deployFlags DeployFlags) ([]corev1.EnvVar, error) {
+func (s ServiceSpec) buildEnvFromConfigMaps(deployFlags DeployFlags) ([]corev1.EnvVar, error) {
 	var result []corev1.EnvVar
 
-	for _, kv := range deployFlags.EnvConfigMaps {
+	for _, kv := range s.deployFlags.EnvConfigMaps {
 		pieces := strings.SplitN(kv, "=", 2)
 		if len(pieces) != 2 {
 			return nil, fmt.Errorf("Expected environment variable from config map to be in format 'ENV_KEY=config-map-name/key'")

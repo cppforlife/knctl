@@ -31,16 +31,20 @@ func TestNewCreateCmd_Ok(t *testing.T) {
 	cmd.Execute([]string{
 		"-n", "test-namespace",
 		"--route", "test-route",
-		"-p", "srv1:rev1=50%",
-		"-p", "srv1:rev2=50%",
+		"-p", "srv1:rev1=25%",
+		"-p", "srv1:rev2=25%",
+		"--service-percentage", "srv1=25%",
+		"--service-percentage", "srv2=25%",
 	})
 	cmd.ExpectReachesExecution()
 
 	DeepEqual(t, realCmd.RouteFlags,
 		RouteFlags{cmdcore.NamespaceFlags{"test-namespace"}, "test-route"})
 
-	DeepEqual(t, realCmd.TrafficFlags,
-		TrafficFlags{Percentages: []string{"srv1:rev1=50%", "srv1:rev2=50%"}})
+	DeepEqual(t, realCmd.TrafficFlags, TrafficFlags{
+		RevisionPercentages: []string{"srv1:rev1=25%", "srv1:rev2=25%"},
+		ServicePercentages:  []string{"srv1=25%", "srv2=25%"},
+	})
 }
 
 func TestNewCreateCmd_OkLongFlagNames(t *testing.T) {
@@ -49,16 +53,20 @@ func TestNewCreateCmd_OkLongFlagNames(t *testing.T) {
 	cmd.Execute([]string{
 		"--namespace", "test-namespace",
 		"--route", "test-route",
-		"--percentage", "srv1:rev1=50%",
-		"--percentage", "srv1:rev2=50%",
+		"--percentage", "srv1:rev1=25%",
+		"--percentage", "srv1:rev2=25%",
+		"--service-percentage", "srv1=25%",
+		"--service-percentage", "srv2=25%",
 	})
 	cmd.ExpectReachesExecution()
 
 	DeepEqual(t, realCmd.RouteFlags,
 		RouteFlags{cmdcore.NamespaceFlags{"test-namespace"}, "test-route"})
 
-	DeepEqual(t, realCmd.TrafficFlags,
-		TrafficFlags{Percentages: []string{"srv1:rev1=50%", "srv1:rev2=50%"}})
+	DeepEqual(t, realCmd.TrafficFlags, TrafficFlags{
+		RevisionPercentages: []string{"srv1:rev1=25%", "srv1:rev2=25%"},
+		ServicePercentages:  []string{"srv1=25%", "srv2=25%"},
+	})
 }
 
 func TestNewCreateCmd_OkMinimum(t *testing.T) {
@@ -74,7 +82,7 @@ func TestNewCreateCmd_OkMinimum(t *testing.T) {
 	DeepEqual(t, realCmd.RouteFlags,
 		RouteFlags{cmdcore.NamespaceFlags{"test-namespace"}, "test-route"})
 
-	DeepEqual(t, realCmd.TrafficFlags, TrafficFlags{Percentages: nil})
+	DeepEqual(t, realCmd.TrafficFlags, TrafficFlags{RevisionPercentages: nil})
 }
 
 func TestNewCreateCmd_RequiredFlags(t *testing.T) {

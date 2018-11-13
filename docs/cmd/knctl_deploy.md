@@ -54,6 +54,7 @@ knctl deploy [flags]
       --git-url string                          Set Git URL
   -h, --help                                    help for deploy
   -i, --image string                            Set image URL
+      --managed-route                           Custom route configuration (default true)
   -n, --namespace string                        Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
   -s, --service string                          Specified service
       --service-account string                  Set service account name for building
@@ -80,5 +81,5 @@ knctl deploy [flags]
 
 ### SEE ALSO
 
-* [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
+* [knctl](knctl.md)	 - knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, pod, revision, rollout, route, service, service-account, ssh-auth-secret, uninstall, version)
 

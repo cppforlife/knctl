@@ -1,6 +1,6 @@
 ## knctl
 
-knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, pod, revision, route, service, service-account, ssh-auth-secret, uninstall, version)
+knctl controls Knative resources (basic-auth-secret, build, curl, deploy, dns-map, domain, ingress, install, logs, pod, revision, rollout, route, service, service-account, ssh-auth-secret, uninstall, version)
 
 ### Synopsis
 
@@ -38,7 +38,8 @@ knctl [flags]
 * [knctl logs](knctl_logs.md)	 - Print service logs
 * [knctl pod](knctl_pod.md)	 - Pod management (list)
 * [knctl revision](knctl_revision.md)	 - Revision management (annotate, delete, list, show, tag, untag)
-* [knctl route](knctl_route.md)	 - Route management (create, delete, list)
+* [knctl rollout](knctl_rollout.md)	 - Create or update route
+* [knctl route](knctl_route.md)	 - Route management (curl, delete, list, show)
 * [knctl service](knctl_service.md)	 - Service management (annotate, delete, list, open, show, url)
 * [knctl service-account](knctl_service-account.md)	 - Service account management (create)
 * [knctl ssh-auth-secret](knctl_ssh-auth-secret.md)	 - SSH auth secret management (create)

@@ -23,17 +23,17 @@ After enough data is gathered, developers can then route 100% traffic to the sel
 - to direct a bit more of traffic to new revision
 
 ```bash
-$ knctl route create --route hello -p hello:latest=40% -p hello:previous=60%
+$ knctl rollout --route hello -p hello:latest=40% -p hello:previous=60%
 ```
 
 - to direct all traffic to latest revision
 
 ```bash
-$ knctl route create --route hello -p hello:latest=100%
+$ knctl rollout --route hello -p hello:latest=100%
 ```
 
 - to direct all traffic back to previous revision
 
 ```bash
-$ knctl route create --route hello -p hello:previous=100%
+$ knctl rollout --route hello -p hello:previous=100%
 ```

@@ -47,13 +47,14 @@ func TestServiceSpecWithBuildConfiguration(t *testing.T) {
 				ServiceAccountName: "test-service-account",
 			},
 		},
-		Image:   "test-image",
-		EnvVars: []string{"test-env-key1=test-env-val1"},
+		Image:        "test-image",
+		EnvVars:      []string{"test-env-key1=test-env-val1"},
+		ManagedRoute: true,
 
 		RemoveKnctlDeployEnvVar: true,
 	}
 
-	spec, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	spec, err := NewServiceSpec(serviceFlags, deployFlags).Service()
 	if err != nil {
 		t.Fatalf("Expected error to not happen: %s", err)
 	}
@@ -115,13 +116,14 @@ func TestServiceSpecWithoutBuildConfiguration(t *testing.T) {
 	}
 
 	deployFlags := DeployFlags{
-		Image:   "test-image",
-		EnvVars: []string{"test-env-key1=test-env-val1"},
+		Image:        "test-image",
+		EnvVars:      []string{"test-env-key1=test-env-val1"},
+		ManagedRoute: true,
 
 		RemoveKnctlDeployEnvVar: true,
 	}
 
-	spec, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	spec, err := NewServiceSpec(serviceFlags, deployFlags).Service()
 	if err != nil {
 		t.Fatalf("Expected error to not happen: %s", err)
 	}
@@ -162,13 +164,14 @@ func TestServiceSpecWithInvalidEnv(t *testing.T) {
 	}
 
 	deployFlags := DeployFlags{
-		Image:   "test-image",
-		EnvVars: []string{"test-env-key1"},
+		Image:        "test-image",
+		EnvVars:      []string{"test-env-key1"},
+		ManagedRoute: true,
 
 		RemoveKnctlDeployEnvVar: true,
 	}
 
-	_, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	_, err := NewServiceSpec(serviceFlags, deployFlags).Service()
 	if err == nil {
 		t.Fatalf("Expected error to happen")
 	}
@@ -191,11 +194,12 @@ func TestServiceSpecWithMultipleEnv(t *testing.T) {
 		EnvVars:       []string{"test-env-key1=test-env-val1", "test-env-key2=test-env-val2"},
 		EnvSecrets:    []string{"test-env-key3=test-secret1/key", "test-env-key4=test-secret2/key"},
 		EnvConfigMaps: []string{"test-env-key5=test-config-map1/key", "test-env-key6=test-config-map2/key"},
+		ManagedRoute:  true,
 
 		RemoveKnctlDeployEnvVar: true,
 	}
 
-	spec, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	spec, err := NewServiceSpec(serviceFlags, deployFlags).Service()
 	if err != nil {
 		t.Fatalf("Expected error to not happen: %s", err)
 	}
@@ -271,13 +275,14 @@ func TestServiceSpecWithInvalidEnvSecret(t *testing.T) {
 	}
 
 	deployFlags := DeployFlags{
-		Image:      "test-image",
-		EnvSecrets: []string{"test-env-secret-key1"},
+		Image:        "test-image",
+		EnvSecrets:   []string{"test-env-secret-key1"},
+		ManagedRoute: true,
 
 		RemoveKnctlDeployEnvVar: true,
 	}
 
-	_, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	_, err := NewServiceSpec(serviceFlags, deployFlags).Service()
 	if err == nil {
 		t.Fatalf("Expected error to happen")
 	}
@@ -298,11 +303,12 @@ func TestServiceSpecWithInvalidEnvConfigMap(t *testing.T) {
 	deployFlags := DeployFlags{
 		Image:         "test-image",
 		EnvConfigMaps: []string{"test-env-config-map-key1"},
+		ManagedRoute:  true,
 
 		RemoveKnctlDeployEnvVar: true,
 	}
 
-	_, err := ServiceSpec{}.Build(serviceFlags, deployFlags)
+	_, err := NewServiceSpec(serviceFlags, deployFlags).Service()
 	if err == nil {
 		t.Fatalf("Expected error to happen")
 	}

@@ -66,6 +66,8 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 
 		WatchPodLogs:             true,
 		WatchPodLogsIndefinitely: true,
+
+		ManagedRoute: true,
 	})
 }
 
@@ -106,6 +108,8 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 
 		WatchPodLogs:             true,
 		WatchPodLogsIndefinitely: true,
+
+		ManagedRoute: true,
 	})
 }
 
@@ -127,6 +131,7 @@ func TestNewDeployCmd_OkMinimum(t *testing.T) {
 		WatchRevisionReady:        true,
 		WatchRevisionReadyTimeout: 5 * time.Minute,
 		WatchPodLogs:              true,
+		ManagedRoute:              true,
 	})
 }
 
@@ -150,6 +155,30 @@ func TestNewDeployCmd_WatchingDisabled(t *testing.T) {
 		WatchRevisionReady:        false,
 		WatchRevisionReadyTimeout: 5 * time.Minute,
 		WatchPodLogs:              false,
+		ManagedRoute:              true,
+	})
+}
+
+func TestNewDeployCmd_ManagedRouteDisabled(t *testing.T) {
+	realCmd := NewDeployOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
+	cmd := NewTestCmd(t, NewDeployCmd(realCmd, cmdcore.FlagsFactory{}))
+	cmd.Execute([]string{
+		"--namespace", "test-namespace",
+		"--service", "test-service",
+		"--image", "test-image",
+		"--managed-route=false",
+	})
+	cmd.ExpectReachesExecution()
+
+	DeepEqual(t, realCmd.ServiceFlags,
+		cmdflags.ServiceFlags{cmdcore.NamespaceFlags{"test-namespace"}, "test-service"})
+
+	DeepEqual(t, realCmd.DeployFlags, DeployFlags{
+		Image:                     "test-image",
+		WatchRevisionReady:        true,
+		WatchRevisionReadyTimeout: 5 * time.Minute,
+		WatchPodLogs:              true,
+		ManagedRoute:              false,
 	})
 }
 

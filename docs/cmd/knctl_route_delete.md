@@ -40,5 +40,5 @@ knctl route delete [flags]
 
 ### SEE ALSO
 
-* [knctl route](knctl_route.md)	 - Route management (create, delete, list)
+* [knctl route](knctl_route.md)	 - Route management (curl, delete, list, show)
 
