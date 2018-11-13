@@ -24,7 +24,6 @@ import (
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	"github.com/spf13/cobra"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -75,10 +74,9 @@ func (o *ListOptions) Run() error {
 		Header: []uitable.Header{
 			uitable.NewHeader("Name"),
 			uitable.NewHeader("Traffic"),
-			uitable.NewHeader("All Traffic Assigned"),
-			uitable.NewHeader("Ready"),
 			uitable.NewHeader("Domain"),
 			internalDomainHeader,
+			uitable.NewHeader("Conditions"),
 			uitable.NewHeader("Age"),
 		},
 
@@ -91,10 +89,9 @@ func (o *ListOptions) Run() error {
 		table.Rows = append(table.Rows, []uitable.Value{
 			uitable.NewValueString(route.Name),
 			o.configurationValue(route),
-			o.allTrafficAssignedValue(route),
-			o.readyValue(route),
 			uitable.NewValueString(route.Status.Domain),
 			uitable.NewValueString(route.Status.DomainInternal),
+			cmdcore.NewConditionsValue(route.Status.Conditions),
 			cmdcore.NewValueAge(route.CreationTimestamp.Time),
 		})
 	}
@@ -110,36 +107,4 @@ func (*ListOptions) configurationValue(route v1alpha1.Route) uitable.ValueString
 		dsts = append(dsts, fmt.Sprintf("%3d%% -> %s:%s", target.Percent, target.ConfigurationName, target.RevisionName))
 	}
 	return uitable.NewValueStrings(dsts)
-}
-
-func (*ListOptions) allTrafficAssignedValue(route v1alpha1.Route) cmdcore.ValueUnknownBool {
-	cond := route.Status.GetCondition(v1alpha1.RouteConditionAllTrafficAssigned)
-	if cond != nil {
-		switch cond.Status {
-		case corev1.ConditionTrue:
-			result := true
-			return cmdcore.NewValueUnknownBool(&result)
-		case corev1.ConditionFalse:
-			result := false
-			return cmdcore.NewValueUnknownBool(&result)
-		}
-	}
-
-	return cmdcore.NewValueUnknownBool(nil)
-}
-
-func (*ListOptions) readyValue(route v1alpha1.Route) cmdcore.ValueUnknownBool {
-	cond := route.Status.GetCondition(v1alpha1.RouteConditionReady)
-	if cond != nil {
-		switch cond.Status {
-		case corev1.ConditionTrue:
-			result := true
-			return cmdcore.NewValueUnknownBool(&result)
-		case corev1.ConditionFalse:
-			result := false
-			return cmdcore.NewValueUnknownBool(&result)
-		}
-	}
-
-	return cmdcore.NewValueUnknownBool(nil)
 }

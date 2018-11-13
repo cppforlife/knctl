@@ -88,11 +88,12 @@ func (o *ListOptions) Run() error {
 			uitable.NewHeader("Tags"),
 			uitable.NewHeader("Allocated Traffic %"),
 			uitable.NewHeader("Annotations"),
+			uitable.NewHeader("Conditions"),
 			uitable.NewHeader("Age"),
 		},
 
 		SortBy: []uitable.ColumnSort{
-			{Column: 4, Asc: false}, // Show latest first
+			{Column: 5, Asc: false}, // Show latest first
 		},
 	}
 
@@ -102,6 +103,7 @@ func (o *ListOptions) Run() error {
 			uitable.NewValueStrings(ctlservice.NewTags(servingClient).List(rev)),
 			NewAllocatedTrafficPercentValue(service, rev),
 			cmdcore.NewAnnotationsValue(rev.Annotations),
+			cmdcore.NewConditionsValue(rev.Status.Conditions),
 			cmdcore.NewValueAge(rev.CreationTimestamp.Time),
 		})
 	}

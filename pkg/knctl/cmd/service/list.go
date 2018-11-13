@@ -75,6 +75,7 @@ func (o *ListOptions) Run() error {
 			uitable.NewHeader("Domain"),
 			internalDomainHeader,
 			uitable.NewHeader("Annotations"),
+			uitable.NewHeader("Conditions"),
 			uitable.NewHeader("Age"),
 		},
 
@@ -89,6 +90,7 @@ func (o *ListOptions) Run() error {
 			uitable.NewValueString(svc.Status.Domain),
 			uitable.NewValueString(svc.Status.DomainInternal),
 			cmdcore.NewAnnotationsValue(svc.Annotations),
+			cmdcore.NewConditionsValue(svc.Status.Conditions),
 			cmdcore.NewValueAge(svc.CreationTimestamp.Time),
 		})
 	}

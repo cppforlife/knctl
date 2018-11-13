@@ -17,6 +17,8 @@ limitations under the License.
 package core
 
 import (
+	"fmt"
+
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 	duckv1alpha1 "github.com/knative/pkg/apis/duck/v1alpha1"
@@ -64,4 +66,22 @@ func (t ConditionsTable) Print(ui ui.UI) {
 	}
 
 	ui.PrintTable(table)
+}
+
+func NewConditionsValue(conditions duckv1alpha1.Conditions) uitable.Value {
+	var total, ok int
+
+	for _, cond := range conditions {
+		total++
+		if cond.Status == corev1.ConditionTrue {
+			ok++
+		}
+	}
+
+	val := uitable.ValueFmt{
+		V:     uitable.NewValueString(fmt.Sprintf("%d OK / %d", ok, total)),
+		Error: ok != total,
+	}
+
+	return val
 }
