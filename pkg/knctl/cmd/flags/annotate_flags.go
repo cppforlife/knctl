@@ -17,6 +17,9 @@ limitations under the License.
 package flags
 
 import (
+	"fmt"
+	"strings"
+
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	"github.com/spf13/cobra"
 )
@@ -27,4 +30,18 @@ type AnnotateFlags struct {
 
 func (s *AnnotateFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory) {
 	cmd.Flags().StringSliceVarP(&s.Annotations, "annotation", "a", nil, "Set annotation (format: key=value) (can be specified multiple times)")
+}
+
+func (s *AnnotateFlags) AsMap() (map[string]interface{}, error) {
+	result := map[string]interface{}{}
+
+	for _, kv := range s.Annotations {
+		pieces := strings.SplitN(kv, "=", 2)
+		if len(pieces) != 2 {
+			return nil, fmt.Errorf("Expected annotation to be in format 'KEY=VALUE'")
+		}
+		result[pieces[0]] = pieces[1]
+	}
+
+	return result, nil
 }

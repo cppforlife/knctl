@@ -21,12 +21,15 @@ import (
 
 	cmdbld "github.com/cppforlife/knctl/pkg/knctl/cmd/build"
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
+	cmdflags "github.com/cppforlife/knctl/pkg/knctl/cmd/flags"
 	"github.com/spf13/cobra"
 )
 
 type DeployFlags struct {
 	GenerateNameFlags    cmdcore.GenerateNameFlags
 	BuildCreateArgsFlags cmdbld.CreateArgsFlags
+	TagFlags             cmdflags.TagFlags
+	AnnotateFlags        cmdflags.AnnotateFlags
 
 	Image         string
 	EnvVars       []string
@@ -47,6 +50,8 @@ type DeployFlags struct {
 func (s *DeployFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory) {
 	s.GenerateNameFlags.Set(cmd, flagsFactory)
 	s.BuildCreateArgsFlags.SetWithBuildPrefix(cmd, flagsFactory)
+	s.TagFlags.Set(cmd, flagsFactory)
+	s.AnnotateFlags.Set(cmd, flagsFactory)
 
 	// TODO separate service account for pulling?
 

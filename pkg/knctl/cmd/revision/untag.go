@@ -29,7 +29,7 @@ type UntagOptions struct {
 	depsFactory cmdcore.DepsFactory
 
 	RevisionFlags cmdflags.RevisionFlags
-	TagFlags      TagFlags
+	TagFlags      cmdflags.TagFlags
 }
 
 func NewUntagOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *UntagOptions {

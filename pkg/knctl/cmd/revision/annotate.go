@@ -17,18 +17,11 @@ limitations under the License.
 package revision
 
 import (
-	"encoding/json"
-	"fmt"
-	"strings"
-	"time"
-
 	"github.com/cppforlife/go-cli-ui/ui"
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	cmdflags "github.com/cppforlife/knctl/pkg/knctl/cmd/flags"
 	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
-	"github.com/cppforlife/knctl/pkg/knctl/util"
 	"github.com/spf13/cobra"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 type AnnotateOptions struct {
@@ -70,37 +63,12 @@ func (o *AnnotateOptions) Run() error {
 		return err
 	}
 
-	patchJSON, err := o.annotationsAdditionPatchJSON()
+	anns := ctlservice.NewAnnotations(servingClient)
+
+	annotations, err := o.AnnotateFlags.AsMap()
 	if err != nil {
 		return err
 	}
 
-	return util.Retry(time.Second, 10*time.Second, func() (bool, error) {
-		_, err := servingClient.ServingV1alpha1().Revisions(revision.Namespace).Patch(revision.Name, types.MergePatchType, patchJSON)
-		if err != nil {
-			return false, fmt.Errorf("Annotating revision: %s", err)
-		}
-
-		return true, nil
-	})
-}
-
-func (o *AnnotateOptions) annotationsAdditionPatchJSON() ([]byte, error) {
-	annotations := map[string]interface{}{}
-
-	for _, kv := range o.AnnotateFlags.Annotations {
-		pieces := strings.SplitN(kv, "=", 2)
-		if len(pieces) != 2 {
-			return nil, fmt.Errorf("Expected annotation to be in format 'KEY=VALUE'")
-		}
-		annotations[pieces[0]] = pieces[1]
-	}
-
-	mergePatch := map[string]interface{}{
-		"metadata": map[string]interface{}{
-			"annotations": annotations,
-		},
-	}
-
-	return json.Marshal(mergePatch)
+	return anns.Annotate(revision, annotations)
 }

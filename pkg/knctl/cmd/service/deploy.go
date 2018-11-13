@@ -127,8 +127,6 @@ func (o *DeployOptions) Run() error {
 
 	o.printTable(createdService)
 
-	tags := ctlservice.NewTags(servingClient)
-
 	if lastRevision != nil {
 		o.ui.PrintLinef("Waiting for new revision (after revision '%s') to be created...", lastRevision.Name)
 	} else {
@@ -140,7 +138,12 @@ func (o *DeployOptions) Run() error {
 		return err
 	}
 
-	err = o.updateRevisionTags(tags, lastRevision, newLastRevision)
+	err = o.updateRevisionTags(lastRevision, newLastRevision, servingClient)
+	if err != nil {
+		return err
+	}
+
+	err = o.updateRevisionAnnotations(newLastRevision, servingClient)
 	if err != nil {
 		return err
 	}
@@ -196,33 +199,52 @@ func (o *DeployOptions) printTable(svc *v1alpha1.Service) {
 }
 
 func (o *DeployOptions) updateRevisionTags(
-	tags ctlservice.Tags, lastRevision *v1alpha1.Revision, newLastRevision *v1alpha1.Revision) error {
+	lastRevision *v1alpha1.Revision, newLastRevision *v1alpha1.Revision, servingClient servingclientset.Interface) error {
 
-	o.ui.PrintLinef("Tagging new revision '%s' as '%s'", newLastRevision.Name, ctlservice.TagsLatest)
+	tags := ctlservice.NewTags(servingClient)
 
-	err := tags.Repoint(newLastRevision, ctlservice.TagsLatest)
-	if err != nil {
-		return err
+	for _, tag := range append([]string{ctlservice.TagsLatest}, o.DeployFlags.TagFlags.Tags...) {
+		o.ui.PrintLinef("Tagging new revision '%s' as '%s'", newLastRevision.Name, tag)
+
+		err := tags.Repoint(newLastRevision, tag)
+		if err != nil {
+			return err
+		}
 	}
 
 	// If there was no last revision, let's tag new revision as previous
 	if lastRevision != nil {
 		o.ui.PrintLinef("Tagging older revision '%s' as '%s'", lastRevision.Name, ctlservice.TagsPrevious)
 
-		err = tags.Repoint(lastRevision, ctlservice.TagsPrevious)
+		err := tags.Repoint(lastRevision, ctlservice.TagsPrevious)
 		if err != nil {
 			return err
 		}
 	} else {
 		o.ui.PrintLinef("Tagging new revision '%s' as '%s'", newLastRevision.Name, ctlservice.TagsPrevious)
 
-		err = tags.Repoint(newLastRevision, ctlservice.TagsPrevious)
+		err := tags.Repoint(newLastRevision, ctlservice.TagsPrevious)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func (o *DeployOptions) updateRevisionAnnotations(
+	newLastRevision *v1alpha1.Revision, servingClient servingclientset.Interface) error {
+
+	o.ui.PrintLinef("Annotating new revision '%s'", newLastRevision.Name)
+
+	anns := ctlservice.NewAnnotations(servingClient)
+
+	annotations, err := o.DeployFlags.AnnotateFlags.AsMap()
+	if err != nil {
+		return err
+	}
+
+	return anns.Annotate(newLastRevision, annotations)
 }
 
 func (o *DeployOptions) watchRevisionReady(

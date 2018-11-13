@@ -43,6 +43,8 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 		"-e", "key2=val2",
 		"--build-timeout", "1s",
 		"-l",
+		"-t", "tag1", "-t", "tag2",
+		"-a", "k1=v1", "-a", "k2=v2",
 	})
 	cmd.ExpectReachesExecution()
 
@@ -68,6 +70,13 @@ func TestNewDeployCmd_Ok(t *testing.T) {
 		WatchPodLogsIndefinitely: true,
 
 		ManagedRoute: true,
+
+		TagFlags: cmdflags.TagFlags{
+			Tags: []string{"tag1", "tag2"},
+		},
+		AnnotateFlags: cmdflags.AnnotateFlags{
+			Annotations: []string{"k1=v1", "k2=v2"},
+		},
 	})
 }
 
@@ -85,6 +94,8 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 		"--env", "key2=val2",
 		"--build-timeout", "1s",
 		"--watch-pod-logs-indefinitely=true",
+		"--tag", "tag1", "--tag", "tag2",
+		"--annotation", "k1=v1", "--annotation", "k2=v2",
 	})
 	cmd.ExpectReachesExecution()
 
@@ -110,6 +121,13 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 		WatchPodLogsIndefinitely: true,
 
 		ManagedRoute: true,
+
+		TagFlags: cmdflags.TagFlags{
+			Tags: []string{"tag1", "tag2"},
+		},
+		AnnotateFlags: cmdflags.AnnotateFlags{
+			Annotations: []string{"k1=v1", "k2=v2"},
+		},
 	})
 }
 

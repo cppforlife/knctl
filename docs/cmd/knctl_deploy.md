@@ -44,6 +44,7 @@ knctl deploy [flags]
 ### Options
 
 ```
+  -a, --annotation strings                      Set annotation (format: key=value) (can be specified multiple times)
       --build-timeout duration                  Set timeout for building stage (Knative Build has a 10m default)
   -d, --directory string                        Set source code directory
   -e, --env strings                             Set environment variable (format: ENV_KEY=value) (can be specified multiple times)
@@ -58,6 +59,7 @@ knctl deploy [flags]
   -n, --namespace string                        Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
   -s, --service string                          Specified service
       --service-account string                  Set service account name for building
+  -t, --tag strings                             Set tag (format: value) (can be specified multiple times)
       --template string                         Set template name
       --template-arg strings                    Set template argument (format: key=value) (can be specified multiple times)
       --template-env strings                    Set template environment variable (format: key=value) (can be specified multiple times)

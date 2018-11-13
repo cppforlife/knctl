@@ -29,7 +29,7 @@ type TagOptions struct {
 	depsFactory cmdcore.DepsFactory
 
 	RevisionFlags cmdflags.RevisionFlags
-	TagFlags      TagFlags
+	TagFlags      cmdflags.TagFlags
 }
 
 func NewTagOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *TagOptions {
