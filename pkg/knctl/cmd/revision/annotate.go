@@ -20,8 +20,10 @@ import (
 	"github.com/cppforlife/go-cli-ui/ui"
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	cmdflags "github.com/cppforlife/knctl/pkg/knctl/cmd/flags"
+	ctlkube "github.com/cppforlife/knctl/pkg/knctl/kube"
 	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
 	"github.com/spf13/cobra"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 type AnnotateOptions struct {
@@ -63,12 +65,15 @@ func (o *AnnotateOptions) Run() error {
 		return err
 	}
 
-	anns := ctlservice.NewAnnotations(servingClient)
+	anns := ctlkube.NewAnnotations(func(type_ types.PatchType, data []byte) error {
+		_, err := servingClient.ServingV1alpha1().Revisions(revision.Namespace).Patch(revision.Name, type_, data)
+		return err
+	})
 
 	annotations, err := o.AnnotateFlags.AsMap()
 	if err != nil {
 		return err
 	}
 
-	return anns.Annotate(revision, annotations)
+	return anns.Add(annotations)
 }

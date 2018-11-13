@@ -24,11 +24,13 @@ import (
 	ctlbuild "github.com/cppforlife/knctl/pkg/knctl/build"
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	cmdflags "github.com/cppforlife/knctl/pkg/knctl/cmd/flags"
+	ctlkube "github.com/cppforlife/knctl/pkg/knctl/kube"
 	"github.com/cppforlife/knctl/pkg/knctl/logs"
 	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	servingclientset "github.com/knative/serving/pkg/client/clientset/versioned"
 	"github.com/spf13/cobra"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -237,14 +239,17 @@ func (o *DeployOptions) updateRevisionAnnotations(
 
 	o.ui.PrintLinef("Annotating new revision '%s'", newLastRevision.Name)
 
-	anns := ctlservice.NewAnnotations(servingClient)
+	anns := ctlkube.NewAnnotations(func(type_ types.PatchType, data []byte) error {
+		_, err := servingClient.ServingV1alpha1().Revisions(newLastRevision.Namespace).Patch(newLastRevision.Name, type_, data)
+		return err
+	})
 
 	annotations, err := o.DeployFlags.AnnotateFlags.AsMap()
 	if err != nil {
 		return err
 	}
 
-	return anns.Annotate(newLastRevision, annotations)
+	return anns.Add(annotations)
 }
 
 func (o *DeployOptions) watchRevisionReady(

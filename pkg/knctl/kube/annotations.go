@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package service
+package kube
 
 import (
 	"encoding/json"
@@ -22,20 +22,20 @@ import (
 	"time"
 
 	"github.com/cppforlife/knctl/pkg/knctl/util"
-	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
-	servingclientset "github.com/knative/serving/pkg/client/clientset/versioned"
 	"k8s.io/apimachinery/pkg/types"
 )
 
+type PatchableFunc func(types.PatchType, []byte) error
+
 type Annotations struct {
-	servingClient servingclientset.Interface
+	patchFunc PatchableFunc
 }
 
-func NewAnnotations(servingClient servingclientset.Interface) Annotations {
-	return Annotations{servingClient}
+func NewAnnotations(patchFunc PatchableFunc) Annotations {
+	return Annotations{patchFunc}
 }
 
-func (a Annotations) Annotate(revision *v1alpha1.Revision, annotations map[string]interface{}) error {
+func (a Annotations) Add(annotations map[string]interface{}) error {
 	mergePatch := map[string]interface{}{
 		"metadata": map[string]interface{}{
 			"annotations": annotations,
@@ -48,7 +48,7 @@ func (a Annotations) Annotate(revision *v1alpha1.Revision, annotations map[strin
 	}
 
 	return util.Retry(time.Second, 10*time.Second, func() (bool, error) {
-		_, err := a.servingClient.ServingV1alpha1().Revisions(revision.Namespace).Patch(revision.Name, types.MergePatchType, patchJSON)
+		err := a.patchFunc(types.MergePatchType, patchJSON)
 		if err != nil {
 			return false, fmt.Errorf("Annotating revision: %s", err)
 		}
