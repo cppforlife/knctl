@@ -55,8 +55,7 @@ func (o *ListOptions) Run() error {
 	}
 
 	table := uitable.Table{
-		Title: "Domains",
-
+		Title:   "Domains",
 		Content: "domains",
 
 		Header: []uitable.Header{

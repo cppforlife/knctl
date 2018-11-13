@@ -67,8 +67,7 @@ func (o *ListOptions) Run() error {
 	internalDomainHeader.Hidden = true
 
 	table := uitable.Table{
-		Title: fmt.Sprintf("Services in namespace '%s'", o.NamespaceFlags.Name),
-
+		Title:   fmt.Sprintf("Services in namespace '%s'", o.NamespaceFlags.Name),
 		Content: "services",
 
 		Header: []uitable.Header{

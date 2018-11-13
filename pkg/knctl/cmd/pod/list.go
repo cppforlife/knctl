@@ -60,8 +60,7 @@ func (o *ListOptions) Run() error {
 	}
 
 	table := uitable.Table{
-		Title: fmt.Sprintf("Pods for service '%s'", o.ServiceFlags.Name),
-
+		Title:   fmt.Sprintf("Pods for service '%s'", o.ServiceFlags.Name),
 		Content: "pods",
 
 		Header: []uitable.Header{

@@ -85,7 +85,6 @@ func (o *ShowOptions) Run() error {
 func (o *ShowOptions) printStatus(revision *v1alpha1.Revision, tags ctlservice.Tags) {
 	table := uitable.Table{
 		Title: fmt.Sprintf("Revision '%s'", o.RevisionFlags.Name),
-
 		// TODO Content: "revision",
 
 		Header: []uitable.Header{

@@ -82,7 +82,6 @@ func (o *ShowOptions) Run() error {
 func (o *ShowOptions) printStatus(build *v1alpha1.Build) {
 	table := uitable.Table{
 		Title: fmt.Sprintf("Build '%s'", o.BuildFlags.Name),
-
 		// TODO Content: "build",
 
 		Header: []uitable.Header{

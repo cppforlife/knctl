@@ -84,7 +84,6 @@ func (o *ShowOptions) Run() error {
 func (o ShowOptions) printStatus(service *v1alpha1.Service) {
 	table := uitable.Table{
 		Title: fmt.Sprintf("Service '%s'", o.ServiceFlags.Name),
-
 		// TODO Content: "service",
 
 		Header: []uitable.Header{

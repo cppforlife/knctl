@@ -66,8 +66,7 @@ func (o *ListOptions) Run() error {
 	}
 
 	table := uitable.Table{
-		Title: fmt.Sprintf("Builds in namespace '%s'", o.NamespaceFlags.Name),
-
+		Title:   fmt.Sprintf("Builds in namespace '%s'", o.NamespaceFlags.Name),
 		Content: "builds",
 
 		Header: []uitable.Header{

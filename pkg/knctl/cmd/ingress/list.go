@@ -58,8 +58,7 @@ func (o *ListOptions) Run() error {
 	}
 
 	table := uitable.Table{
-		Title: "Ingresses",
-
+		Title:   "Ingresses",
 		Content: "ingresses",
 
 		Header: []uitable.Header{

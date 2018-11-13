@@ -37,7 +37,6 @@ func NewPodConditionsTable(podsCh chan corev1.Pod) PodConditionsTable {
 func (t PodConditionsTable) Print(ui ui.UI) {
 	table := uitable.Table{
 		Title: fmt.Sprintf("Pods conditions"),
-
 		// TODO Content: "conditions",
 
 		Header: []uitable.Header{

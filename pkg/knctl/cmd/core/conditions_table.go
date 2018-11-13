@@ -35,7 +35,6 @@ func NewConditionsTable(conditions duckv1alpha1.Conditions) ConditionsTable {
 func (t ConditionsTable) Print(ui ui.UI) {
 	table := uitable.Table{
 		Title: "Conditions",
-
 		// TODO Content: "conditions",
 
 		Header: []uitable.Header{

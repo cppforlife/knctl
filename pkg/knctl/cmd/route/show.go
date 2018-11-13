@@ -74,7 +74,6 @@ func (o *ShowOptions) Run() error {
 func (o *ShowOptions) printStatus(route *v1alpha1.Route) {
 	table := uitable.Table{
 		Title: fmt.Sprintf("Route '%s'", o.RouteFlags.Name),
-
 		// TODO Content: "route",
 
 		Header: []uitable.Header{
@@ -100,7 +99,6 @@ func (o *ShowOptions) printStatus(route *v1alpha1.Route) {
 func (o *ShowOptions) printTargets(route *v1alpha1.Route) {
 	table := uitable.Table{
 		Title: "Targets",
-
 		// TODO Content: "targets",
 
 		Header: []uitable.Header{
