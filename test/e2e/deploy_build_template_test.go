@@ -133,7 +133,7 @@ func TestDeployBuildTemplate(t *testing.T) {
 }
 
 const (
-	// Taken from https://github.com/knative/build-templates/blob/26e2684ba2e5c1e94a1eddec0af3b2ae2e46ff85/buildpack/buildpack.yaml
+	// Taken from https://github.com/knative/build-templates/blob/39146dffac752f187618ffef9d2d712aa9c8d243/buildpack/buildpack.yaml
 	buildpackTemplateYAML = `
 apiVersion: build.knative.dev/v1alpha1
 kind: BuildTemplate
@@ -163,7 +163,7 @@ spec:
   - name: build
     image: packs/cf:build
     args: ["-skipDetect=${SKIP_DETECT}", "-buildpackOrder=${BUILDPACK_ORDER}"]
-    workingdir: "${DIRECTORY}"
+    workingDir: "${DIRECTORY}"
     volumeMounts:
     - name: droplet
       mountPath: /out
@@ -174,7 +174,7 @@ spec:
   # Out: an image published as $IMAGE
   - name: export
     image: packs/cf:export
-    workingdir: /in
+    workingDir: /in
     args: ["${IMAGE}"]
     volumeMounts:
     - name: droplet
