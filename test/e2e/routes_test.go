@@ -27,6 +27,7 @@ func TestRoutes(t *testing.T) {
 	logger := Logger{}
 	env := BuildEnv(t)
 	knctl := Knctl{t, env.Namespace, logger}
+	curl := Curl{t, knctl}
 
 	const (
 		routeName    = "test-routes-name"
@@ -35,21 +36,13 @@ func TestRoutes(t *testing.T) {
 	)
 
 	cleanUp := func() {
-		knctl.RunWithOpts([]string{"route", "delete", "-n", "default", "--route", routeName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"route", "delete", "--route", routeName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"service", "delete", "-s", serviceName1}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"service", "delete", "-s", serviceName2}, RunOpts{AllowError: true})
 	}
 
-	logger.Section("Delete previous route with the same name if exists", cleanUp)
+	logger.Section("Delete previous route and services if exists", cleanUp)
 	defer cleanUp()
-
-	logger.Section("Delete previous service with the same name if exists", func() {
-		knctl.RunWithOpts([]string{"service", "delete", "-n", "default", "-s", serviceName1}, RunOpts{AllowError: true})
-		knctl.RunWithOpts([]string{"service", "delete", "-n", "default", "-s", serviceName2}, RunOpts{AllowError: true})
-	})
-
-	defer func() {
-		knctl.RunWithOpts([]string{"service", "delete", "-n", "default", "-s", serviceName1}, RunOpts{AllowError: true})
-		knctl.RunWithOpts([]string{"service", "delete", "-n", "default", "-s", serviceName2}, RunOpts{AllowError: true})
-	}()
 
 	logger.Section("Deploy services that can be routed to", func() {
 		knctl.Run([]string{
@@ -69,8 +62,7 @@ func TestRoutes(t *testing.T) {
 
 	logger.Section("Create route", func() {
 		knctl.Run([]string{
-			"route",
-			"create",
+			"rollout",
 			"--route", routeName,
 			"-p", serviceName1 + ":latest=50%",
 			"-p", serviceName2 + ":latest=50%",
@@ -78,7 +70,7 @@ func TestRoutes(t *testing.T) {
 	})
 
 	logger.Section("Checking if route was added", func() {
-		out := knctl.Run([]string{"route", "list", "-n", "default", "--json"})
+		out := knctl.Run([]string{"route", "list", "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		var foundRoute bool
@@ -104,13 +96,26 @@ func TestRoutes(t *testing.T) {
 	})
 
 	logger.Section("Check if route directs traffic to both services", func() {
-		// TODO figure out why route does not become ready
+		// Make sure route returns both first
+		curl.WaitForRouteContent(routeName, serviceName1)
+		curl.WaitForRouteContent(routeName, serviceName2)
+
+		counts := curl.RouteContentCounts(routeName, 100, []string{serviceName1, serviceName2})
+		if len(counts) != 2 {
+			t.Fatalf("Expected route to point to only two services and received two types of responses, counts: %#v", counts)
+		}
+
+		for _, name := range []string{serviceName1, serviceName2} {
+			v := counts[name]
+			if v < 40 && v > 60 {
+				t.Fatalf("Expected route to split traffic equally between two services, counts: %#v", counts)
+			}
+		}
 	})
 
 	logger.Section("Reconfigure route", func() {
 		knctl.Run([]string{
-			"route",
-			"create",
+			"rollout",
 			"--route", routeName,
 			"-p", serviceName1 + ":latest=20%",
 			"-p", serviceName2 + ":latest=80%",
@@ -118,7 +123,7 @@ func TestRoutes(t *testing.T) {
 	})
 
 	logger.Section("Checking if route was reconfigured", func() {
-		out := knctl.Run([]string{"route", "list", "-n", "default", "--json"})
+		out := knctl.Run([]string{"route", "list", "--json"})
 		resp := uitest.JSONUIFromBytes(t, []byte(out))
 
 		var foundRoute bool
@@ -144,15 +149,23 @@ func TestRoutes(t *testing.T) {
 	})
 
 	logger.Section("Check if route directs traffic to both services after being reconfigured", func() {
-		// TODO figure out why route does not become ready
-	})
+		// Make sure route returns both first
+		curl.WaitForRouteContent(routeName, serviceName1)
+		curl.WaitForRouteContent(routeName, serviceName2)
 
-	logger.Section("Deleting route", func() {
-		knctl.Run([]string{"route", "delete", "-n", "default", "--route", routeName})
+		counts := curl.RouteContentCounts(routeName, 100, []string{serviceName1, serviceName2})
+		if len(counts) != 2 {
+			t.Fatalf("Expected route to point to only two services and received two types of responses, counts: %#v", counts)
+		}
 
-		out := knctl.Run([]string{"route", "list", "-n", "default", "--json"})
-		if strings.Contains(out, routeName) {
-			t.Fatalf("Expected to not see route in the list of routes, but was: %s", out)
+		v1 := counts[serviceName1]
+		if v1 < 10 && v1 > 30 {
+			t.Fatalf("Expected route to split 20%% of traffic to service1, counts: %#v", counts)
+		}
+
+		v2 := counts[serviceName2]
+		if v2 < 70 && v2 > 90 {
+			t.Fatalf("Expected route to split 80%% of traffic to service2, counts: %#v", counts)
 		}
 	})
 }

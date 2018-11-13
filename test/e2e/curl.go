@@ -32,7 +32,7 @@ func (c Curl) WaitForContent(serviceName, expectedContent string) {
 	var out string
 
 	for i := 0; i < 300; i++ {
-		out, _ = c.knctl.RunWithOpts([]string{"curl", "-n", "default", "-s", serviceName}, RunOpts{AllowError: true})
+		out, _ = c.knctl.RunWithOpts([]string{"curl", "-s", serviceName}, RunOpts{AllowError: true})
 		if strings.Contains(out, expectedContent) {
 			curledSuccessfully = true
 			break
@@ -50,7 +50,7 @@ func (c Curl) WaitForRouteContent(routeName, expectedContent string) {
 	var out string
 
 	for i := 0; i < 300; i++ {
-		out, _ = c.knctl.RunWithOpts([]string{"route", "curl", "-n", "default", "--route", routeName}, RunOpts{AllowError: true})
+		out, _ = c.knctl.RunWithOpts([]string{"route", "curl", "--route", routeName}, RunOpts{AllowError: true})
 		if strings.Contains(out, expectedContent) {
 			curledSuccessfully = true
 			break
@@ -61,4 +61,26 @@ func (c Curl) WaitForRouteContent(routeName, expectedContent string) {
 	if !curledSuccessfully {
 		c.t.Fatalf("Expected to find output '%s' in '%s' but did not", expectedContent, out)
 	}
+}
+
+func (c Curl) RouteContentCounts(routeName string, times int, responseKey []string) map[string]int {
+	result := map[string]int{}
+
+	for i := 0; i < times; i++ {
+		out := c.knctl.Run([]string{"route", "curl", "--route", routeName})
+
+		var matched bool
+		for _, k := range responseKey {
+			if strings.Contains(out, k) {
+				result[k]++
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			result[out]++
+		}
+	}
+
+	return result
 }
