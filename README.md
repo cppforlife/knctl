@@ -21,7 +21,14 @@ Grab pre-built binaries from the [Releases page](https://github.com/cppforlife/k
   - [Ingresses](./docs/ingresses.md)
   - [Complete command reference](./docs/cmd/knctl.md)
 - Blog posts
-  - [starkandwayne.com: Deploying 12-factor apps to Knative](https://starkandwayne.com/blog/deploying-12factor-apps-to-knative/)
+  - [IBM Developer Blog: Introducing Knctl: A simpler way to work with Knative](https://developer.ibm.com/blogs/2018/11/12/knctl-a-simpler-way-to-work-with-knative/)
+  - starkandwayne.com blog
+	  - [Deploying 12-factor apps to Knative](https://www.starkandwayne.com/blog/deploying-12factor-apps-to-knative/)
+		- [Building and deploying applications to Knative](https://starkandwayne.com/blog/building-and-deploying-applications-to-knative/)
+		- [Adding public traffic to Knative on Google Kubernetes Engine](https://starkandwayne.com/blog/public-traffic-into-knative-on-gke/)
+		- [Adding a custom hostname domain for Knative services](https://starkandwayne.com/blog/adding-a-custom-domain-for-knative-services/)
+		- [Build Docker images inside your Kubernetes with Knative Build](https://starkandwayne.com/blog/build-docker-images-inside-kubernetes-with-knative-build/)
+		- [Binding secrets to Knative services](https://starkandwayne.com/blog/binding-secrets-to-knative-services/)
 
 ## Development
 
