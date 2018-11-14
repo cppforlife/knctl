@@ -81,10 +81,10 @@ func TestRoutes(t *testing.T) {
 
 				traffic := row["traffic"]
 
-				if !strings.Contains(traffic, "50% -> :"+serviceName1) {
+				if !strings.Contains(traffic, "50% -> "+serviceName1) {
 					t.Fatalf("Expected route to point to '%s', but was '%s'", serviceName1, traffic)
 				}
-				if !strings.Contains(traffic, "50% -> :"+serviceName2) {
+				if !strings.Contains(traffic, "50% -> "+serviceName2) {
 					t.Fatalf("Expected route to point to '%s', but was '%s'", serviceName2, traffic)
 				}
 			}
@@ -134,10 +134,10 @@ func TestRoutes(t *testing.T) {
 
 				traffic := row["traffic"]
 
-				if !strings.Contains(traffic, "20% -> :"+serviceName1) {
+				if !strings.Contains(traffic, "20% -> "+serviceName1) {
 					t.Fatalf("Expected route to point to '%s', but was '%s'", serviceName1, traffic)
 				}
-				if !strings.Contains(traffic, "80% -> :"+serviceName2) {
+				if !strings.Contains(traffic, "80% -> "+serviceName2) {
 					t.Fatalf("Expected route to point to '%s', but was '%s'", serviceName2, traffic)
 				}
 			}

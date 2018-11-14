@@ -73,9 +73,9 @@ func (o *ListOptions) Run() error {
 
 		Header: []uitable.Header{
 			uitable.NewHeader("Name"),
-			uitable.NewHeader("Traffic"),
 			uitable.NewHeader("Domain"),
 			internalDomainHeader,
+			uitable.NewHeader("Traffic"),
 			uitable.NewHeader("Annotations"),
 			uitable.NewHeader("Conditions"),
 			uitable.NewHeader("Age"),
@@ -89,9 +89,9 @@ func (o *ListOptions) Run() error {
 	for _, route := range routes.Items {
 		table.Rows = append(table.Rows, []uitable.Value{
 			uitable.NewValueString(route.Name),
-			o.configurationValue(route),
 			uitable.NewValueString(route.Status.Domain),
 			uitable.NewValueString(route.Status.DomainInternal),
+			o.configurationValue(route),
 			cmdcore.NewAnnotationsValue(route.Annotations),
 			cmdcore.NewConditionsValue(route.Status.Conditions),
 			cmdcore.NewValueAge(route.CreationTimestamp.Time),
@@ -106,7 +106,14 @@ func (o *ListOptions) Run() error {
 func (*ListOptions) configurationValue(route v1alpha1.Route) uitable.ValueStrings {
 	var dsts []string
 	for _, target := range route.Spec.Traffic {
-		dsts = append(dsts, fmt.Sprintf("%3d%% -> %s:%s", target.Percent, target.ConfigurationName, target.RevisionName))
+		dst := ""
+		if len(target.RevisionName) > 0 {
+			dst = target.RevisionName
+		}
+		if len(target.ConfigurationName) > 0 {
+			dst = target.ConfigurationName
+		}
+		dsts = append(dsts, fmt.Sprintf("%d%% -> %s", target.Percent, dst))
 	}
 	return uitable.NewValueStrings(dsts)
 }

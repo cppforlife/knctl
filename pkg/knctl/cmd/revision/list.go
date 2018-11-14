@@ -136,11 +136,7 @@ func NewTrafficValue(revision v1alpha1.Revision, routes []v1alpha1.Route) uitabl
 		// not based on desired configuration
 		for _, target := range route.Status.Traffic {
 			if target.RevisionName == revision.Name {
-				domain := route.Status.Domain
-				if len(target.Name) > 0 {
-					domain += target.Name + "." + domain
-				}
-				result = append(result, fmt.Sprintf("%d%% -> %s", target.Percent, domain))
+				result = append(result, fmt.Sprintf("%d%% -> %s", target.Percent, route.Status.Domain))
 			}
 		}
 	}
