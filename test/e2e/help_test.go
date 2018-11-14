@@ -55,7 +55,7 @@ Route Management Commands:
   domain            Domain management (create, list)
   ingress           Ingress management (list)
   rollout           Create or update route
-  route             Route management (curl, delete, list, show)
+  route             Route management (annotate, curl, delete, list, show)
 
 System Commands:
   install           Install Knative and Istio
