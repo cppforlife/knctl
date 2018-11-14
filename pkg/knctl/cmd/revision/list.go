@@ -79,6 +79,11 @@ func (o *ListOptions) Run() error {
 		return err
 	}
 
+	routes, err := servingClient.ServingV1alpha1().Routes(o.ServiceFlags.NamespaceFlags.Name).List(metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+
 	table := uitable.Table{
 		Title:   fmt.Sprintf("Revisions for service '%s'", service.Name),
 		Content: "revisions",
@@ -86,14 +91,14 @@ func (o *ListOptions) Run() error {
 		Header: []uitable.Header{
 			uitable.NewHeader("Name"),
 			uitable.NewHeader("Tags"),
-			uitable.NewHeader("Allocated Traffic %"),
 			uitable.NewHeader("Annotations"),
 			uitable.NewHeader("Conditions"),
 			uitable.NewHeader("Age"),
+			uitable.NewHeader("Traffic"),
 		},
 
 		SortBy: []uitable.ColumnSort{
-			{Column: 5, Asc: false}, // Show latest first
+			{Column: 4, Asc: false}, // Show latest first
 		},
 	}
 
@@ -101,10 +106,10 @@ func (o *ListOptions) Run() error {
 		table.Rows = append(table.Rows, []uitable.Value{
 			uitable.NewValueString(rev.Name),
 			uitable.NewValueStrings(ctlservice.NewTags(servingClient).List(rev)),
-			NewAllocatedTrafficPercentValue(service, rev),
 			cmdcore.NewAnnotationsValue(rev.Annotations),
 			cmdcore.NewConditionsValue(rev.Status.Conditions),
 			cmdcore.NewValueAge(rev.CreationTimestamp.Time),
+			NewTrafficValue(service, rev, routes.Items),
 		})
 	}
 
@@ -113,13 +118,16 @@ func (o *ListOptions) Run() error {
 	return nil
 }
 
-func NewAllocatedTrafficPercentValue(svc *v1alpha1.Service, rev v1alpha1.Revision) uitable.Value {
-	percent := 0
-	for _, item := range svc.Status.Traffic {
-		if item.RevisionName == rev.Name {
-			percent = item.Percent
-			break
+func NewTrafficValue(service *v1alpha1.Service, revision v1alpha1.Revision, routes []v1alpha1.Route) uitable.Value {
+	var result []string
+	for _, route := range routes {
+		// Show based on actual configuration of the targets,
+		// not based on desired configuration
+		for _, target := range route.Status.Traffic {
+			if target.RevisionName == revision.Name {
+				result = append(result, fmt.Sprintf("%3d%% -> %s", target.Percent, route.Status.Domain))
+			}
 		}
 	}
-	return uitable.NewValueSuffix(uitable.NewValueInt(percent), "%")
+	return uitable.NewValueStrings(result)
 }
