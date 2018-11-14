@@ -24,7 +24,7 @@ import (
 func NewCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "route",
-		Aliases: []string{"r", "rs", "routes"},
+		Aliases: []string{"rt", "rts", "routes"},
 		Short:   "Route management",
 		Annotations: map[string]string{
 			cmdcore.RouteMgmtHelpGroup.Key: cmdcore.RouteMgmtHelpGroup.Value,
