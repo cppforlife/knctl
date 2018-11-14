@@ -27,8 +27,12 @@ type ServiceFlags struct {
 }
 
 func (s *ServiceFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory) {
+	s.SetOptional(cmd, flagsFactory)
+	cmd.MarkFlagRequired("service")
+}
+
+func (s *ServiceFlags) SetOptional(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory) {
 	s.NamespaceFlags.Set(cmd, flagsFactory)
 
 	cmd.Flags().StringVarP(&s.Name, "service", "s", "", "Specified service")
-	cmd.MarkFlagRequired("service")
 }

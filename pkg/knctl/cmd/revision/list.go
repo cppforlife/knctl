@@ -53,7 +53,7 @@ func NewListCmd(o *ListOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Comman
   knctl revision list -s svc1 -n ns1`,
 		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
-	o.ServiceFlags.Set(cmd, flagsFactory)
+	o.ServiceFlags.SetOptional(cmd, flagsFactory)
 	return cmd
 }
 
@@ -63,15 +63,23 @@ func (o *ListOptions) Run() error {
 		return err
 	}
 
-	service, err := servingClient.ServingV1alpha1().Services(o.ServiceFlags.NamespaceFlags.Name).Get(o.ServiceFlags.Name, metav1.GetOptions{})
-	if err != nil {
-		return err
-	}
+	tableTitle := "Revisions"
+	serviceHeader := uitable.NewHeader("Service")
+	listOpts := metav1.ListOptions{}
 
-	listOpts := metav1.ListOptions{
-		LabelSelector: labels.Set(map[string]string{
+	if len(o.ServiceFlags.Name) > 0 {
+		tableTitle += fmt.Sprintf(" for service '%s'", o.ServiceFlags.Name)
+		serviceHeader.Hidden = true
+
+		listOpts.LabelSelector = labels.Set(map[string]string{
 			serving.ConfigurationLabelKey: o.ServiceFlags.Name,
-		}).String(),
+		}).String()
+
+		// Verify that service exists by this name
+		_, err := servingClient.ServingV1alpha1().Services(o.ServiceFlags.NamespaceFlags.Name).Get(o.ServiceFlags.Name, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
 	}
 
 	revisions, err := servingClient.ServingV1alpha1().Revisions(o.ServiceFlags.NamespaceFlags.Name).List(listOpts)
@@ -85,10 +93,11 @@ func (o *ListOptions) Run() error {
 	}
 
 	table := uitable.Table{
-		Title:   fmt.Sprintf("Revisions for service '%s'", service.Name),
+		Title:   tableTitle,
 		Content: "revisions",
 
 		Header: []uitable.Header{
+			serviceHeader,
 			uitable.NewHeader("Name"),
 			uitable.NewHeader("Tags"),
 			uitable.NewHeader("Annotations"),
@@ -98,18 +107,20 @@ func (o *ListOptions) Run() error {
 		},
 
 		SortBy: []uitable.ColumnSort{
-			{Column: 4, Asc: false}, // Show latest first
+			{Column: 0, Asc: true},
+			{Column: 5, Asc: false}, // Show latest first
 		},
 	}
 
 	for _, rev := range revisions.Items {
 		table.Rows = append(table.Rows, []uitable.Value{
+			uitable.NewValueString(rev.Labels[serving.ConfigurationLabelKey]),
 			uitable.NewValueString(rev.Name),
 			uitable.NewValueStrings(ctlservice.NewTags(servingClient).List(rev)),
 			cmdcore.NewAnnotationsValue(rev.Annotations),
 			cmdcore.NewConditionsValue(rev.Status.Conditions),
 			cmdcore.NewValueAge(rev.CreationTimestamp.Time),
-			NewTrafficValue(service, rev, routes.Items),
+			NewTrafficValue(rev, routes.Items),
 		})
 	}
 
@@ -118,14 +129,18 @@ func (o *ListOptions) Run() error {
 	return nil
 }
 
-func NewTrafficValue(service *v1alpha1.Service, revision v1alpha1.Revision, routes []v1alpha1.Route) uitable.Value {
+func NewTrafficValue(revision v1alpha1.Revision, routes []v1alpha1.Route) uitable.Value {
 	var result []string
 	for _, route := range routes {
 		// Show based on actual configuration of the targets,
 		// not based on desired configuration
 		for _, target := range route.Status.Traffic {
 			if target.RevisionName == revision.Name {
-				result = append(result, fmt.Sprintf("%3d%% -> %s", target.Percent, route.Status.Domain))
+				domain := route.Status.Domain
+				if len(target.Name) > 0 {
+					domain += target.Name + "." + domain
+				}
+				result = append(result, fmt.Sprintf("%d%% -> %s", target.Percent, domain))
 			}
 		}
 	}

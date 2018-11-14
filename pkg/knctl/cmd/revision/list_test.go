@@ -52,9 +52,11 @@ func TestNewListCmd_OkLongFlagNames(t *testing.T) {
 		cmdflags.ServiceFlags{cmdcore.NamespaceFlags{"test-namespace"}, "test-service"})
 }
 
-func TestNewListCmd_RequiredFlags(t *testing.T) {
+func TestNewListCmd_OkMinimum(t *testing.T) {
 	realCmd := NewListOptions(nil, cmdcore.NewDepsFactory())
 	cmd := NewTestCmd(t, NewListCmd(realCmd, cmdcore.FlagsFactory{}))
 	cmd.Execute([]string{})
-	cmd.ExpectRequiredFlags([]string{"service"})
+	cmd.ExpectReachesExecution()
+
+	DeepEqual(t, realCmd.ServiceFlags, cmdflags.ServiceFlags{})
 }

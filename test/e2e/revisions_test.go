@@ -32,6 +32,7 @@ func TestRevisions(t *testing.T) {
 
 	const (
 		serviceName         = "test-revisions-service-name"
+		serviceName2        = "test-revisions-service-name2"
 		expectedContentRev1 = "TestRevisions_ContentRev1"
 		expectedContentRev2 = "TestRevisions_ContentRev2"
 		expectedContentRev3 = "TestRevisions_ContentRev3"
@@ -45,6 +46,7 @@ func TestRevisions(t *testing.T) {
 
 	cleanUp := func() {
 		knctl.RunWithOpts([]string{"service", "delete", "-s", serviceName}, RunOpts{AllowError: true})
+		knctl.RunWithOpts([]string{"service", "delete", "-s", serviceName2}, RunOpts{AllowError: true})
 	}
 
 	logger.Section("Delete previous service with the same name if exists", cleanUp)
@@ -138,12 +140,29 @@ func TestRevisions(t *testing.T) {
 		}
 	})
 
-	logger.Section("Deleting service", func() {
-		knctl.Run([]string{"service", "delete", "-s", serviceName})
+	logger.Section("Deploy another service", func() {
+		knctl.Run([]string{
+			"deploy",
+			"-s", serviceName2,
+			"-i", "gcr.io/knative-samples/helloworld-go",
+			"-e", "TARGET=" + expectedContentRev1,
+		})
+	})
 
-		out := knctl.Run([]string{"service", "list", "--json"})
-		if strings.Contains(out, serviceName) {
-			t.Fatalf("Expected to not see sample service in the list of services, but was: %s", out)
+	logger.Section("Checking if revisions from both services can be viewed", func() {
+		out := knctl.Run([]string{"revision", "list", "--json"})
+		resp := uitest.JSONUIFromBytes(t, []byte(out))
+
+		if len(resp.Tables[0].Rows) != 3 {
+			t.Fatalf("Expected to see revisions from both services in the list, but did not: '%s'", out)
+		}
+
+		// And if revisions are filtered by service...
+		out = knctl.Run([]string{"revision", "list", "-s", serviceName2, "--json"})
+		resp = uitest.JSONUIFromBytes(t, []byte(out))
+
+		if len(resp.Tables[0].Rows) != 1 {
+			t.Fatalf("Expected to see revision from single service in the list, but did not: '%s'", out)
 		}
 	})
 }
