@@ -32,8 +32,6 @@ Grab pre-built binaries from the [Releases page](https://github.com/cppforlife/k
 
 ## Development
 
-If you are interested in contributing, see [CONTRIBUTING.md](./CONTRIBUTING.md).
-
 ```bash
 # export GOPATH=...
 
