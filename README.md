@@ -12,10 +12,10 @@ Grab pre-built binaries from the [Releases page](https://github.com/cppforlife/k
 - [Deploy from local source directory](./docs/deploy-source-directory.md)
 - [Deploy with custom Build Template (for example Buildpack)](./docs/deploy-custom-build-template.md)
 - [Deploy with secrets](./docs/deploy-secrets.md)
+- [Blue-green deploy](./docs/blue-green-deploy.md)
 - [`knctl` as a `kubectl` plugin](./docs/kubectl-plugin.md)
 - Advanced
   - [Manage domains](./docs/manage-domains.md)
-  - [Traffic splitting WIP](./docs/traffic-splitting.md)
   - [Stanalone build](./docs/standalone-build.md)
   - [Annotations](./docs/annotations.md)
   - [Ingresses](./docs/ingresses.md)
