@@ -237,17 +237,21 @@ func (o *DeployOptions) updateRevisionTags(
 func (o *DeployOptions) updateRevisionAnnotations(
 	newLastRevision *v1alpha1.Revision, servingClient servingclientset.Interface) error {
 
+	annotations, err := o.DeployFlags.AnnotateFlags.AsMap()
+	if err != nil {
+		return err
+	}
+
+	if len(annotations) == 0 {
+		return nil
+	}
+
 	o.ui.PrintLinef("Annotating new revision '%s'", newLastRevision.Name)
 
 	anns := ctlkube.NewAnnotations(func(type_ types.PatchType, data []byte) error {
 		_, err := servingClient.ServingV1alpha1().Revisions(newLastRevision.Namespace).Patch(newLastRevision.Name, type_, data)
 		return err
 	})
-
-	annotations, err := o.DeployFlags.AnnotateFlags.AsMap()
-	if err != nil {
-		return err
-	}
 
 	return anns.Add(annotations)
 }
