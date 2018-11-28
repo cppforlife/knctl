@@ -120,6 +120,7 @@ func (s BuildSpec) template(opts BuildSpecOpts) (*v1alpha1.TemplateInstantiation
 
 	return &v1alpha1.TemplateInstantiationSpec{
 		Name:      opts.Template,
+		Kind:      "BuildTemplate",
 		Arguments: args,
 		Env:       env,
 	}, nil

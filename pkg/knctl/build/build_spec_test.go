@@ -124,6 +124,7 @@ func TestBuildSpecWithCustomBuildTemplate(t *testing.T) {
 		},
 		Template: &v1alpha1.TemplateInstantiationSpec{
 			Name: "test-template",
+			Kind: "BuildTemplate",
 			Arguments: []v1alpha1.ArgumentSpec{
 				{
 					Name:  "test-template-arg-key",
@@ -139,6 +140,10 @@ func TestBuildSpecWithCustomBuildTemplate(t *testing.T) {
 				Value: "test-template-env-val",
 			}},
 		},
+	}
+
+	if !reflect.DeepEqual(spec.Template, expectedSpec.Template) {
+		t.Fatalf("Expect spec.template '%#v' to equal '%#v'", spec.Template, expectedSpec.Template)
 	}
 
 	if !reflect.DeepEqual(spec, expectedSpec) {
