@@ -65,7 +65,8 @@ func (s *CreateArgsFlags) setWithPrefix(prefix string, cmd *cobra.Command, flags
 
 	cmd.Flags().StringVar(&s.ServiceAccountName, "service-account", "", "Set service account name for building") // TODO separate
 
-	cmd.Flags().StringVar(&s.Template, "template", "", "Set template name")
+	cmd.Flags().StringVar(&s.TemplateKind, "template-kind", "", "Set to 'cluster' to use ClusterBuildTemplate kind of templates")
+	cmd.Flags().StringVar(&s.TemplateName, "template", "", "Set template name")
 	cmd.Flags().StringSliceVar(&s.TemplateArgs, "template-arg", nil, "Set template argument (format: key=value) (can be specified multiple times)")
 	cmd.Flags().StringSliceVar(&s.TemplateEnv, "template-env", nil, "Set template environment variable (format: key=value) (can be specified multiple times)")
 

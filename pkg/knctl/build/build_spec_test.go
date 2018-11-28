@@ -105,7 +105,7 @@ func TestBuildSpecWithCustomBuildTemplate(t *testing.T) {
 		ServiceAccountName: "test-service-account",
 		GitURL:             "test-git-url",
 		GitRevision:        "test-git-revision",
-		Template:           "test-template",
+		TemplateName:       "test-template",
 		TemplateArgs:       []string{"test-template-arg-key=test-template-arg-val"},
 		TemplateEnv:        []string{"test-template-env-key=test-template-env-val"},
 		Image:              "test-image",
@@ -124,6 +124,7 @@ func TestBuildSpecWithCustomBuildTemplate(t *testing.T) {
 		},
 		Template: &v1alpha1.TemplateInstantiationSpec{
 			Name: "test-template",
+			Kind: "BuildTemplate",
 			Arguments: []v1alpha1.ArgumentSpec{
 				{
 					Name:  "test-template-arg-key",
@@ -139,6 +140,62 @@ func TestBuildSpecWithCustomBuildTemplate(t *testing.T) {
 				Value: "test-template-env-val",
 			}},
 		},
+	}
+
+	if !reflect.DeepEqual(spec.Template, expectedSpec.Template) {
+		t.Fatalf("Expect spec.template '%#v' to equal '%#v'", spec.Template, expectedSpec.Template)
+	}
+
+	if !reflect.DeepEqual(spec, expectedSpec) {
+		t.Fatalf("Expect spec '%#v' to equal '%#v'", spec, expectedSpec)
+	}
+}
+
+func TestBuildSpecWithCustomClusterBuildTemplate(t *testing.T) {
+	spec, err := ctlbuild.BuildSpec{}.Build(ctlbuild.BuildSpecOpts{
+		ServiceAccountName: "test-service-account",
+		GitURL:             "test-git-url",
+		GitRevision:        "test-git-revision",
+		TemplateName:       "test-template",
+		TemplateKind:       "cluster",
+		TemplateArgs:       []string{"test-template-arg-key=test-template-arg-val"},
+		TemplateEnv:        []string{"test-template-env-key=test-template-env-val"},
+		Image:              "test-image",
+	})
+	if err != nil {
+		t.Fatalf("Expected build spec to build successfully: %s", err)
+	}
+
+	expectedSpec := v1alpha1.BuildSpec{
+		ServiceAccountName: "test-service-account",
+		Source: &v1alpha1.SourceSpec{
+			Git: &v1alpha1.GitSourceSpec{
+				Url:      "test-git-url",
+				Revision: "test-git-revision",
+			},
+		},
+		Template: &v1alpha1.TemplateInstantiationSpec{
+			Name: "test-template",
+			Kind: "ClusterBuildTemplate",
+			Arguments: []v1alpha1.ArgumentSpec{
+				{
+					Name:  "test-template-arg-key",
+					Value: "test-template-arg-val",
+				},
+				{
+					Name:  "IMAGE",
+					Value: "test-image",
+				},
+			},
+			Env: []corev1.EnvVar{{
+				Name:  "test-template-env-key",
+				Value: "test-template-env-val",
+			}},
+		},
+	}
+
+	if !reflect.DeepEqual(spec.Template, expectedSpec.Template) {
+		t.Fatalf("Expect spec.template '%#v' to equal '%#v'", spec.Template, expectedSpec.Template)
 	}
 
 	if !reflect.DeepEqual(spec, expectedSpec) {
