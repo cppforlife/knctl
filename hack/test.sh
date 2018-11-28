@@ -21,6 +21,6 @@ export KNCTL_KUBECONFIG=
 export KNCTL_BASIC_AUTH_SECRET_PASSWORD=
 export KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY=
 
-GOCACHE=off go test ./pkg/... -test.v $@
+GOCACHE=off go test ./pkg/... -test.v "$@"
 
 echo "Success"
