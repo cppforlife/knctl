@@ -40,7 +40,8 @@ type BuildSpecOpts struct {
 
 	ServiceAccountName string
 
-	Template     string
+	TemplateName string
+	TemplateKind string
 	TemplateArgs []string
 	TemplateEnv  []string
 
@@ -104,7 +105,7 @@ func (s BuildSpec) source(opts BuildSpecOpts) (*v1alpha1.SourceSpec, error) {
 }
 
 func (s BuildSpec) template(opts BuildSpecOpts) (*v1alpha1.TemplateInstantiationSpec, error) {
-	if len(opts.Template) == 0 {
+	if len(opts.TemplateName) == 0 {
 		return nil, nil
 	}
 
@@ -118,16 +119,21 @@ func (s BuildSpec) template(opts BuildSpecOpts) (*v1alpha1.TemplateInstantiation
 		return nil, err
 	}
 
+	templateKind := v1alpha1.BuildTemplateKind
+	if opts.TemplateKind == "cluster" || opts.TemplateKind == "Cluster" || opts.TemplateKind == "ClusterBuildTemplate" {
+		templateKind = v1alpha1.ClusterBuildTemplateKind
+	}
+
 	return &v1alpha1.TemplateInstantiationSpec{
-		Name:      opts.Template,
-		Kind:      "BuildTemplate",
+		Name:      opts.TemplateName,
+		Kind:      templateKind,
 		Arguments: args,
 		Env:       env,
 	}, nil
 }
 
 func (s BuildSpec) nonTemplateSteps(opts BuildSpecOpts) []corev1.Container {
-	if len(opts.Template) > 0 {
+	if len(opts.TemplateName) > 0 {
 		return nil
 	}
 

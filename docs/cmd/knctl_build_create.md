@@ -44,6 +44,7 @@ knctl build create [flags]
       --template string          Set template name
       --template-arg strings     Set template argument (format: key=value) (can be specified multiple times)
       --template-env strings     Set template environment variable (format: key=value) (can be specified multiple times)
+      --template-kind string     Set to 'cluster' to use ClusterBuildTemplate kind of templates
       --timeout duration         Set timeout for building stage (Knative Build has a 10m default)
 ```
 

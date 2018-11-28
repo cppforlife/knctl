@@ -63,6 +63,7 @@ knctl deploy [flags]
       --template string                         Set template name
       --template-arg strings                    Set template argument (format: key=value) (can be specified multiple times)
       --template-env strings                    Set template environment variable (format: key=value) (can be specified multiple times)
+      --template-kind string                    Set to 'cluster' to use ClusterBuildTemplate kind of templates
       --watch-pod-logs                          Watch pod logs for new revision (default true)
   -l, --watch-pod-logs-indefinitely             Watch pod logs for new revision indefinitely
       --watch-revision-ready                    Wait for new revision to become ready (default true)
