@@ -29,6 +29,8 @@ Grab pre-built binaries from the [Releases page](https://github.com/cppforlife/k
 	  - [Adding a custom hostname domain for Knative services](https://starkandwayne.com/blog/adding-a-custom-domain-for-knative-services/)
 	  - [Build Docker images inside your Kubernetes with Knative Build](https://starkandwayne.com/blog/build-docker-images-inside-kubernetes-with-knative-build/)
 	  - [Binding secrets to Knative services](https://starkandwayne.com/blog/binding-secrets-to-knative-services/)
+- Talks
+  - [Dr Nic's Introducing Knative to Small Teams talk](https://speakerdeck.com/drnic/introducing-knative-to-small-teams) (slides only)
 
 ## Development
 
