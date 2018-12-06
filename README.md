@@ -30,6 +30,7 @@ Grab pre-built binaries from the [Releases page](https://github.com/cppforlife/k
 	  - [Build Docker images inside your Kubernetes with Knative Build](https://starkandwayne.com/blog/build-docker-images-inside-kubernetes-with-knative-build/)
 	  - [Binding secrets to Knative services](https://starkandwayne.com/blog/binding-secrets-to-knative-services/)
 - Talks
+  - [Introducing Knctl, a command line tool for Knative (YouTube)](https://www.youtube.com/watch?v=cJyJGm22Pf4)
   - [Dr Nic's Introducing Knative to Small Teams talk](https://speakerdeck.com/drnic/introducing-knative-to-small-teams) (slides only)
 
 ## Development
