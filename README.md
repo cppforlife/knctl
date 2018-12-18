@@ -16,7 +16,7 @@ Grab pre-built binaries from the [Releases page](https://github.com/cppforlife/k
 - [`knctl` as a `kubectl` plugin](./docs/kubectl-plugin.md)
 - Advanced
   - [Manage domains](./docs/manage-domains.md)
-  - [Stanalone build](./docs/standalone-build.md)
+  - [Standalone build](./docs/standalone-build.md)
   - [Annotations](./docs/annotations.md)
   - [Ingresses](./docs/ingresses.md)
   - [Complete command reference](./docs/cmd/knctl.md)
