@@ -31,3 +31,11 @@
   name = "k8s.io/code-generator"
   unused-packages = false
   non-go = false
+
+# Fix: #49
+#
+# NOTE:
+#   use of go-autorest v10.14.0
+[[override]]
+name = "github.com/Azure/go-autorest"
+revision = "bca49d5b51a50dc5bb17bbf6204c711c6dbded06"
