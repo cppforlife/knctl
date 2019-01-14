@@ -243,9 +243,9 @@ func (ts *azureTokenSource) retrieveTokenFromCfg() (*azureToken, error) {
 		token: adal.Token{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
-			// ExpiresIn:    expiresIn,
-			// ExpiresOn:    expiresOn,
-			// NotBefore:    expiresOn,
+			ExpiresIn:    expiresIn,
+			ExpiresOn:    expiresOn,
+			NotBefore:    expiresOn,
 			Resource:     fmt.Sprintf("spn:%s", apiserverID),
 			Type:         tokenType,
 		},
@@ -262,8 +262,8 @@ func (ts *azureTokenSource) storeTokenInCfg(token *azureToken) error {
 	newCfg[cfgClientID] = token.clientID
 	newCfg[cfgTenantID] = token.tenantID
 	newCfg[cfgApiserverID] = token.apiserverID
-	// newCfg[cfgExpiresIn] = token.token.ExpiresIn
-	// newCfg[cfgExpiresOn] = token.token.ExpiresOn
+	newCfg[cfgExpiresIn] = token.token.ExpiresIn
+	newCfg[cfgExpiresOn] = token.token.ExpiresOn
 
 	err := ts.persister.Persist(newCfg)
 	if err != nil {
