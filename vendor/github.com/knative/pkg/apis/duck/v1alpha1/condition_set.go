@@ -176,7 +176,7 @@ func (r conditionsImpl) GetCondition(t ConditionType) *Condition {
 	}
 
 	for _, c := range r.accessor.GetConditions() {
-		if c.Type == t || c.State == t {
+		if c.Type == t {
 			return &c
 		}
 	}

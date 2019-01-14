@@ -49,7 +49,6 @@ type Condition struct {
 	// Type of condition.
 	// +required
 	Type ConditionType `json:"type" description:"type of status condition"`
-	State ConditionType `json:"state,omitempty" description:"type of status condition (deprecated from Knative 0.1.x)"`
 
 	// Status of the condition, one of True, False, Unknown.
 	// +required
