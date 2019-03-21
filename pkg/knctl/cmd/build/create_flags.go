@@ -67,8 +67,8 @@ func (s *CreateArgsFlags) setWithPrefix(prefix string, cmd *cobra.Command, flags
 
 	cmd.Flags().StringVar(&s.TemplateKind, "template-kind", "", "Set to 'cluster' to use ClusterBuildTemplate kind of templates")
 	cmd.Flags().StringVar(&s.TemplateName, "template", "", "Set template name")
-	cmd.Flags().StringSliceVar(&s.TemplateArgs, "template-arg", nil, "Set template argument (format: key=value) (can be specified multiple times)")
-	cmd.Flags().StringSliceVar(&s.TemplateEnv, "template-env", nil, "Set template environment variable (format: key=value) (can be specified multiple times)")
+	cmd.Flags().StringArrayVar(&s.TemplateArgs, "template-arg", nil, "Set template argument (format: key=value) (can be specified multiple times)")
+	cmd.Flags().StringArrayVar(&s.TemplateEnv, "template-env", nil, "Set template environment variable (format: key=value) (can be specified multiple times)")
 
 	cmd.Flags().DurationVar(&s.Timeout, prefix+"timeout", time.Duration(0), "Set timeout for building stage (Knative Build has a 10m default)")
 }

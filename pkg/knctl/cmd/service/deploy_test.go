@@ -200,6 +200,31 @@ func TestNewDeployCmd_ManagedRouteDisabled(t *testing.T) {
 	})
 }
 
+func TestNewDeployCmd_EnvValueWithCommas(t *testing.T) {
+	realCmd := NewDeployOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
+	cmd := NewTestCmd(t, NewDeployCmd(realCmd, cmdcore.FlagsFactory{}))
+	cmd.Execute([]string{
+		"--namespace", "test-namespace",
+		"--service", "test-service",
+		"--image", "test-image",
+		"--env", "env-key=env-val1,env-val2,env-val3",
+	})
+	cmd.ExpectReachesExecution()
+
+	DeepEqual(t, realCmd.ServiceFlags,
+		cmdflags.ServiceFlags{cmdcore.NamespaceFlags{"test-namespace"}, "test-service"})
+
+	DeepEqual(t, realCmd.DeployFlags, DeployFlags{
+		Image:   "test-image",
+		EnvVars: []string{"env-key=env-val1,env-val2,env-val3"},
+
+		WatchRevisionReady:        true,
+		WatchRevisionReadyTimeout: 5 * time.Minute,
+		WatchPodLogs:              true,
+		ManagedRoute:              true,
+	})
+}
+
 func TestNewDeployCmd_RequiredFlags(t *testing.T) {
 	realCmd := NewDeployOptions(nil, cmdcore.NewConfigFactoryImpl(), cmdcore.NewDepsFactory())
 	cmd := NewTestCmd(t, NewDeployCmd(realCmd, cmdcore.FlagsFactory{}))

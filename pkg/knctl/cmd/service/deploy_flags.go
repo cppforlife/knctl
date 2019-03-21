@@ -66,7 +66,7 @@ func (s *DeployFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory)
 	cmd.Flags().BoolVarP(&s.WatchPodLogsIndefinitely, "watch-pod-logs-indefinitely", "l",
 		false, "Watch pod logs for new revision indefinitely")
 
-	cmd.Flags().StringSliceVarP(&s.EnvVars, "env", "e", nil, "Set environment variable (format: ENV_KEY=value) (can be specified multiple times)")
+	cmd.Flags().StringArrayVarP(&s.EnvVars, "env", "e", nil, "Set environment variable (format: ENV_KEY=value) (can be specified multiple times)")
 	cmd.Flags().StringSliceVar(&s.EnvSecrets, "env-secret", nil, "Set environment variable from a secret (format: ENV_KEY=secret-name/key) (can be specified multiple times)")
 	cmd.Flags().StringSliceVar(&s.EnvConfigMaps, "env-config-map", nil, "Set environment variable from a config map (format: ENV_KEY=config-map-name/key) (can be specified multiple times)")
 

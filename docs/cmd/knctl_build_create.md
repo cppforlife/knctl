@@ -32,20 +32,20 @@ knctl build create [flags]
 ### Options
 
 ```
-  -b, --build string             Specified build
-  -d, --directory string         Set source code directory
-      --generate-name            Set to generate name
-      --git-revision string      Set Git revision (examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
-      --git-url string           Set Git URL
-  -h, --help                     help for create
-  -i, --image string             Set image URL
-  -n, --namespace string         Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
-      --service-account string   Set service account name for building
-      --template string          Set template name
-      --template-arg strings     Set template argument (format: key=value) (can be specified multiple times)
-      --template-env strings     Set template environment variable (format: key=value) (can be specified multiple times)
-      --template-kind string     Set to 'cluster' to use ClusterBuildTemplate kind of templates
-      --timeout duration         Set timeout for building stage (Knative Build has a 10m default)
+  -b, --build string               Specified build
+  -d, --directory string           Set source code directory
+      --generate-name              Set to generate name
+      --git-revision string        Set Git revision (examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)
+      --git-url string             Set Git URL
+  -h, --help                       help for create
+  -i, --image string               Set image URL
+  -n, --namespace string           Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
+      --service-account string     Set service account name for building
+      --template string            Set template name
+      --template-arg stringArray   Set template argument (format: key=value) (can be specified multiple times)
+      --template-env stringArray   Set template environment variable (format: key=value) (can be specified multiple times)
+      --template-kind string       Set to 'cluster' to use ClusterBuildTemplate kind of templates
+      --timeout duration           Set timeout for building stage (Knative Build has a 10m default)
 ```
 
 ### Options inherited from parent commands

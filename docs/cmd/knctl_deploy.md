@@ -47,7 +47,7 @@ knctl deploy [flags]
   -a, --annotation strings                      Set annotation (format: key=value) (can be specified multiple times)
       --build-timeout duration                  Set timeout for building stage (Knative Build has a 10m default)
   -d, --directory string                        Set source code directory
-  -e, --env strings                             Set environment variable (format: ENV_KEY=value) (can be specified multiple times)
+  -e, --env stringArray                         Set environment variable (format: ENV_KEY=value) (can be specified multiple times)
       --env-config-map strings                  Set environment variable from a config map (format: ENV_KEY=config-map-name/key) (can be specified multiple times)
       --env-secret strings                      Set environment variable from a secret (format: ENV_KEY=secret-name/key) (can be specified multiple times)
       --generate-name                           Set to generate name
@@ -61,8 +61,8 @@ knctl deploy [flags]
       --service-account string                  Set service account name for building
   -t, --tag strings                             Set tag (format: value) (can be specified multiple times)
       --template string                         Set template name
-      --template-arg strings                    Set template argument (format: key=value) (can be specified multiple times)
-      --template-env strings                    Set template environment variable (format: key=value) (can be specified multiple times)
+      --template-arg stringArray                Set template argument (format: key=value) (can be specified multiple times)
+      --template-env stringArray                Set template environment variable (format: key=value) (can be specified multiple times)
       --template-kind string                    Set to 'cluster' to use ClusterBuildTemplate kind of templates
       --watch-pod-logs                          Watch pod logs for new revision (default true)
   -l, --watch-pod-logs-indefinitely             Watch pod logs for new revision indefinitely
