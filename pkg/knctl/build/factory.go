@@ -38,7 +38,7 @@ func NewFactory(
 }
 
 func (f Factory) New(build *v1alpha1.Build) Build {
-	waiter := NewBuildWaiter(build, f.buildClient)
+	waiter := NewBuildWaiter(build, f.buildClient, f.coreClient.CoreV1())
 	logs := NewLogs(waiter, f.coreClient.CoreV1())
 	sourceFactory := NewSourceFactory(waiter, f.coreClient, f.restConfig)
 	return NewBuild(waiter, logs, sourceFactory)

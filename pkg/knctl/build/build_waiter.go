@@ -23,16 +23,23 @@ import (
 	"github.com/knative/build/pkg/apis/build/v1alpha1"
 	buildclientset "github.com/knative/build/pkg/client/clientset/versioned"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 type BuildWaiter struct {
-	build       *v1alpha1.Build
-	buildClient buildclientset.Interface
+	build            *v1alpha1.Build
+	buildClient      buildclientset.Interface
+	podsGetterClient typedcorev1.PodsGetter
 }
 
-func NewBuildWaiter(build *v1alpha1.Build, buildClient buildclientset.Interface) BuildWaiter {
-	return BuildWaiter{build, buildClient}
+func NewBuildWaiter(
+	build *v1alpha1.Build,
+	buildClient buildclientset.Interface,
+	podsGetterClient typedcorev1.PodsGetter,
+) BuildWaiter {
+	return BuildWaiter{build, buildClient, podsGetterClient}
 }
 
 func (w BuildWaiter) WaitForBuilderAssignment(cancelCh chan struct{}) (*v1alpha1.Build, error) {
@@ -85,24 +92,50 @@ func (w BuildWaiter) WaitForCompletion(cancelCh chan struct{}) (*v1alpha1.Build,
 	}
 }
 
-func (w BuildWaiter) WaitForClusterBuilderPodAssignment(cancelCh chan struct{}) (*v1alpha1.Build, error) {
+func (w BuildWaiter) WaitForClusterBuilderPodAssignment(cancelCh chan struct{}) (*v1alpha1.Build, *corev1.Pod, error) {
+	var build *v1alpha1.Build
+
 	for {
 		// TODO infinite retry
 
-		build, err := w.buildClient.BuildV1alpha1().Builds(w.build.Namespace).Get(w.build.Name, metav1.GetOptions{})
+		var err error
+
+		build, err = w.buildClient.BuildV1alpha1().Builds(w.build.Namespace).Get(w.build.Name, metav1.GetOptions{})
 		if err != nil {
-			return nil, fmt.Errorf("Getting build while waiting for cluster build to assign pod: %s", err)
+			return nil, nil, fmt.Errorf("Getting build while waiting for cluster build to assign pod: %s", err)
 		}
 
 		if build.Status.Cluster != nil {
 			if len(build.Status.Cluster.Namespace) > 0 && len(build.Status.Cluster.PodName) > 0 {
-				return build, nil
+				break
 			}
 		}
 
 		select {
 		case <-cancelCh:
-			return build, nil
+			return build, nil, nil
+		default:
+			time.Sleep(1 * time.Second)
+		}
+	}
+
+	// Check if pod was initialized and is ready to be interacted via the API
+	for {
+		// TODO infinite retry
+		podsClient := w.podsGetterClient.Pods(build.Status.Cluster.Namespace)
+
+		pod, err := podsClient.Get(build.Status.Cluster.PodName, metav1.GetOptions{})
+		if err != nil {
+			if !errors.IsNotFound(err) {
+				return build, nil, fmt.Errorf("Getting assigned building pod: %s", err)
+			}
+		} else {
+			return build, pod, nil
+		}
+
+		select {
+		case <-cancelCh:
+			return build, pod, nil
 		default:
 			time.Sleep(1 * time.Second)
 		}

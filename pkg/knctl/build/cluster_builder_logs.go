@@ -22,7 +22,6 @@ import (
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/cppforlife/knctl/pkg/knctl/logs"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
@@ -39,7 +38,7 @@ func NewClusterBuilderLogs(
 }
 
 func (l ClusterBuilderLogs) Tail(ui ui.UI, cancelCh chan struct{}) error { // TODO cancel
-	build, err := l.waiter.WaitForClusterBuilderPodAssignment(cancelCh)
+	build, pod, err := l.waiter.WaitForClusterBuilderPodAssignment(cancelCh)
 	if err != nil {
 		return fmt.Errorf("Waiting for build to be assigned a pod: %s", err)
 	}
@@ -49,11 +48,6 @@ func (l ClusterBuilderLogs) Tail(ui ui.UI, cancelCh chan struct{}) error { // TO
 	}
 
 	podsClient := l.podsGetterClient.Pods(build.Status.Cluster.Namespace)
-
-	pod, err := podsClient.Get(build.Status.Cluster.PodName, metav1.GetOptions{})
-	if err != nil {
-		return fmt.Errorf("Getting assigned building pod: %s", err)
-	}
 
 	statusWatcher := PodTerminalStatusWatcher{*pod, podsClient}
 	cancelPodTailCh := make(chan struct{})

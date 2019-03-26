@@ -22,7 +22,6 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	ctlkube "github.com/cppforlife/knctl/pkg/knctl/kube"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
@@ -57,7 +56,7 @@ func (s ClusterBuilderSource) Upload(ui ui.UI, cancelCh chan struct{}) error { /
 		ui.PrintLinef("[%s] Finished uploading source code...", time.Now().Format(time.RFC3339))
 	}()
 
-	build, err := s.waiter.WaitForClusterBuilderPodAssignment(cancelCh)
+	build, pod, err := s.waiter.WaitForClusterBuilderPodAssignment(cancelCh)
 	if err != nil {
 		return fmt.Errorf("Waiting for build to be assigned a pod: %s", err)
 	}
@@ -67,11 +66,6 @@ func (s ClusterBuilderSource) Upload(ui ui.UI, cancelCh chan struct{}) error { /
 	}
 
 	podsClient := s.coreClient.CoreV1().Pods(build.Status.Cluster.Namespace)
-
-	pod, err := podsClient.Get(build.Status.Cluster.PodName, metav1.GetOptions{})
-	if err != nil {
-		return fmt.Errorf("Getting assigned building pod: %s", err)
-	}
 
 	err = PodInitContainerRunningWatcher{*pod, podsClient, clusterBuilderCustomSourceStep}.Wait(cancelCh)
 	if err != nil {
