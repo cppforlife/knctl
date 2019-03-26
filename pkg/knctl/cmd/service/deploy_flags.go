@@ -17,6 +17,7 @@ limitations under the License.
 package service
 
 import (
+	"strconv"
 	"time"
 
 	cmdbld "github.com/cppforlife/knctl/pkg/knctl/cmd/build"
@@ -35,6 +36,10 @@ type DeployFlags struct {
 	EnvVars       []string
 	EnvSecrets    []string
 	EnvConfigMaps []string
+
+	ContainerConcurrency *int
+	MinScale             *int
+	MaxScale             *int
 
 	WatchRevisionReady        bool
 	WatchRevisionReadyTimeout time.Duration
@@ -70,5 +75,38 @@ func (s *DeployFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory)
 	cmd.Flags().StringSliceVar(&s.EnvSecrets, "env-secret", nil, "Set environment variable from a secret (format: ENV_KEY=secret-name/key) (can be specified multiple times)")
 	cmd.Flags().StringSliceVar(&s.EnvConfigMaps, "env-config-map", nil, "Set environment variable from a config map (format: ENV_KEY=config-map-name/key) (can be specified multiple times)")
 
+	cmd.Flags().Var(newDefaultlessIntValue(&s.ContainerConcurrency), "container-concurrency", "Set container concurrency")
+	cmd.Flags().Var(newDefaultlessIntValue(&s.MinScale), "min-scale", "Set autoscaling rule for minimum number of containers")
+	cmd.Flags().Var(newDefaultlessIntValue(&s.MaxScale), "max-scale", "Set autoscaling rule for maximum number of containers")
+
 	cmd.Flags().BoolVar(&s.ManagedRoute, "managed-route", true, "Custom route configuration")
+}
+
+type defaultlessIntValue struct {
+	val **int
+}
+
+func newDefaultlessIntValue(p **int) *defaultlessIntValue {
+	return &defaultlessIntValue{p}
+}
+
+func (i *defaultlessIntValue) Set(s string) error {
+	v, err := strconv.ParseInt(s, 0, 64)
+	if err != nil {
+		return err
+	}
+	val := int(v)
+	(*i.val) = &val
+	return nil
+}
+
+func (i *defaultlessIntValue) Type() string {
+	return "int"
+}
+
+func (i *defaultlessIntValue) String() string {
+	if i.val == nil || *i.val == nil {
+		return "unspecified"
+	}
+	return strconv.Itoa(int(**i.val))
 }

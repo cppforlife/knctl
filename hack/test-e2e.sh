@@ -23,4 +23,4 @@ export KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY=
 
 GOCACHE=off go test ./test/e2e/ -timeout 120m -test.v "$@"
 
-echo "Success"
+echo E2E SUCCESS

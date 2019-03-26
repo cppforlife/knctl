@@ -96,11 +96,18 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 		"--watch-pod-logs-indefinitely=true",
 		"--tag", "tag1", "--tag", "tag2",
 		"--annotation", "k1=v1", "--annotation", "k2=v2",
+		"--container-concurrency", "1",
+		"--min-scale", "10",
+		"--max-scale", "100",
 	})
 	cmd.ExpectReachesExecution()
 
 	DeepEqual(t, realCmd.ServiceFlags,
 		cmdflags.ServiceFlags{cmdcore.NamespaceFlags{"test-namespace"}, "test-service"})
+
+	containerConcurrency := 1
+	minScale := 10
+	maxScale := 100
 
 	DeepEqual(t, realCmd.DeployFlags, DeployFlags{
 		BuildCreateArgsFlags: cmdbld.CreateArgsFlags{
@@ -113,6 +120,10 @@ func TestNewDeployCmd_OkLongFlagNames(t *testing.T) {
 		},
 		Image:   "test-image",
 		EnvVars: []string{"key1=val1", "key2=val2"},
+
+		ContainerConcurrency: &containerConcurrency,
+		MinScale:             &minScale,
+		MaxScale:             &maxScale,
 
 		WatchRevisionReady:        true,
 		WatchRevisionReadyTimeout: 5 * time.Minute,

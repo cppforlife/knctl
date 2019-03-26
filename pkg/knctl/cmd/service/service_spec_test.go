@@ -31,6 +31,69 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+func TestServiceSpecWithConcurrency(t *testing.T) {
+	serviceFlags := cmdflags.ServiceFlags{
+		NamespaceFlags: cmdcore.NamespaceFlags{
+			Name: "test-namespace",
+		},
+		Name: "test-service",
+	}
+
+	containerConcurrency := 1
+	minScale := 10
+	maxScale := 100
+
+	deployFlags := DeployFlags{
+		Image:        "test-image",
+		EnvVars:      []string{"test-env-key1=test-env-val1"},
+		ManagedRoute: true,
+
+		ContainerConcurrency: &containerConcurrency,
+		MinScale:             &minScale,
+		MaxScale:             &maxScale,
+
+		RemoveKnctlDeployEnvVar: true,
+	}
+
+	spec, err := NewServiceSpec(serviceFlags, deployFlags).Service()
+	if err != nil {
+		t.Fatalf("Expected error to not happen: %s", err)
+	}
+
+	expectedSpec := v1alpha1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "test-service",
+			Namespace: "test-namespace",
+		},
+		Spec: v1alpha1.ServiceSpec{
+			RunLatest: &v1alpha1.RunLatestType{
+				Configuration: v1alpha1.ConfigurationSpec{
+					Build: &v1alpha1.RawExtension{},
+					RevisionTemplate: v1alpha1.RevisionTemplateSpec{
+						ObjectMeta: metav1.ObjectMeta{
+							Annotations: map[string]string{
+								"autoscaling.knative.dev/minScale": "10",
+								"autoscaling.knative.dev/maxScale": "100",
+							},
+						},
+						Spec: v1alpha1.RevisionSpec{
+							ContainerConcurrency: v1alpha1.RevisionContainerConcurrencyType(1),
+							Container: corev1.Container{
+								Image: deployFlags.Image,
+								Env:   []corev1.EnvVar{{Name: "test-env-key1", Value: "test-env-val1"}},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	if !reflect.DeepEqual(spec, expectedSpec) {
+		t.Fatalf("Expected spec '%#v' to equal '%#v'", spec, expectedSpec)
+	}
+}
+
 func TestServiceSpecWithBuildConfiguration(t *testing.T) {
 	serviceFlags := cmdflags.ServiceFlags{
 		NamespaceFlags: cmdcore.NamespaceFlags{
@@ -89,6 +152,9 @@ func TestServiceSpecWithBuildConfiguration(t *testing.T) {
 						},
 					},
 					RevisionTemplate: v1alpha1.RevisionTemplateSpec{
+						ObjectMeta: metav1.ObjectMeta{
+							Annotations: map[string]string{},
+						},
 						Spec: v1alpha1.RevisionSpec{
 							ServiceAccountName: "test-service-account",
 							Container: corev1.Container{
@@ -138,6 +204,9 @@ func TestServiceSpecWithoutBuildConfiguration(t *testing.T) {
 				Configuration: v1alpha1.ConfigurationSpec{
 					Build: &v1alpha1.RawExtension{},
 					RevisionTemplate: v1alpha1.RevisionTemplateSpec{
+						ObjectMeta: metav1.ObjectMeta{
+							Annotations: map[string]string{},
+						},
 						Spec: v1alpha1.RevisionSpec{
 							Container: corev1.Container{
 								Image: deployFlags.Image,
@@ -214,6 +283,9 @@ func TestServiceSpecWithMultipleEnv(t *testing.T) {
 				Configuration: v1alpha1.ConfigurationSpec{
 					Build: &v1alpha1.RawExtension{},
 					RevisionTemplate: v1alpha1.RevisionTemplateSpec{
+						ObjectMeta: metav1.ObjectMeta{
+							Annotations: map[string]string{},
+						},
 						Spec: v1alpha1.RevisionSpec{
 							Container: corev1.Container{
 								Image: deployFlags.Image,

@@ -18,6 +18,7 @@ package service
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	ctlbuild "github.com/cppforlife/knctl/pkg/knctl/build"
@@ -122,11 +123,23 @@ func (s ServiceSpec) Configuration() (v1alpha1.Configuration, error) {
 		})
 	}
 
+	revisionAnns := map[string]string{}
+
+	if s.deployFlags.MinScale != nil {
+		revisionAnns["autoscaling.knative.dev/minScale"] = strconv.Itoa(*s.deployFlags.MinScale)
+	}
+	if s.deployFlags.MaxScale != nil {
+		revisionAnns["autoscaling.knative.dev/maxScale"] = strconv.Itoa(*s.deployFlags.MaxScale)
+	}
+
 	conf := v1alpha1.Configuration{
 		// ObjectMeta is populated when object is being created
 		Spec: v1alpha1.ConfigurationSpec{
 			Build: &v1alpha1.RawExtension{BuildSpec: buildSpec},
 			RevisionTemplate: v1alpha1.RevisionTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Annotations: revisionAnns,
+				},
 				Spec: v1alpha1.RevisionSpec{
 					// TODO service account may be different for runtime vs build
 					ServiceAccountName: s.deployFlags.BuildCreateArgsFlags.ServiceAccountName,
@@ -134,6 +147,10 @@ func (s ServiceSpec) Configuration() (v1alpha1.Configuration, error) {
 				},
 			},
 		},
+	}
+
+	if s.deployFlags.ContainerConcurrency != nil {
+		conf.Spec.RevisionTemplate.Spec.ContainerConcurrency = v1alpha1.RevisionContainerConcurrencyType(*s.deployFlags.ContainerConcurrency)
 	}
 
 	return conf, nil

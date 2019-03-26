@@ -23,4 +23,4 @@ export KNCTL_SSH_AUTH_SECRET_PRIVATE_KEY=
 
 GOCACHE=off go test ./pkg/... -test.v "$@"
 
-echo "Success"
+echo UNIT SUCCESS

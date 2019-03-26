@@ -21,3 +21,5 @@ set -e -x -u
 ./hack/test.sh
 
 ./hack/test-e2e.sh
+
+echo ALL SUCCESS

@@ -46,6 +46,7 @@ knctl deploy [flags]
 ```
   -a, --annotation strings                      Set annotation (format: key=value) (can be specified multiple times)
       --build-timeout duration                  Set timeout for building stage (Knative Build has a 10m default)
+      --container-concurrency int               Set container concurrency (default unspecified)
   -d, --directory string                        Set source code directory
   -e, --env stringArray                         Set environment variable (format: ENV_KEY=value) (can be specified multiple times)
       --env-config-map strings                  Set environment variable from a config map (format: ENV_KEY=config-map-name/key) (can be specified multiple times)
@@ -56,6 +57,8 @@ knctl deploy [flags]
   -h, --help                                    help for deploy
   -i, --image string                            Set image URL
       --managed-route                           Custom route configuration (default true)
+      --max-scale int                           Set autoscaling rule for maximum number of containers (default unspecified)
+      --min-scale int                           Set autoscaling rule for minimum number of containers (default unspecified)
   -n, --namespace string                        Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
   -s, --service string                          Specified service
       --service-account string                  Set service account name for building
