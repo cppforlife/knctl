@@ -90,7 +90,7 @@ func (o *ListOptions) Run() error {
 		table.Rows = append(table.Rows, []uitable.Value{
 			uitable.NewValueString(route.Name),
 			uitable.NewValueString(route.Status.Domain),
-			uitable.NewValueString(route.Status.DomainInternal),
+			uitable.NewValueString(route.Status.Address.Hostname),
 			o.configurationValue(route),
 			cmdcore.NewAnnotationsValue(route.Annotations),
 			cmdcore.NewConditionsValue(route.Status.Conditions),

@@ -76,7 +76,13 @@ func NewDeployCmd(o *DeployOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Co
   knctl deploy -s srv1 -n ns1 \
       --image gcr.io/knative-samples/helloworld-go \
       --env-secret TARGET=secret/key1 \
-      --env-secret TARGET=secret/key2`,
+      --env-secret TARGET=secret/key2
+	  
+  knctl deploy -s srv1 -n ns1 \
+      --image gcr.io/knative-samples/helloworld-go \
+	  --mount-secret secret-name=/mount/path1
+	  --mount-configmap configmap-name=/mount/path2
+	  `,
 		Annotations: map[string]string{
 			cmdcore.BasicHelpGroup.Key: cmdcore.BasicHelpGroup.Value,
 		},

@@ -89,7 +89,7 @@ func (o *ShowOptions) printStatus(route *v1alpha1.Route) {
 	table.Rows = append(table.Rows, []uitable.Value{
 		uitable.NewValueString(route.Name),
 		uitable.NewValueString(route.Status.Domain),
-		uitable.NewValueString(route.Status.DomainInternal),
+		uitable.NewValueString(route.Status.Address.Hostname),
 		cmdcore.NewValueAge(route.CreationTimestamp.Time),
 	})
 

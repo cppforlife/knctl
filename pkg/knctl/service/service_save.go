@@ -125,7 +125,7 @@ func (s *Service) updateConfiguration(conf v1alpha1.Configuration) (*v1alpha1.Co
 			return false, fmt.Errorf("Creating conf: %s", err)
 		}
 
-		conf.Spec.Generation = origConfiguration.Spec.Generation
+		conf.Spec.DeprecatedGeneration = origConfiguration.Spec.DeprecatedGeneration
 		origConfiguration.Spec = conf.Spec
 
 		conf, err := s.servingClient.ServingV1alpha1().Configurations(s.serviceSpec.Namespace()).Update(origConfiguration)

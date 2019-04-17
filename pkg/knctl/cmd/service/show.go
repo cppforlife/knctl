@@ -100,7 +100,7 @@ func (o ShowOptions) printStatus(service *v1alpha1.Service) {
 	table.Rows = append(table.Rows, []uitable.Value{
 		uitable.NewValueString(service.Name),
 		uitable.NewValueString(service.Status.Domain),
-		uitable.NewValueString(service.Status.DomainInternal),
+		uitable.NewValueString(service.Status.Address.Hostname),
 		cmdcore.NewAnnotationsValue(service.Annotations),
 		cmdcore.NewValueAge(service.CreationTimestamp.Time),
 	})

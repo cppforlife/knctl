@@ -37,6 +37,9 @@ type DeployFlags struct {
 	EnvSecrets    []string
 	EnvConfigMaps []string
 
+	VolumeMountSecrets    []string
+	VolumeMountConfigMaps []string
+
 	ContainerConcurrency *int
 	MinScale             *int
 	MaxScale             *int
@@ -78,6 +81,8 @@ func (s *DeployFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory)
 	cmd.Flags().Var(newDefaultlessIntValue(&s.ContainerConcurrency), "container-concurrency", "Set container concurrency")
 	cmd.Flags().Var(newDefaultlessIntValue(&s.MinScale), "min-scale", "Set autoscaling rule for minimum number of containers")
 	cmd.Flags().Var(newDefaultlessIntValue(&s.MaxScale), "max-scale", "Set autoscaling rule for maximum number of containers")
+	cmd.Flags().StringSliceVar(&s.VolumeMountSecrets, "mount-secret", nil, "Mount a secret as a volume (format: secret-name=/mount/path) (can be specified multiple times)")
+	cmd.Flags().StringSliceVar(&s.VolumeMountConfigMaps, "mount-configmap", nil, "Mount a config map as a volume (format: configmap-name=/mount/path) (can be specified multiple times)")
 
 	cmd.Flags().BoolVar(&s.ManagedRoute, "managed-route", true, "Custom route configuration")
 }

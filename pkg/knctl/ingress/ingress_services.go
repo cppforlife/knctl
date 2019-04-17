@@ -61,7 +61,7 @@ func NewIngressServices(coreClient kubernetes.Interface) IngressServices {
 func (s IngressServices) List() ([]IngressService, error) {
 	listOpts := metav1.ListOptions{
 		LabelSelector: labels.Set(map[string]string{
-			"knative": "ingressgateway",
+			"istio": "ingressgateway",
 		}).String(),
 	}
 

@@ -39,6 +39,12 @@ knctl deploy [flags]
       --image gcr.io/knative-samples/helloworld-go \
       --env-secret TARGET=secret/key1 \
       --env-secret TARGET=secret/key2
+	  
+  knctl deploy -s srv1 -n ns1 \
+      --image gcr.io/knative-samples/helloworld-go \
+	  --mount-secret secret-name=/mount/path1
+	  --mount-configmap configmap-name=/mount/path2
+	  
 ```
 
 ### Options
@@ -59,6 +65,8 @@ knctl deploy [flags]
       --managed-route                           Custom route configuration (default true)
       --max-scale int                           Set autoscaling rule for maximum number of containers (default unspecified)
       --min-scale int                           Set autoscaling rule for minimum number of containers (default unspecified)
+      --mount-config strings                    Mount a config map as a volume (format: configmap-name=/mount) (can be specified multiple times)
+      --mount-secret strings                    Mount a secret as a volume (format: secret-name=/mount/path) (can be specified multiple times)
   -n, --namespace string                        Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
   -s, --service string                          Specified service
       --service-account string                  Set service account name for building

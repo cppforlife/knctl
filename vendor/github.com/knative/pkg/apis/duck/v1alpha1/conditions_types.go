@@ -42,6 +42,23 @@ const (
 	ConditionSucceeded ConditionType = "Succeeded"
 )
 
+// ConditionSeverity expresses the severity of a Condition Type failing.
+type ConditionSeverity string
+
+const (
+	// ConditionSeverityError specifies that a failure of a condition type
+	// should be viewed as an error.  As "Error" is the default for conditions
+	// we use the empty string (coupled with omitempty) to avoid confusion in
+	// the case where the condition is in state "True" (aka nothing is wrong).
+	ConditionSeverityError ConditionSeverity = ""
+	// ConditionSeverityWarning specifies that a failure of a condition type
+	// should be viewed as a warning, but that things could still work.
+	ConditionSeverityWarning ConditionSeverity = "Warning"
+	// ConditionSeverityInfo specifies that a failure of a condition type
+	// should be viewed as purely informational, and that things could still work.
+	ConditionSeverityInfo ConditionSeverity = "Info"
+)
+
 // Conditions defines a readiness condition for a Knative resource.
 // See: https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#typical-status-properties
 // +k8s:deepcopy-gen=true
@@ -53,6 +70,11 @@ type Condition struct {
 	// Status of the condition, one of True, False, Unknown.
 	// +required
 	Status corev1.ConditionStatus `json:"status" description:"status of the condition, one of True, False, Unknown"`
+
+	// Severity with which to treat failures of this type of condition.
+	// When this is not specified, it defaults to Error.
+	// +optional
+	Severity ConditionSeverity `json:"severity,omitempty" description:"how to interpret failures of this condition, one of Error, Warning, Info"`
 
 	// LastTransitionTime is the last time the condition transitioned from one status to another.
 	// We use VolatileTime in place of metav1.Time to exclude this from creating equality.Semantic
@@ -93,7 +115,6 @@ func (c *Condition) IsUnknown() bool {
 	return c.Status == corev1.ConditionUnknown
 }
 
-
 // Conditions is an Implementable "duck type".
 var _ duck.Implementable = (*Conditions)(nil)
 
@@ -108,25 +129,28 @@ type KResource struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Status KResourceStatus `json:"status"`
+	Status Status `json:"status"`
 }
 
-// KResourceStatus shows how we expect folks to embed Conditions in
+// Status shows how we expect folks to embed Conditions in
 // their Status field.
-type KResourceStatus struct {
-	Conditions Conditions `json:"conditions,omitempty"`
+// WARNING: Adding fields to this struct will add them to all Knative resources.
+type Status struct {
+	// ObservedGeneration is the 'Generation' of the Service that
+	// was last processed by the controller.
+	// +optional
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+
+	// Conditions the latest available observations of a resource's current state.
+	// +optional
+	// +patchMergeKey=type
+	// +patchStrategy=merge
+	Conditions Conditions `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type"`
 }
 
-func (krs *KResourceStatus) GetConditions() Conditions {
-	return krs.Conditions
-}
-
-func (krs *KResourceStatus) SetConditions(conditions Conditions) {
-	krs.Conditions = conditions
-}
-
-// Ensure KResourceStatus satisfies ConditionsAccessor
-var _ ConditionsAccessor = (*KResourceStatus)(nil)
+// TODO: KResourceStatus is added for backwards compatibility for <= 0.4.0 releases. Remove later.
+// KResourceStatus [Deprecated] use Status directly. Will be deleted ~0.6.0 release.
+type KResourceStatus Status
 
 // In order for Conditions to be Implementable, KResource must be Populatable.
 var _ duck.Populatable = (*KResource)(nil)
@@ -135,12 +159,23 @@ var _ duck.Populatable = (*KResource)(nil)
 var _ apis.Listable = (*KResource)(nil)
 
 // GetFullType implements duck.Implementable
-func (_ *Conditions) GetFullType() duck.Populatable {
+func (*Conditions) GetFullType() duck.Populatable {
 	return &KResource{}
+}
+
+// GetCondition fetches the condition of the specified type.
+func (s *Status) GetCondition(t ConditionType) *Condition {
+	for _, cond := range s.Conditions {
+		if cond.Type == t {
+			return &cond
+		}
+	}
+	return nil
 }
 
 // Populate implements duck.Populatable
 func (t *KResource) Populate() {
+	t.Status.ObservedGeneration = 42
 	t.Status.Conditions = Conditions{{
 		// Populate ALL fields
 		Type:               "Birthday",
@@ -152,7 +187,7 @@ func (t *KResource) Populate() {
 }
 
 // GetListType implements apis.Listable
-func (r *KResource) GetListType() runtime.Object {
+func (*KResource) GetListType() runtime.Object {
 	return &KResourceList{}
 }
 

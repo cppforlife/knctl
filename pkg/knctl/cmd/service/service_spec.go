@@ -115,6 +115,19 @@ func (s ServiceSpec) Configuration() (v1alpha1.Configuration, error) {
 
 	serviceCont.Env = append(serviceCont.Env, envVars...)
 
+	secretVolumes, secretVolumeMounts, err := s.buildMountToSecrets(s.deployFlags)
+	if err != nil {
+		return v1alpha1.Configuration{}, err
+	}
+
+	configMapVolumes, configMapVolumeMounts, err:= s.buildMountToConfigMaps(s.deployFlags)
+	if err != nil {
+		return v1alpha1.Configuration{}, err
+	}
+
+	serviceCont.VolumeMounts = append(serviceCont.VolumeMounts, secretVolumeMounts...)
+	serviceCont.VolumeMounts = append(serviceCont.VolumeMounts, configMapVolumeMounts...)
+
 	// TODO it's convenient to force redeploy anytime deploy is issued
 	if !s.deployFlags.RemoveKnctlDeployEnvVar {
 		serviceCont.Env = append(serviceCont.Env, corev1.EnvVar{
@@ -147,6 +160,14 @@ func (s ServiceSpec) Configuration() (v1alpha1.Configuration, error) {
 				},
 			},
 		},
+	}
+
+	if len(secretVolumes) > 0 {
+		conf.Spec.RevisionTemplate.Spec.Volumes = append(conf.Spec.RevisionTemplate.Spec.Volumes, secretVolumes...)
+	}
+
+	if len(configMapVolumes) > 0 {
+		conf.Spec.RevisionTemplate.Spec.Volumes = append(conf.Spec.RevisionTemplate.Spec.Volumes, configMapVolumes...)
 	}
 
 	if s.deployFlags.ContainerConcurrency != nil {
@@ -214,4 +235,67 @@ func (s ServiceSpec) buildEnvFromConfigMaps(deployFlags DeployFlags) ([]corev1.E
 	}
 
 	return result, nil
+}
+
+
+func (s ServiceSpec) buildMountToSecrets(deployFlags DeployFlags) ([]corev1.Volume, []corev1.VolumeMount, error) {
+	var volumes []corev1.Volume
+	var volumeMounts []corev1.VolumeMount
+	for _, kv := range s.deployFlags.VolumeMountSecrets {
+		pieces := strings.SplitN(kv, "=", 2)
+		if len(pieces) != 2 {
+			return nil, nil, fmt.Errorf("Expected parameter for mounting a secret should be in format 'secret-name=/mount/path'")
+		}
+
+		volumeName := fmt.Sprintf("secret-volume-%s", pieces[0])
+		
+		volumes = append(volumes, corev1.Volume{
+			Name: volumeName,
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					SecretName: pieces[0],
+				},
+			},
+		})
+
+		volumeMounts = append(volumeMounts, corev1.VolumeMount{
+			Name: volumeName,
+			ReadOnly: true,
+			MountPath: pieces[1],
+		})
+	}
+
+	return volumes, volumeMounts, nil
+}
+
+func (s ServiceSpec) buildMountToConfigMaps(deployFlags DeployFlags) ([]corev1.Volume, []corev1.VolumeMount, error) {
+	var volumes []corev1.Volume
+	var volumeMounts []corev1.VolumeMount
+	for _, kv := range s.deployFlags.VolumeMountConfigMaps {
+		pieces := strings.SplitN(kv, "=", 2)
+		if len(pieces) != 2 {
+			return nil, nil, fmt.Errorf("Expected parameter for mounting a config map should be in format 'config-map-name=/mount/path'")
+		}
+
+		volumeName := fmt.Sprintf("configmap-volume-%s", pieces[0])
+		
+		volumes = append(volumes, corev1.Volume{
+			Name: volumeName,
+			VolumeSource: corev1.VolumeSource{
+				ConfigMap: &corev1.ConfigMapVolumeSource{
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: pieces[0],
+					},
+				},
+			},
+		})
+
+		volumeMounts = append(volumeMounts, corev1.VolumeMount{
+			Name: volumeName,
+			ReadOnly: true,
+			MountPath: pieces[1],
+		})
+	}
+
+	return volumes, volumeMounts, nil
 }

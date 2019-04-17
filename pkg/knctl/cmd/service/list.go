@@ -88,7 +88,7 @@ func (o *ListOptions) Run() error {
 		table.Rows = append(table.Rows, []uitable.Value{
 			uitable.NewValueString(svc.Name),
 			uitable.NewValueString(svc.Status.Domain),
-			uitable.NewValueString(svc.Status.DomainInternal),
+			uitable.NewValueString(svc.Status.Address.Hostname),
 			cmdcore.NewAnnotationsValue(svc.Annotations),
 			cmdcore.NewConditionsValue(svc.Status.Conditions),
 			cmdcore.NewValueAge(svc.CreationTimestamp.Time),
