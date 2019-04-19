@@ -32,6 +32,8 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
+	"github.com/ghodss/yaml"
+	"fmt"
 )
 
 type DeployOptions struct {
@@ -81,7 +83,7 @@ func NewDeployCmd(o *DeployOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Co
   knctl deploy -s srv1 -n ns1 \
       --image gcr.io/knative-samples/helloworld-go \
 	  --mount-secret secret-name=/mount/path1
-	  --mount-configmap configmap-name=/mount/path2
+	  --mount-config-map config-map-name=/mount/path2
 	  `,
 		Annotations: map[string]string{
 			cmdcore.BasicHelpGroup.Key: cmdcore.BasicHelpGroup.Value,
@@ -115,6 +117,22 @@ func (o *DeployOptions) Run() error {
 	}
 
 	serviceSpec := NewServiceSpec(o.ServiceFlags, o.DeployFlags)
+	if o.DeployFlags.DryRun {
+		svc, err := serviceSpec.Service()
+		if err != nil {
+			return err
+		} 
+		
+		d, err := yaml.Marshal(&svc)
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("%s\n", d)
+		
+		return nil
+	}
+
 	buildObjFactory := ctlbuild.NewFactory(buildClient, coreClient, restConfig)
 	serviceObj := ctlservice.NewService(serviceSpec, servingClient, buildClient, coreClient, buildObjFactory)
 

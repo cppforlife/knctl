@@ -115,6 +115,18 @@ func (s ServiceSpec) Configuration() (v1alpha1.Configuration, error) {
 
 	serviceCont.Env = append(serviceCont.Env, envVars...)
 
+	for _, configmapName := range s.deployFlags.EnvFromConfigMaps {
+		envFromSource := corev1.EnvFromSource{
+			ConfigMapRef: &corev1.ConfigMapEnvSource {
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: configmapName,
+				},
+			},
+		}
+
+		serviceCont.EnvFrom = append(serviceCont.EnvFrom, envFromSource)
+	}
+
 	secretVolumes, secretVolumeMounts, err := s.buildMountToSecrets(s.deployFlags)
 	if err != nil {
 		return v1alpha1.Configuration{}, err
