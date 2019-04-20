@@ -27,13 +27,12 @@ import (
 	ctlkube "github.com/cppforlife/knctl/pkg/knctl/kube"
 	"github.com/cppforlife/knctl/pkg/knctl/logs"
 	ctlservice "github.com/cppforlife/knctl/pkg/knctl/service"
+	"github.com/ghodss/yaml"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	servingclientset "github.com/knative/serving/pkg/client/clientset/versioned"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
-	"github.com/ghodss/yaml"
-	"fmt"
 )
 
 type DeployOptions struct {
@@ -82,8 +81,8 @@ func NewDeployCmd(o *DeployOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Co
 	  
   knctl deploy -s srv1 -n ns1 \
       --image gcr.io/knative-samples/helloworld-go \
-	  --mount-secret secret-name=/mount/path1
-	  --mount-config-map config-map-name=/mount/path2
+	  --secret-mount secret-name=/mount/path1
+	  --config-map-mount config-map-name=/mount/path2
 	  `,
 		Annotations: map[string]string{
 			cmdcore.BasicHelpGroup.Key: cmdcore.BasicHelpGroup.Value,
@@ -121,15 +120,15 @@ func (o *DeployOptions) Run() error {
 		svc, err := serviceSpec.Service()
 		if err != nil {
 			return err
-		} 
-		
+		}
+
 		d, err := yaml.Marshal(&svc)
 		if err != nil {
 			return err
 		}
 
-		fmt.Printf("%s\n", d)
-		
+		o.ui.PrintBlock(d)
+
 		return nil
 	}
 

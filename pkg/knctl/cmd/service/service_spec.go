@@ -115,9 +115,9 @@ func (s ServiceSpec) Configuration() (v1alpha1.Configuration, error) {
 
 	serviceCont.Env = append(serviceCont.Env, envVars...)
 
-	for _, configmapName := range s.deployFlags.EnvFromConfigMaps {
+	for _, configmapName := range s.deployFlags.EnvAllFromConfigMaps {
 		envFromSource := corev1.EnvFromSource{
-			ConfigMapRef: &corev1.ConfigMapEnvSource {
+			ConfigMapRef: &corev1.ConfigMapEnvSource{
 				LocalObjectReference: corev1.LocalObjectReference{
 					Name: configmapName,
 				},
@@ -132,7 +132,7 @@ func (s ServiceSpec) Configuration() (v1alpha1.Configuration, error) {
 		return v1alpha1.Configuration{}, err
 	}
 
-	configMapVolumes, configMapVolumeMounts, err:= s.buildMountToConfigMaps(s.deployFlags)
+	configMapVolumes, configMapVolumeMounts, err := s.buildMountToConfigMaps(s.deployFlags)
 	if err != nil {
 		return v1alpha1.Configuration{}, err
 	}
@@ -249,18 +249,17 @@ func (s ServiceSpec) buildEnvFromConfigMaps(deployFlags DeployFlags) ([]corev1.E
 	return result, nil
 }
 
-
 func (s ServiceSpec) buildMountToSecrets(deployFlags DeployFlags) ([]corev1.Volume, []corev1.VolumeMount, error) {
 	var volumes []corev1.Volume
 	var volumeMounts []corev1.VolumeMount
-	for _, kv := range s.deployFlags.VolumeMountSecrets {
+	for _, kv := range s.deployFlags.SecretVolumeMounts {
 		pieces := strings.SplitN(kv, "=", 2)
 		if len(pieces) != 2 {
 			return nil, nil, fmt.Errorf("Expected parameter for mounting a secret should be in format 'secret-name=/mount/path'")
 		}
 
 		volumeName := fmt.Sprintf("secret-volume-%s", pieces[0])
-		
+
 		volumes = append(volumes, corev1.Volume{
 			Name: volumeName,
 			VolumeSource: corev1.VolumeSource{
@@ -271,8 +270,8 @@ func (s ServiceSpec) buildMountToSecrets(deployFlags DeployFlags) ([]corev1.Volu
 		})
 
 		volumeMounts = append(volumeMounts, corev1.VolumeMount{
-			Name: volumeName,
-			ReadOnly: true,
+			Name:      volumeName,
+			ReadOnly:  true,
 			MountPath: pieces[1],
 		})
 	}
@@ -283,14 +282,14 @@ func (s ServiceSpec) buildMountToSecrets(deployFlags DeployFlags) ([]corev1.Volu
 func (s ServiceSpec) buildMountToConfigMaps(deployFlags DeployFlags) ([]corev1.Volume, []corev1.VolumeMount, error) {
 	var volumes []corev1.Volume
 	var volumeMounts []corev1.VolumeMount
-	for _, kv := range s.deployFlags.VolumeMountConfigMaps {
+	for _, kv := range s.deployFlags.ConfigMapVolumeMounts {
 		pieces := strings.SplitN(kv, "=", 2)
 		if len(pieces) != 2 {
 			return nil, nil, fmt.Errorf("Expected parameter for mounting a config map should be in format 'config-map-name=/mount/path'")
 		}
 
 		volumeName := fmt.Sprintf("configmap-volume-%s", pieces[0])
-		
+
 		volumes = append(volumes, corev1.Volume{
 			Name: volumeName,
 			VolumeSource: corev1.VolumeSource{
@@ -303,8 +302,8 @@ func (s ServiceSpec) buildMountToConfigMaps(deployFlags DeployFlags) ([]corev1.V
 		})
 
 		volumeMounts = append(volumeMounts, corev1.VolumeMount{
-			Name: volumeName,
-			ReadOnly: true,
+			Name:      volumeName,
+			ReadOnly:  true,
 			MountPath: pieces[1],
 		})
 	}

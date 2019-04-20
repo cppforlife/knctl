@@ -32,14 +32,14 @@ type DeployFlags struct {
 	TagFlags             cmdflags.TagFlags
 	AnnotateFlags        cmdflags.AnnotateFlags
 
-	Image            string
-	EnvVars          []string
-	EnvSecrets       []string
-	EnvConfigMaps    []string
-	EnvFromConfigMaps []string
+	Image                string
+	EnvVars              []string
+	EnvSecrets           []string
+	EnvConfigMaps        []string
+	EnvAllFromConfigMaps []string
 
-	VolumeMountSecrets    []string
-	VolumeMountConfigMaps []string
+	SecretVolumeMounts    []string
+	ConfigMapVolumeMounts []string
 
 	ContainerConcurrency *int
 	MinScale             *int
@@ -54,7 +54,7 @@ type DeployFlags struct {
 	ManagedRoute bool
 
 	RemoveKnctlDeployEnvVar bool
-	DryRun bool
+	DryRun                  bool
 }
 
 func (s *DeployFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory) {
@@ -79,13 +79,13 @@ func (s *DeployFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory)
 	cmd.Flags().StringArrayVarP(&s.EnvVars, "env", "e", nil, "Set environment variable (format: ENV_KEY=value) (can be specified multiple times)")
 	cmd.Flags().StringSliceVar(&s.EnvSecrets, "env-secret", nil, "Set environment variable from a secret (format: ENV_KEY=secret-name/key) (can be specified multiple times)")
 	cmd.Flags().StringSliceVar(&s.EnvConfigMaps, "env-config-map", nil, "Set environment variable from a config map (format: ENV_KEY=config-map-name/key) (can be specified multiple times)")
-	cmd.Flags().StringSliceVar(&s.EnvFromConfigMaps, "envfrom-config-map", nil, "Set environment variables as all key-value in a config map (format: config-map-name) (can be specified multiple times)")
+	cmd.Flags().StringSliceVar(&s.EnvAllFromConfigMaps, "env-all-from-config-map", nil, "Set environment variables as all key-value in a config map (format: config-map-name) (can be specified multiple times)")
 
 	cmd.Flags().Var(newDefaultlessIntValue(&s.ContainerConcurrency), "container-concurrency", "Set container concurrency")
 	cmd.Flags().Var(newDefaultlessIntValue(&s.MinScale), "min-scale", "Set autoscaling rule for minimum number of containers")
 	cmd.Flags().Var(newDefaultlessIntValue(&s.MaxScale), "max-scale", "Set autoscaling rule for maximum number of containers")
-	cmd.Flags().StringSliceVar(&s.VolumeMountSecrets, "mount-secret", nil, "Mount a secret as a volume (format: secret-name=/mount/path) (can be specified multiple times)")
-	cmd.Flags().StringSliceVar(&s.VolumeMountConfigMaps, "mount-config-map", nil, "Mount a config map as a volume (format: configmap-name=/mount/path) (can be specified multiple times)")
+	cmd.Flags().StringSliceVar(&s.SecretVolumeMounts, "secret-mount", nil, "Mount a secret as a volume (format: secret-name=/mount/path) (can be specified multiple times)")
+	cmd.Flags().StringSliceVar(&s.ConfigMapVolumeMounts, "config-map-mount", nil, "Mount a config map as a volume (format: configmap-name=/mount/path) (can be specified multiple times)")
 
 	cmd.Flags().BoolVar(&s.ManagedRoute, "managed-route", true, "Custom route configuration")
 
