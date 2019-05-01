@@ -3,7 +3,7 @@
 Install `knctl` by grabbing pre-built binaries from the [Releases page](https://github.com/cppforlife/knctl/releases)
 
 ```bash
-$ shasum -a 265 ~/Downloads/knctl-*
+$ shasum -a 256 ~/Downloads/knctl-*
 # Compare checksum output to what's included in the release notes
 
 $ mv ~/Downloads/knctl-* /usr/local/bin/knctl
