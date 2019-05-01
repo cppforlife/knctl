@@ -33,6 +33,7 @@ knctl build create [flags]
 
 ```
   -b, --build string               Specified build
+      --build-arg stringArray      Set build argument (format: key=value) (can be specified multiple times)
   -d, --directory string           Set source code directory
       --generate-name              Set to generate name
       --git-revision string        Set Git revision (examples: https://git-scm.com/docs/gitrevisions#_specifying_revisions)

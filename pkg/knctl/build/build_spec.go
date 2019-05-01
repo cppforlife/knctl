@@ -45,6 +45,8 @@ type BuildSpecOpts struct {
 	TemplateArgs []string
 	TemplateEnv  []string
 
+	BuildArgs []string
+
 	Image   string
 	Timeout time.Duration
 }
@@ -137,14 +139,20 @@ func (s BuildSpec) nonTemplateSteps(opts BuildSpecOpts) []corev1.Container {
 		return nil
 	}
 
+	args := []string{
+		"--dockerfile=/workspace/Dockerfile",
+		"--destination=" + opts.Image,
+	}
+
+	for _, kv := range opts.BuildArgs {
+		args = append(args, "--build-arg="+kv)
+	}
+
 	return []corev1.Container{
 		{
 			Name:  "build-and-push",
 			Image: "gcr.io/kaniko-project/executor",
-			Args: []string{
-				"--dockerfile=/workspace/Dockerfile",
-				"--destination=" + opts.Image,
-			},
+			Args:  args,
 		},
 	}
 }

@@ -70,6 +70,8 @@ func (s *CreateArgsFlags) setWithPrefix(prefix string, cmd *cobra.Command, flags
 	cmd.Flags().StringArrayVar(&s.TemplateArgs, "template-arg", nil, "Set template argument (format: key=value) (can be specified multiple times)")
 	cmd.Flags().StringArrayVar(&s.TemplateEnv, "template-env", nil, "Set template environment variable (format: key=value) (can be specified multiple times)")
 
+	cmd.Flags().StringArrayVar(&s.BuildArgs, "build-arg", nil, "Set build argument (format: key=value) (can be specified multiple times)")
+
 	cmd.Flags().DurationVar(&s.Timeout, prefix+"timeout", time.Duration(0), "Set timeout for building stage (Knative Build has a 10m default)")
 }
 

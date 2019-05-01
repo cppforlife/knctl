@@ -42,8 +42,8 @@ knctl deploy [flags]
 	  
   knctl deploy -s srv1 -n ns1 \
       --image gcr.io/knative-samples/helloworld-go \
-	  --mount-secret secret-name=/mount/path1
-	  --mount-configmap configmap-name=/mount/path2
+	  --secret-mount secret-name=/mount/path1
+	  --config-map-mount config-map-name=/mount/path2
 	  
 ```
 
@@ -51,10 +51,14 @@ knctl deploy [flags]
 
 ```
   -a, --annotation strings                      Set annotation (format: key=value) (can be specified multiple times)
+      --build-arg stringArray                   Set build argument (format: key=value) (can be specified multiple times)
       --build-timeout duration                  Set timeout for building stage (Knative Build has a 10m default)
+      --config-map-mount strings                Mount a config map as a volume (format: configmap-name=/mount/path) (can be specified multiple times)
       --container-concurrency int               Set container concurrency (default unspecified)
   -d, --directory string                        Set source code directory
+      --dry-run                                 Dry run
   -e, --env stringArray                         Set environment variable (format: ENV_KEY=value) (can be specified multiple times)
+      --env-all-from-config-map strings         Set environment variables as all key-value in a config map (format: config-map-name) (can be specified multiple times)
       --env-config-map strings                  Set environment variable from a config map (format: ENV_KEY=config-map-name/key) (can be specified multiple times)
       --env-secret strings                      Set environment variable from a secret (format: ENV_KEY=secret-name/key) (can be specified multiple times)
       --generate-name                           Set to generate name
@@ -65,9 +69,8 @@ knctl deploy [flags]
       --managed-route                           Custom route configuration (default true)
       --max-scale int                           Set autoscaling rule for maximum number of containers (default unspecified)
       --min-scale int                           Set autoscaling rule for minimum number of containers (default unspecified)
-      --mount-config strings                    Mount a config map as a volume (format: configmap-name=/mount) (can be specified multiple times)
-      --mount-secret strings                    Mount a secret as a volume (format: secret-name=/mount/path) (can be specified multiple times)
   -n, --namespace string                        Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
+      --secret-mount strings                    Mount a secret as a volume (format: secret-name=/mount/path) (can be specified multiple times)
   -s, --service string                          Specified service
       --service-account string                  Set service account name for building
   -t, --tag strings                             Set tag (format: value) (can be specified multiple times)
