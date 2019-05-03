@@ -24,6 +24,7 @@ import (
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 	cmdflags "github.com/cppforlife/knctl/pkg/knctl/cmd/flags"
 	"github.com/spf13/cobra"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 type DeployFlags struct {
@@ -44,6 +45,11 @@ type DeployFlags struct {
 	ContainerConcurrency *int
 	MinScale             *int
 	MaxScale             *int
+
+	MemoryRequest *resource.Quantity
+	CPURequest    *resource.Quantity
+	MemoryLimit   *resource.Quantity
+	CPULimit      *resource.Quantity
 
 	WatchRevisionReady        bool
 	WatchRevisionReadyTimeout time.Duration
@@ -87,6 +93,11 @@ func (s *DeployFlags) Set(cmd *cobra.Command, flagsFactory cmdcore.FlagsFactory)
 	cmd.Flags().StringSliceVar(&s.SecretVolumeMounts, "secret-mount", nil, "Mount a secret as a volume (format: secret-name=/mount/path) (can be specified multiple times)")
 	cmd.Flags().StringSliceVar(&s.ConfigMapVolumeMounts, "config-map-mount", nil, "Mount a config map as a volume (format: configmap-name=/mount/path) (can be specified multiple times)")
 
+	cmd.Flags().Var(newResourceQuantityValue(&s.MemoryRequest), "memory-request", "Set amount of memory request. (e.g., 1Gi or 1024Mi)")
+	cmd.Flags().Var(newResourceQuantityValue(&s.CPURequest), "cpu-request", "Set amount of cpu request. (e.g., 0.5 or 500m")
+	cmd.Flags().Var(newResourceQuantityValue(&s.MemoryLimit), "memory-limit", "Set amount of memory limit. (e.g., 1Gi or 1024Mi)")
+	cmd.Flags().Var(newResourceQuantityValue(&s.CPULimit), "cpu-limit", "Set amount of cpu limit. (e.g., 0.5 or 500m")
+
 	cmd.Flags().BoolVar(&s.ManagedRoute, "managed-route", true, "Custom route configuration")
 
 	cmd.Flags().BoolVar(&s.DryRun, "dry-run", false, "Dry run")
@@ -119,4 +130,33 @@ func (i *defaultlessIntValue) String() string {
 		return "unspecified"
 	}
 	return strconv.Itoa(int(**i.val))
+}
+
+type resourceQuantityValue struct {
+	val **resource.Quantity
+}
+
+func newResourceQuantityValue(p **resource.Quantity) *resourceQuantityValue {
+	return &resourceQuantityValue{p}
+}
+
+func (q *resourceQuantityValue) Set(s string) error {
+	val, err := resource.ParseQuantity(s)
+	if err != nil {
+		return err
+	}
+
+	(*q.val) = &val
+	return nil
+}
+
+func (q *resourceQuantityValue) Type() string {
+	return "resource.Quantity"
+}
+
+func (q *resourceQuantityValue) String() string {
+	if q.val == nil || *q.val == nil {
+		return "unspecified"
+	}
+	return (*q.val).String()
 }

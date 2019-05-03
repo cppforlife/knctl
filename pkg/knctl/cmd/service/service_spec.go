@@ -26,6 +26,8 @@ import (
 	buildv1alpha1 "github.com/knative/build/pkg/apis/build/v1alpha1"
 	"github.com/knative/serving/pkg/apis/serving/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apirand "k8s.io/apimachinery/pkg/util/rand"
 )
@@ -155,6 +157,34 @@ func (s ServiceSpec) Configuration() (v1alpha1.Configuration, error) {
 	}
 	if s.deployFlags.MaxScale != nil {
 		revisionAnns["autoscaling.knative.dev/maxScale"] = strconv.Itoa(*s.deployFlags.MaxScale)
+	}
+
+	if s.deployFlags.MemoryRequest != nil {
+		if serviceCont.Resources.Requests == nil {
+			serviceCont.Resources.Requests = make(map[v1.ResourceName]resource.Quantity)
+		}
+		serviceCont.Resources.Requests[v1.ResourceMemory] = *s.deployFlags.MemoryRequest
+	}
+
+	if s.deployFlags.CPURequest != nil {
+		if serviceCont.Resources.Requests == nil {
+			serviceCont.Resources.Requests = make(map[v1.ResourceName]resource.Quantity)
+		}
+		serviceCont.Resources.Requests[v1.ResourceCPU] = *s.deployFlags.CPURequest
+	}
+
+	if s.deployFlags.MemoryLimit != nil {
+		if serviceCont.Resources.Limits == nil {
+			serviceCont.Resources.Limits = make(map[v1.ResourceName]resource.Quantity)
+		}
+		serviceCont.Resources.Limits[v1.ResourceMemory] = *s.deployFlags.MemoryLimit
+	}
+
+	if s.deployFlags.CPULimit != nil {
+		if serviceCont.Resources.Limits == nil {
+			serviceCont.Resources.Limits = make(map[v1.ResourceName]resource.Quantity)
+		}
+		serviceCont.Resources.Limits[v1.ResourceCPU] = *s.deployFlags.CPULimit
 	}
 
 	conf := v1alpha1.Configuration{
