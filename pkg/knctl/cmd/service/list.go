@@ -18,6 +18,7 @@ package service
 
 import (
 	"fmt"
+
 	cmdcore "github.com/cppforlife/knctl/pkg/knctl/cmd/core"
 
 	"github.com/cppforlife/go-cli-ui/ui"
@@ -85,10 +86,14 @@ func (o *ListOptions) Run() error {
 	}
 
 	for _, svc := range services.Items {
+		hostname := svc.Status.Address.Hostname
+		if hostname == "" {
+			hostname = "no hostname"
+		}
 		table.Rows = append(table.Rows, []uitable.Value{
 			uitable.NewValueString(svc.Name),
 			uitable.NewValueString(svc.Status.Domain),
-			uitable.NewValueString(svc.Status.Address.Hostname),
+			uitable.NewValueString(hostname),
 			cmdcore.NewAnnotationsValue(svc.Annotations),
 			cmdcore.NewConditionsValue(svc.Status.Conditions),
 			cmdcore.NewValueAge(svc.CreationTimestamp.Time),

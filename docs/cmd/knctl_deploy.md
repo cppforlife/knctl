@@ -55,6 +55,8 @@ knctl deploy [flags]
       --build-timeout duration                  Set timeout for building stage (Knative Build has a 10m default)
       --config-map-mount strings                Mount a config map as a volume (format: configmap-name=/mount/path) (can be specified multiple times)
       --container-concurrency int               Set container concurrency (default unspecified)
+      --cpu-limit resource.Quantity             Set amount of cpu limit. (e.g., 0.5 or 500m (default unspecified)
+      --cpu-request resource.Quantity           Set amount of cpu request. (e.g., 0.5 or 500m (default unspecified)
   -d, --directory string                        Set source code directory
       --dry-run                                 Dry run
   -e, --env stringArray                         Set environment variable (format: ENV_KEY=value) (can be specified multiple times)
@@ -68,6 +70,8 @@ knctl deploy [flags]
   -i, --image string                            Set image URL
       --managed-route                           Custom route configuration (default true)
       --max-scale int                           Set autoscaling rule for maximum number of containers (default unspecified)
+      --memory-limit resource.Quantity          Set amount of memory limit. (e.g., 1Gi or 1024Mi) (default unspecified)
+      --memory-request resource.Quantity        Set amount of memory request. (e.g., 1Gi or 1024Mi) (default unspecified)
       --min-scale int                           Set autoscaling rule for minimum number of containers (default unspecified)
   -n, --namespace string                        Specified namespace ($KNCTL_NAMESPACE or default from kubeconfig)
       --secret-mount strings                    Mount a secret as a volume (format: secret-name=/mount/path) (can be specified multiple times)
